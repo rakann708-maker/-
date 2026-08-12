@@ -872,7 +872,7 @@ local function startAntiBots()
 			page.Parent = sf
 			page.BackgroundTransparency = 1
 			page.Size = UDim2.new(1, 0, 0, 380)
-			page.Position = UDim2.new(0, 0, 0, -80)
+			page.Position = UDim2.new(0, 0, 0, -90)
 
 			local Avatar = Instance.new("ImageLabel")
 			Avatar.Parent = page
