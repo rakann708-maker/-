@@ -863,7 +863,7 @@ local function startAntiBots()
 			list.Padding = UDim.new(0, 12)
 
 			local pad = sf:FindFirstChildOfClass("UIPadding") or Instance.new("UIPadding", sf)
-			pad.PaddingTop = UDim.new(0, 12)
+			pad.PaddingTop = UDim.new(0, 0)
 			pad.PaddingLeft = UDim.new(0, 12)
 			pad.PaddingRight = UDim.new(0, 12)
 			pad.PaddingBottom = UDim.new(0, 12)
@@ -872,6 +872,7 @@ local function startAntiBots()
 			page.Parent = sf
 			page.BackgroundTransparency = 1
 			page.Size = UDim2.new(1, 0, 0, 380)
+			page.Position = UDim2.new(0, 0, 0, -20)
 
 			local Avatar = Instance.new("ImageLabel")
 			Avatar.Parent = page
