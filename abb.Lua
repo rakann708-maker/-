@@ -1060,57 +1060,6 @@ MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(
 		end
 	end
 
-	-- ====== SCRIPTS UI ======
-	do
-		local sf = findOrionScrollBySentinel("##SCRIPTS_CONTAINER##")
-		if sf and sf:IsA("ScrollingFrame") then
-			sf.Active = true
-			sf.ScrollingEnabled = true
-			sf.ScrollBarThickness = 6
-			sf.AutomaticCanvasSize = Enum.AutomaticSize.Y
-
-			for _,ch in ipairs(sf:GetChildren()) do
-				if not ch:IsA("UIListLayout") and not ch:IsA("UIPadding") then ch:Destroy() end
-			end
-
-			local list = sf:FindFirstChildOfClass("UIListLayout") or Instance.new("UIListLayout", sf)
-			list.SortOrder = Enum.SortOrder.LayoutOrder
-			list.Padding = UDim.new(0, 12)
-
-			local pad = sf:FindFirstChildOfClass("UIPadding") or Instance.new("UIPadding", sf)
-			pad.PaddingTop = UDim.new(0, 12)
-			pad.PaddingLeft = UDim.new(0, 12)
-			pad.PaddingRight = UDim.new(0, 12)
-			pad.PaddingBottom = UDim.new(0, 12)
-
-			-- عنوان صفحة السكربتس
-			local title = Instance.new("TextLabel")
-			title.Parent = sf
-			title.BackgroundTransparency = 1
-			title.Size = UDim2.new(1, 0, 0, 44)
-			title.Font = Enum.Font.GothamBold
-			title.TextSize = 26
-			title.TextColor3 = Color3.fromRGB(255,255,255)
-			title.Text = "السكربتس"
-			title.TextXAlignment = Enum.TextXAlignment.Center
-
-			-- زر تحكم بوت (الزر الرئيسي)
-			local botControlBtn = Instance.new("TextButton")
-			botControlBtn.Parent = sf
-			botControlBtn.BackgroundColor3 = Color3.fromRGB(240,240,240)
-			botControlBtn.BorderSizePixel = 0
-			botControlBtn.Size = UDim2.new(1, 0, 0, 52)
-			botControlBtn.Text = "تحكم بوت"
-			botControlBtn.Font = Enum.Font.GothamBold
-			botControlBtn.TextSize = 16
-			botControlBtn.TextColor3 = Color3.fromRGB(0,0,0)
-			round(botControlBtn, 12)
-			botControlBtn.MouseButton1Click:Connect(function()
-				makeAutoNotif("تحكم بوت", "تم الضغط على الزر بنجاح", 2)
-			end)
-		end
-	end
-
 	-- ====== SETTINGS UI (Scroll + حفظ زر) ======
 	do
 		local sf = findOrionScrollBySentinel("##SETTINGS_CONTAINER##")
