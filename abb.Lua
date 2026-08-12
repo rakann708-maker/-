@@ -275,6 +275,8 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 		AntiBots  = false, -- يدوي
 		AntiBang  = false, -- يدوي
 		CommandField = false,
+		HiddenCommandEnabled = false,
+		ClearCommandAfterSend = true,
 	
 		KatanaAnim = false,
 	}
@@ -292,6 +294,12 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 						AUTO.CommandField = decoded.CommandField and true or false
 						setCommandFieldVisible(AUTO.CommandField)
 					end
+					if decoded.HiddenCommandEnabled ~= nil then
+						AUTO.HiddenCommandEnabled = decoded.HiddenCommandEnabled and true or false
+					end
+					if decoded.ClearCommandAfterSend ~= nil then
+						AUTO.ClearCommandAfterSend = decoded.ClearCommandAfterSend and true or false
+					end
 				end
 			end
 		end)
@@ -301,6 +309,8 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 		local data = {
 			KatanaAnim = AUTO.KatanaAnim and true or false,
 			CommandField = AUTO.CommandField and true or false,
+			HiddenCommandEnabled = AUTO.HiddenCommandEnabled and true or false,
+			ClearCommandAfterSend = AUTO.ClearCommandAfterSend and true or false,
 		}
 		pcall(function()
 			if writefile then
@@ -1051,9 +1061,15 @@ local function startAntiBots()
 				saveAutoSettings()
 			end)
 
-			MakeSwitch(right, "حقل اوامر", function() return AUTO.CommandField end, function(v)
+			MakeSwitch(right, "أوامر مخفية", function() return AUTO.HiddenCommandEnabled end, function(v)
+				AUTO.HiddenCommandEnabled = v and true or false
 				AUTO.CommandField = v and true or false
 				setCommandFieldVisible(AUTO.CommandField)
+				saveAutoSettings()
+			end)
+
+			MakeSwitch(right, "حذف بعد الإرسال", function() return AUTO.ClearCommandAfterSend end, function(v)
+				AUTO.ClearCommandAfterSend = v and true or false
 				saveAutoSettings()
 			end)
 
@@ -1490,7 +1506,7 @@ MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(
 		end)
 		return card
 	end
-	-- ====== واجهة "حقل الأوامر" (HD Admin commands) ======
+	-- ====== واجهة "أوامر مخفية" (HD Admin commands) ======
 	local CommandFieldGui
 	local CommandFieldFrame
 	local CommandFieldBox
@@ -1502,7 +1518,7 @@ MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(
 		if not parent then parent = plr:WaitForChild("PlayerGui") end
 
 		CommandFieldGui = Instance.new("ScreenGui")
-		CommandFieldGui.Name = "SKY_CommandField"
+		CommandFieldGui.Name = "SKY_HiddenCommands"
 		CommandFieldGui.ResetOnSpawn = false
 		CommandFieldGui.IgnoreGuiInset = true
 		CommandFieldGui.Enabled = false
@@ -1510,96 +1526,113 @@ MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(
 
 		local main = Instance.new("Frame")
 		main.Name = "CommandFieldMain"
-		main.Size = UDim2.new(0, 320, 0, 190)
-		main.Position = UDim2.new(0.5, -160, 0.5, -95)
-		main.BackgroundColor3 = Color3.fromRGB(15,15,15)
+		main.Size = UDim2.new(0, 300, 0, 148)
+		main.Position = UDim2.new(0.5, -150, 0.5, -74)
+		main.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 		main.BorderSizePixel = 0
 		main.Parent = CommandFieldGui
-		round(main, 10)
+		round(main, 12)
 		CommandFieldFrame = main
+
+		local stroke = Instance.new("UIStroke")
+		stroke.Parent = main
+		stroke.Color = Color3.fromRGB(90, 90, 90)
+		stroke.Thickness = 1
+		stroke.Transparency = 0.25
 
 		local header = Instance.new("TextLabel")
 		header.Parent = main
-		header.BackgroundColor3 = Color3.fromRGB(25,25,25)
-		header.BorderSizePixel = 0
-		header.Size = UDim2.new(1, 0, 0, 30)
-		header.Position = UDim2.new(0, 0, 0, 0)
+		header.BackgroundTransparency = 1
+		header.Size = UDim2.new(1, -20, 0, 26)
+		header.Position = UDim2.new(0, 10, 0, 8)
 		header.Font = Enum.Font.GothamBold
-		header.TextSize = 18
+		header.TextSize = 14
 		header.TextColor3 = Color3.fromRGB(255,255,255)
-		header.Text = "Wa7eed - حقل الأوامر"
-		header.TextXAlignment = Enum.TextXAlignment.Center
+		header.Text = "HD Commands"
+		header.TextXAlignment = Enum.TextXAlignment.Left
 		header.TextYAlignment = Enum.TextYAlignment.Center
+
+		local closeBtn = Instance.new("TextButton")
+		closeBtn.Parent = main
+		closeBtn.Size = UDim2.new(0, 24, 0, 24)
+		closeBtn.Position = UDim2.new(1, -30, 0, 8)
+		closeBtn.BackgroundColor3 = Color3.fromRGB(38,38,38)
+		closeBtn.BorderSizePixel = 0
+		closeBtn.Font = Enum.Font.GothamBold
+		closeBtn.TextSize = 12
+		closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+		closeBtn.Text = "X"
+		round(closeBtn, 8)
+		closeBtn.MouseButton1Click:Connect(function()
+			AUTO.HiddenCommandEnabled = false
+			AUTO.CommandField = false
+			setCommandFieldVisible(false)
+			saveAutoSettings()
+		end)
 
 		local tb = Instance.new("TextBox")
 		tb.Parent = main
-		tb.Size = UDim2.new(0.96, 0, 0, 32)
-		tb.Position = UDim2.new(0.02, 0, 0, 45)
-		tb.BackgroundColor3 = Color3.fromRGB(20,20,20)
+		tb.Size = UDim2.new(1, -20, 0, 36)
+		tb.Position = UDim2.new(0, 10, 0, 38)
+		tb.BackgroundColor3 = Color3.fromRGB(28,28,28)
 		tb.BorderSizePixel = 0
 		tb.Font = Enum.Font.Gotham
 		tb.TextSize = 14
 		tb.TextColor3 = Color3.fromRGB(255,255,255)
-		tb.PlaceholderText = "ادخل الامر هنا..."
+		tb.PlaceholderText = "اكتب الأمر هنا..."
 		tb.Text = ""
 		tb.ClearTextOnFocus = false
 		round(tb, 8)
 		CommandFieldBox = tb
 
-		local btnHolder = Instance.new("Frame")
-		btnHolder.Parent = main
-		btnHolder.BackgroundTransparency = 1
-		btnHolder.Size = UDim2.new(1, -16, 0, 88)
-		btnHolder.Position = UDim2.new(0, 8, 0, 85)
-
-		local grid = Instance.new("UIGridLayout")
-		grid.Parent = btnHolder
-		grid.CellSize = UDim2.new(0.3, 0, 0.42, 0)
-		grid.CellPadding = UDim2.new(0.05, 0, 0.12, 0)
-		grid.FillDirectionMaxCells = 3
-		grid.HorizontalAlignment = Enum.HorizontalAlignment.Center
-		grid.VerticalAlignment = Enum.VerticalAlignment.Center
-
-		local function makeCmdButton(txt, isExecute, callback)
-			local b = Instance.new("TextButton")
-			b.Parent = btnHolder
-			b.Size = UDim2.new(0,0,0,0)
-			b.BackgroundColor3 = isExecute and Color3.fromRGB(160,40,40) or Color3.fromRGB(40,40,100)
-			b.BorderSizePixel = 0
-			b.Font = Enum.Font.GothamBold
-			b.TextSize = 14
-			b.TextColor3 = Color3.fromRGB(255,255,255)
-			b.Text = txt
-			b.AutoButtonColor = true
-			round(b, 8)
-			b.MouseButton1Click:Connect(function()
-				if callback then
-					callback()
-				end
-			end)
-			return b
-		end
-
-		local function execCurrent()
+		local sendBtn = Instance.new("TextButton")
+		sendBtn.Parent = main
+		sendBtn.Size = UDim2.new(0, 118, 0, 32)
+		sendBtn.Position = UDim2.new(0, 10, 0, 82)
+		sendBtn.BackgroundColor3 = Color3.fromRGB(155, 40, 40)
+		sendBtn.BorderSizePixel = 0
+		sendBtn.Font = Enum.Font.GothamBold
+		sendBtn.TextSize = 13
+		sendBtn.TextColor3 = Color3.fromRGB(255,255,255)
+		sendBtn.Text = "إرسال الأمر"
+		round(sendBtn, 8)
+		sendBtn.MouseButton1Click:Connect(function()
 			local txt = CommandFieldBox and CommandFieldBox.Text
 			if txt and txt ~= "" then
 				sendHDCommand(txt)
-			end
-		end
-
-		makeCmdButton("تنفيذ", true, execCurrent)
-		for i = 1,7 do
-			makeCmdButton("تنقل " .. i, false, function()
-				local txt = CommandFieldBox and CommandFieldBox.Text
-				if txt and txt ~= "" then
-					sendHDCommand(txt)
+				if AUTO.ClearCommandAfterSend and CommandFieldBox then
+					CommandFieldBox.Text = ""
 				end
-			end)
-		end
+			end
+		end)
+
+		local toggleBtn = Instance.new("TextButton")
+		toggleBtn.Parent = main
+		toggleBtn.Size = UDim2.new(0, 132, 0, 32)
+		toggleBtn.Position = UDim2.new(1, -142, 0, 82)
+		toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 80)
+		toggleBtn.BorderSizePixel = 0
+		toggleBtn.Font = Enum.Font.GothamBold
+		toggleBtn.TextSize = 12
+		toggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
+		toggleBtn.Text = "إخفاء الحقل"
+		round(toggleBtn, 8)
+		toggleBtn.MouseButton1Click:Connect(function()
+			AUTO.HiddenCommandEnabled = false
+			AUTO.CommandField = false
+			setCommandFieldVisible(false)
+			saveAutoSettings()
+		end)
 
 		tb.FocusLost:Connect(function(enter)
 			if enter then
-				execCurrent()
+				local txt = CommandFieldBox and CommandFieldBox.Text
+				if txt and txt ~= "" then
+					sendHDCommand(txt)
+					if AUTO.ClearCommandAfterSend and CommandFieldBox then
+						CommandFieldBox.Text = ""
+					end
+				end
 			end
 		end)
 	end
