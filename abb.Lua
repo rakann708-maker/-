@@ -436,97 +436,80 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 	AUTO.AntiThrow = true
 	startAntiThrow()
 
-	-- ====== AntiBang (حماية من بانق باستخدام BodyVelocity + toggle موحد) ======
-	local BANG_XZ = 1000000000
-	local BANG_Y  = -6000
-	local antiBangTaskId = 0
+	-- ====== Bang protection (new action extracted from decoded script) ======
+	local bangProtectActive = false
+	local bangProtectConn = nil
 
 	local function stopBangProtect()
-		antiBangTaskId += 1
-		AUTO.AntiBang = false
+		bangProtectActive = false
 
-		local hrp = currentHRP
-		if hrp then
-			local bv = hrp:FindFirstChild("BangProtectBV")
-			if bv then bv:Destroy() end
-			hrp.AssemblyLinearVelocity = Vector3.zero
-			hrp.AssemblyAngularVelocity = Vector3.zero
+		if bangProtectConn then
+			bangProtectConn:Disconnect()
+			bangProtectConn = nil
 		end
 
-		local hum = currentHum
+		local char = plr.Character
+		local root = char and char:FindFirstChild("HumanoidRootPart")
+		if root then
+			local bv = root:FindFirstChild("BangProtectBV")
+			if bv then bv:Destroy() end
+			root.AssemblyLinearVelocity = Vector3.zero
+			root.AssemblyAngularVelocity = Vector3.zero
+		end
+
+		local hum = char and char:FindFirstChildOfClass("Humanoid")
 		if hum then
-			pcall(function()
-				hum.PlatformStand = false
-				hum.Sit = false
-				hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-			end)
+			hum.Sit = false
+			hum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
 		end
 	end
 
 	local function startBangProtect()
-		antiBangTaskId += 1
-		local myId = antiBangTaskId
-		AUTO.AntiBang = true
+		bangProtectActive = true
 
-		task.spawn(function()
-			while AUTO.AntiBang and myId == antiBangTaskId do
-				local hrp = currentHRP
-				local hum = currentHum
-				if hrp and hum then
-					applyAntiDeathSettings(hum)
-					local bv = hrp:FindFirstChild("BangProtectBV")
-					if not bv then
-						bv = Instance.new("BodyVelocity")
-						bv.Name = "BangProtectBV"
-						bv.MaxForce = Vector3.new(1e5, 0, 1e5)
-						bv.Velocity = Vector3.zero
-						bv.Parent = hrp
-					end
+		local function runBangProtect()
+			local char = plr.Character
+			local root = char and char:FindFirstChild("HumanoidRootPart")
+			local hum = char and char:FindFirstChildOfClass("Humanoid")
+			if not root or not hum then return end
 
-					local cam = workspace.CurrentCamera
-					if cam then
-						local fwd = cam.CFrame.LookVector
-						local right = cam.CFrame.RightVector
-						local move = Vector3.zero
+			local bv = root:FindFirstChild("BangProtectBV")
+			if not bv then
+				bv = Instance.new("BodyVelocity")
+				bv.Name = "BangProtectBV"
+				bv.MaxForce = Vector3.new(100000, 0, 100000)
+				bv.Velocity = Vector3.zero
+				bv.Parent = root
+			end
 
-						if UserInputService:IsKeyDown(Enum.KeyCode.W) then move += Vector3.new(fwd.X, 0, fwd.Z) end
-						if UserInputService:IsKeyDown(Enum.KeyCode.S) then move -= Vector3.new(fwd.X, 0, fwd.Z) end
-						if UserInputService:IsKeyDown(Enum.KeyCode.A) then move -= Vector3.new(right.X, 0, right.Z) end
-						if UserInputService:IsKeyDown(Enum.KeyCode.D) then move += Vector3.new(right.X, 0, right.Z) end
+			local speed = hum.WalkSpeed > 0 and hum.WalkSpeed or 16
+			local cam = workspace.CurrentCamera
+			if cam then
+				local fwd = Vector3.new(cam.CFrame.LookVector.X, 0, cam.CFrame.LookVector.Z)
+				local rgt = Vector3.new(cam.CFrame.RightVector.X, 0, cam.CFrame.RightVector.Z)
+				if fwd.Magnitude > 0 then fwd = fwd.Unit end
+				if rgt.Magnitude > 0 then rgt = rgt.Unit end
 
-						if move.Magnitude > 0 then
-							move = move.Unit * (hum.WalkSpeed > 0 and hum.WalkSpeed or 16)
-						else
-							move = Vector3.zero
-						end
-
-						bv.Velocity = move
-					end
-
-					hrp.CFrame = CFrame.new(BANG_XZ, BANG_Y, BANG_XZ)
-					hrp.AssemblyLinearVelocity = Vector3.zero
-					hrp.AssemblyAngularVelocity = Vector3.zero
-
-					if hum.Health <= 0 then hum.Health = math.max(hum.MaxHealth, 100) end
-					hum.Sit = true
+				local vel = Vector3.zero
+				if not UserInputService:GetFocusedTextBox() then
+					if UserInputService:IsKeyDown(Enum.KeyCode.W) then vel += fwd end
+					if UserInputService:IsKeyDown(Enum.KeyCode.S) then vel -= fwd end
+					if UserInputService:IsKeyDown(Enum.KeyCode.A) then vel -= rgt end
+					if UserInputService:IsKeyDown(Enum.KeyCode.D) then vel += rgt end
 				end
-				task.wait(0.1)
-			end
 
-			local hrp = currentHRP
-			if hrp then
-				local bv = hrp:FindFirstChild("BangProtectBV")
-				if bv then bv:Destroy() end
-			end
+				if UserInputService.TouchEnabled and hum.MoveDirection.Magnitude > 0 then
+					local md = hum.MoveDirection
+					vel += Vector3.new(md.X, 0, md.Z)
+				end
 
-			local hum = currentHum
-			if hum then
-				pcall(function()
-					hum.PlatformStand = false
-					hum.Sit = false
-					hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-				end)
+				bv.Velocity = vel.Magnitude > 0 and vel.Unit * speed or Vector3.zero
 			end
+		end
+
+		bangProtectConn = RunService.Heartbeat:Connect(function()
+			if not bangProtectActive then return end
+			runBangProtect()
 		end)
 	end
 
@@ -1099,8 +1082,7 @@ local function startAntiBots()
 				if v then startAntiBots() else antiBotsTaskId += 1 end
 			end)
 
-			MakeSwitch(right, "حماية بانق", function() return AUTO.AntiBang end, function(v)
-				AUTO.AntiBang = v and true or false
+			MakeSwitch(right, "حماية بانق", function() return bangProtectActive end, function(v)
 				if v then
 					startBangProtect()
 				else
