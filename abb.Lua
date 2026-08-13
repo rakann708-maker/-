@@ -1043,12 +1043,26 @@ local function startAntiBots()
 				if v then startAntiBots() else antiBotsTaskId += 1 end
 			end)
 
-
-			MakeSwitch(right, "مضاد بانق", function() return AUTO.AntiBang end, function(v)
-				AUTO.AntiBang = v
-				if v then startAntiBang() else antiBangTaskId += 1 end
+			MakeSwitch(right, "HD Commands", function() return AUTO.CommandField end, function(v)
+				AUTO.CommandField = v and true or false
+				AUTO.HiddenCommandEnabled = AUTO.CommandField
+				setCommandFieldVisible(AUTO.CommandField)
+				saveAutoSettings()
 			end)
 
+			MakeSwitch(right, "حذف بعد الإرسال", function() return AUTO.ClearCommandAfterSend end, function(v)
+				AUTO.ClearCommandAfterSend = v and true or false
+				saveAutoSettings()
+			end)
+
+			MakeSwitch(right, "مضاد بانق", function() return AUTO.AntiBang end, function(v)
+				AUTO.AntiBang = v and true or false
+				if v then
+					startAntiBang()
+				else
+					stopAntiBang()
+				end
+			end)
 
 			
 			MakeSwitch(right, "انيميشن كاتانا", function() return AUTO.KatanaAnim end, function(v)
@@ -1649,9 +1663,7 @@ local function startAntiBots()
 		end
 	end
 
-	setCommandFieldVisible(true)
-
-
+	setCommandFieldVisible(false)
 
 
 	-- Counter storage
