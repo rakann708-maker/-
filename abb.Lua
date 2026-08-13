@@ -436,43 +436,91 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 	AUTO.AntiThrow = true
 	startAntiThrow()
 
-	-- ====== AntiBang (يوصلك بعيد تحت الأرض ويخليك هناك لين تطفيه) ======
-	local BANG_XZ = 1000000000  -- 1e9 (آمن). إذا تبي أكبر جرّب ترفعها لكن بعض المابات/الفيزياء ممكن تخرب
+	-- ====== AntiBang (حماية من بانق باستخدام BodyVelocity + toggle موحد) ======
+	local BANG_XZ = 1000000000
 	local BANG_Y  = -6000
-
 	local antiBangTaskId = 0
 
-	local function startAntiBang()
+	local function stopBangProtect()
+		antiBangTaskId += 1
+		AUTO.AntiBang = false
+
+		local hrp = currentHRP
+		if hrp then
+			local bv = hrp:FindFirstChild("BangProtectBV")
+			if bv then bv:Destroy() end
+			hrp.AssemblyLinearVelocity = Vector3.zero
+			hrp.AssemblyAngularVelocity = Vector3.zero
+		end
+
+		local hum = currentHum
+		if hum then
+			pcall(function()
+				hum.PlatformStand = false
+				hum.Sit = false
+				hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+			end)
+		end
+	end
+
+	local function startBangProtect()
 		antiBangTaskId += 1
 		local myId = antiBangTaskId
+		AUTO.AntiBang = true
 
 		task.spawn(function()
-			-- خذ مكان رجعة
-			local back = lastSafeCFrame or (currentHRP and currentHRP.CFrame)
 			while AUTO.AntiBang and myId == antiBangTaskId do
 				local hrp = currentHRP
 				local hum = currentHum
 				if hrp and hum then
 					applyAntiDeathSettings(hum)
-					-- مكان بعيد تحت (نفس XZ عشان ما يضيع)
+					local bv = hrp:FindFirstChild("BangProtectBV")
+					if not bv then
+						bv = Instance.new("BodyVelocity")
+						bv.Name = "BangProtectBV"
+						bv.MaxForce = Vector3.new(1e5, 0, 1e5)
+						bv.Velocity = Vector3.zero
+						bv.Parent = hrp
+					end
+
+					local cam = workspace.CurrentCamera
+					if cam then
+						local fwd = cam.CFrame.LookVector
+						local right = cam.CFrame.RightVector
+						local move = Vector3.zero
+
+						if UserInputService:IsKeyDown(Enum.KeyCode.W) then move += Vector3.new(fwd.X, 0, fwd.Z) end
+						if UserInputService:IsKeyDown(Enum.KeyCode.S) then move -= Vector3.new(fwd.X, 0, fwd.Z) end
+						if UserInputService:IsKeyDown(Enum.KeyCode.A) then move -= Vector3.new(right.X, 0, right.Z) end
+						if UserInputService:IsKeyDown(Enum.KeyCode.D) then move += Vector3.new(right.X, 0, right.Z) end
+
+						if move.Magnitude > 0 then
+							move = move.Unit * (hum.WalkSpeed > 0 and hum.WalkSpeed or 16)
+						else
+							move = Vector3.zero
+						end
+
+						bv.Velocity = move
+					end
+
 					hrp.CFrame = CFrame.new(BANG_XZ, BANG_Y, BANG_XZ)
 					hrp.AssemblyLinearVelocity = Vector3.zero
 					hrp.AssemblyAngularVelocity = Vector3.zero
-					-- حافظ على الحياة
+
 					if hum.Health <= 0 then hum.Health = math.max(hum.MaxHealth, 100) end
+					hum.Sit = true
 				end
-				task.wait(0.2)
+				task.wait(0.1)
 			end
 
-			-- رجّعك إذا طفيته
 			local hrp = currentHRP
+			if hrp then
+				local bv = hrp:FindFirstChild("BangProtectBV")
+				if bv then bv:Destroy() end
+			end
+
 			local hum = currentHum
-			if hrp and hum then
-				local to = back or lastSafeCFrame or hrp.CFrame
-				to = getGroundedCFrame(to)
-				hrp.CFrame = to
-				hrp.AssemblyLinearVelocity = Vector3.zero
-				hrp.AssemblyAngularVelocity = Vector3.zero
+			if hum then
 				pcall(function()
 					hum.PlatformStand = false
 					hum.Sit = false
@@ -480,6 +528,14 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 				end)
 			end
 		end)
+	end
+
+	local function startAntiBang()
+		startBangProtect()
+	end
+
+	local function stopAntiBang()
+		stopBangProtect()
 	end
 
 		-- ======
@@ -1043,24 +1099,12 @@ local function startAntiBots()
 				if v then startAntiBots() else antiBotsTaskId += 1 end
 			end)
 
-			MakeSwitch(right, "HD Commands", function() return AUTO.CommandField end, function(v)
-				AUTO.CommandField = v and true or false
-				AUTO.HiddenCommandEnabled = AUTO.CommandField
-				setCommandFieldVisible(AUTO.CommandField)
-				saveAutoSettings()
-			end)
-
-			MakeSwitch(right, "حذف بعد الإرسال", function() return AUTO.ClearCommandAfterSend end, function(v)
-				AUTO.ClearCommandAfterSend = v and true or false
-				saveAutoSettings()
-			end)
-
-			MakeSwitch(right, "مضاد بانق", function() return AUTO.AntiBang end, function(v)
+			MakeSwitch(right, "حماية بانق", function() return AUTO.AntiBang end, function(v)
 				AUTO.AntiBang = v and true or false
 				if v then
-					startAntiBang()
+					startBangProtect()
 				else
-					stopAntiBang()
+					stopBangProtect()
 				end
 			end)
 
