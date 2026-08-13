@@ -102,7 +102,7 @@ local function T18ShowAlreadyConnectedToast()
     msgLbl.Size                 = UDim2.new(1, -28, 0, 18)
     msgLbl.Position             = UDim2.new(0, 20, 0, 34)
     msgLbl.BackgroundTransparency = 1
-    msgLbl.Text                 = "Ø§ÙØ³ÙØ±Ø¨Øª ÙØªØµÙ Ø¨Ø§ÙÙØ¹Ù."
+    msgLbl.Text                 = "السكربت متصل بالفعل."
     msgLbl.TextColor3           = Color3.fromRGB(170, 170, 170)
     msgLbl.TextXAlignment       = Enum.TextXAlignment.Right
     msgLbl.Font                 = Enum.Font.Gotham
@@ -367,7 +367,7 @@ SpectateNameLabel = nil
 SpectateWarningLabel = nil
 SpectatePlayerRemovingConnection = nil
 SavedLocation = nil
-local _Hang = {running=false, savedCF=nil, activConn=nil, remConn=nil, prefix="ÙÙØ¨", flingPos=Vector3.new(999999999,999999999,999999999), cmd="char me"}
+local _Hang = {running=false, savedCF=nil, activConn=nil, remConn=nil, prefix="كلب", flingPos=Vector3.new(999999999,999999999,999999999), cmd="char me"}
 _T18Lang = "ar"
 _T18TR = nil
 _T18Rev = nil
@@ -917,7 +917,7 @@ do
     Subtitle.Size = UDim2.new(0.58, 0, 0, 18)
     Subtitle.Position = UDim2.new(0, 18, 0, 42)
     Subtitle.BackgroundTransparency = 1
-    Subtitle.Text = "Ø´Ø§Ø±ÙÙÙØ§ Ø§ÙØªØ±Ø§Ø­Ø§ØªÙÙ Ø¹ÙÙ Ø§ÙØ¯Ø³ÙÙØ±Ø¯"
+    Subtitle.Text = "شاركونا اقتراحاتكم على الدسكورد"
     Subtitle.TextColor3 = Theme.Muted
     Subtitle.TextXAlignment = Enum.TextXAlignment.Left
     Subtitle.Font = Enum.Font.Gotham
@@ -948,7 +948,7 @@ do
     TopBadgeText.Size = UDim2.new(1, -34, 1, 0)
     TopBadgeText.Position = UDim2.new(0, 28, 0, 0)
     TopBadgeText.BackgroundTransparency = 1
-    TopBadgeText.Text = "Ø¹ÙØ¯Ù ÙØ´ÙÙØ©Ø ØªÙØ§ØµÙ Ø¯Ø³ÙÙØ±Ø¯"
+    TopBadgeText.Text = "عندك مشكلة؟ تواصل دسكورد"
     TopBadgeText.TextColor3 = Theme.Text
     TopBadgeText.TextXAlignment = Enum.TextXAlignment.Left
     TopBadgeText.Font = Enum.Font.GothamMedium
@@ -988,7 +988,7 @@ do
     WelcomeLabel.Size = UDim2.new(1, -110, 0, 28)
     WelcomeLabel.Position = UDim2.new(0, 98, 0, 14)
     WelcomeLabel.BackgroundTransparency = 1
-    WelcomeLabel.Text = "Ø£ÙÙÙØ§ " .. LocalPlayer.DisplayName
+    WelcomeLabel.Text = "أهلًا " .. LocalPlayer.DisplayName
     WelcomeLabel.TextColor3 = Theme.Text
     WelcomeLabel.TextXAlignment = Enum.TextXAlignment.Right
     WelcomeLabel.Font = Enum.Font.GothamBold
@@ -999,7 +999,7 @@ do
     PlanLabel.Size = UDim2.new(1, -110, 0, 18)
     PlanLabel.Position = UDim2.new(0, 98, 0, 46)
     PlanLabel.BackgroundTransparency = 1
-    PlanLabel.Text = "Ø´Ø§Ø±ÙÙÙØ§ Ø§ÙØªØ±Ø§Ø­Ø§ØªÙÙ Ø¹ÙÙ Ø§ÙØ¯Ø³ÙÙØ±Ø¯ | Ø§Ø¶ØºØ· Ø§ÙØ²Ø± Ø§ÙØµØºÙØ± ÙØ¥Ø®ÙØ§Ø¡ Ø§ÙÙØ§ÙØ°Ø©"
+    PlanLabel.Text = "شاركونا اقتراحاتكم على الدسكورد | اضغط الزر الصغير لإخفاء النافذة"
     PlanLabel.TextColor3 = Theme.Muted
     PlanLabel.TextXAlignment = Enum.TextXAlignment.Right
     PlanLabel.Font = Enum.Font.Gotham
@@ -1031,7 +1031,7 @@ PanelPadding.Parent = ContentPanel
 local SectionLabel = Instance.new("TextLabel")
 SectionLabel.Size = UDim2.new(1, 0, 0, 18)
 SectionLabel.BackgroundTransparency = 1
-SectionLabel.Text = "Ø§ÙØªØ­ÙÙ Ø§ÙØ±Ø¦ÙØ³Ù"
+SectionLabel.Text = "التحكم الرئيسي"
 SectionLabel.TextColor3 = Theme.Muted
 SectionLabel.TextXAlignment = Enum.TextXAlignment.Right
 SectionLabel.Font = Enum.Font.GothamMedium
@@ -1060,7 +1060,7 @@ Input.Size = UDim2.new(1, 0, 0, 42)
 Input.Position = UDim2.new(0, 0, 0, 26)
 Input.BackgroundColor3 = Theme.Input
 Input.BackgroundTransparency = 0.22
-Input.PlaceholderText = "Ø§ÙØªØ¨ Ø§Ø³Ù Ø§ÙÙØ§Ø¹Ø¨ ÙÙØ§"
+Input.PlaceholderText = "اكتب اسم اللاعب هنا"
 Input.Text = ""
 Input.TextColor3 = Theme.Text
 Input.PlaceholderColor3 = Theme.Muted
@@ -1154,16 +1154,16 @@ local function makeInput(name, placeholder, defaultText, position)
     return box
 end
 
-BangBtn = makeButton("BangBtn", "Ø¨Ø§ÙÙ", UDim2.new(0, 168, 0, 38), UDim2.new(0, 4, 0, 82), Theme.ButtonBlue, Theme.Accent)
-ResetBtn = makeButton("ResetBtn", "Ø±ÙØ³ÙØª", UDim2.new(0, 168, 0, 38), UDim2.new(0, 190, 0, 82), Theme.ButtonBlue, Theme.Accent)
-FlingBtn = makeButton("FlingBtn", "Ø­ÙØ§ÙØ© Ø¨Ø§ÙÙ", UDim2.new(1, -8, 0, 38), UDim2.new(0, 4, 0, 130), Theme.ButtonBlue, Theme.Accent)
-TargetFlingBtn = makeButton("TargetFlingBtn", "ÙÙÙÙ", UDim2.new(0, 168, 0, 38), UDim2.new(0, 190, 0, 130), Theme.ButtonBlue, Theme.Accent)
-FlyBtn = makeButton("FlyBtn", "Ø·ÙØ±Ø§Ù", UDim2.new(0, 168, 0, 38), UDim2.new(0, 4, 0, 178), Theme.ButtonBlue, Theme.Accent)
-SpeedInput = makeInput("SpeedInput", "Ø³Ø±Ø¹Ø© Ø§ÙØ·ÙØ±Ø§Ù", "50", UDim2.new(0, 190, 0, 178))
-WalkSpeedBtn = makeButton("WalkSpeedBtn", "Ø³Ø±Ø¹Ø© Ø§ÙÙØ§Ø¹Ø¨", UDim2.new(0, 168, 0, 38), UDim2.new(0, 4, 0, 226), Theme.ButtonBlue, Theme.Accent)
-WalkSpeedInput = makeInput("WalkSpeedInput", "Ø³Ø±Ø¹Ø© Ø§ÙÙØ´Ù", "16", UDim2.new(0, 190, 0, 226))
-ZombieWalkBtn = makeButton("ZombieWalkBtn", "ÙØ´ÙØ© Ø²ÙÙØ¨Ù", UDim2.new(1, -8, 0, 38), UDim2.new(0, 4, 0, 274), Theme.ButtonBlue, Theme.Accent)
-_G._HLBtn = makeButton("HeadlessBtn", "ÙÙØ¯ÙØ³", UDim2.new(1, -8, 0, 38), UDim2.new(0, 4, 0, 274), Theme.ButtonBlue, Theme.Accent)
+BangBtn = makeButton("BangBtn", "بانق", UDim2.new(0, 168, 0, 38), UDim2.new(0, 4, 0, 82), Theme.ButtonBlue, Theme.Accent)
+ResetBtn = makeButton("ResetBtn", "ريسيت", UDim2.new(0, 168, 0, 38), UDim2.new(0, 190, 0, 82), Theme.ButtonBlue, Theme.Accent)
+FlingBtn = makeButton("FlingBtn", "حماية بانق", UDim2.new(1, -8, 0, 38), UDim2.new(0, 4, 0, 130), Theme.ButtonBlue, Theme.Accent)
+TargetFlingBtn = makeButton("TargetFlingBtn", "فلنق", UDim2.new(0, 168, 0, 38), UDim2.new(0, 190, 0, 130), Theme.ButtonBlue, Theme.Accent)
+FlyBtn = makeButton("FlyBtn", "طيران", UDim2.new(0, 168, 0, 38), UDim2.new(0, 4, 0, 178), Theme.ButtonBlue, Theme.Accent)
+SpeedInput = makeInput("SpeedInput", "سرعة الطيران", "50", UDim2.new(0, 190, 0, 178))
+WalkSpeedBtn = makeButton("WalkSpeedBtn", "سرعة اللاعب", UDim2.new(0, 168, 0, 38), UDim2.new(0, 4, 0, 226), Theme.ButtonBlue, Theme.Accent)
+WalkSpeedInput = makeInput("WalkSpeedInput", "سرعة المشي", "16", UDim2.new(0, 190, 0, 226))
+ZombieWalkBtn = makeButton("ZombieWalkBtn", "مشية زومبي", UDim2.new(1, -8, 0, 38), UDim2.new(0, 4, 0, 274), Theme.ButtonBlue, Theme.Accent)
+_G._HLBtn = makeButton("HeadlessBtn", "هيدلس", UDim2.new(1, -8, 0, 38), UDim2.new(0, 4, 0, 274), Theme.ButtonBlue, Theme.Accent)
 
 SpeedLabel = Instance.new("TextLabel")
 SpeedLabel.Size = UDim2.new(0, 178, 0, 40)
@@ -1176,14 +1176,14 @@ SpeedLabel.Font = Enum.Font.Gotham
 SpeedLabel.TextSize = 15
 SpeedLabel.Parent = ContentPanel
 
-TeleportBtn = makeButton("TeleportBtn", "ØªÙÙÙ", UDim2.new(0, 168, 0, 38), UDim2.new(0, 4, 0, 274), Theme.ButtonBlue, Theme.Accent)
-SpectateBtn = makeButton("SpectateBtn", "ÙØ´Ø§ÙØ¯Ø©", UDim2.new(0, 168, 0, 38), UDim2.new(0, 190, 0, 274), Theme.ButtonBlue, Theme.Accent)
-HeadBangBtn = makeButton("HeadBangBtn", "ÙÙØ¯ Ø¨Ø§ÙÙ", UDim2.new(0, 168, 0, 38), UDim2.new(0, 4, 0, 274), Theme.ButtonBlue, Theme.Accent)
-SavePlaceBtn  = makeButton("SavePlaceBtn",  "Ø­ÙØ¸ ÙÙØ§ÙÙ", UDim2.new(0, 168, 0, 38), UDim2.new(1, -172, 0, 274), Theme.ButtonBlue, Theme.Accent)
-HangAutoBtn   = makeButton("HangAutoBtn",   "ØªØ¹ÙÙÙ",     UDim2.new(0, 168, 0, 38), UDim2.new(0, 4,    0, 274), Theme.ButtonBlue, Theme.Accent)
-_Hang.freezeBtn     = makeButton("FreezeOnlyBtn","ØªØ¬ÙÙØ¯",     UDim2.new(0, 168, 0, 38), UDim2.new(0, 4,    0, 274), Theme.ButtonBlue, Theme.Accent)
-_Hang.cuffBtn       = makeButton("CuffOnlyBtn",  "ÙÙØ¨Ø´",      UDim2.new(0, 168, 0, 38), UDim2.new(0, 4,    0, 274), Theme.ButtonBlue, Theme.Accent)
-_Hang.pullBtn        = makeButton("PullBtn",       "Ø³Ø­Ø¨",       UDim2.new(0, 168, 0, 38), UDim2.new(0, 4,    0, 274), Theme.ButtonBlue, Theme.Accent)
+TeleportBtn = makeButton("TeleportBtn", "تنقل", UDim2.new(0, 168, 0, 38), UDim2.new(0, 4, 0, 274), Theme.ButtonBlue, Theme.Accent)
+SpectateBtn = makeButton("SpectateBtn", "مشاهدة", UDim2.new(0, 168, 0, 38), UDim2.new(0, 190, 0, 274), Theme.ButtonBlue, Theme.Accent)
+HeadBangBtn = makeButton("HeadBangBtn", "هيد بانق", UDim2.new(0, 168, 0, 38), UDim2.new(0, 4, 0, 274), Theme.ButtonBlue, Theme.Accent)
+SavePlaceBtn  = makeButton("SavePlaceBtn",  "حفظ مكاني", UDim2.new(0, 168, 0, 38), UDim2.new(1, -172, 0, 274), Theme.ButtonBlue, Theme.Accent)
+HangAutoBtn   = makeButton("HangAutoBtn",   "تعليق",     UDim2.new(0, 168, 0, 38), UDim2.new(0, 4,    0, 274), Theme.ButtonBlue, Theme.Accent)
+_Hang.freezeBtn     = makeButton("FreezeOnlyBtn","تجميد",     UDim2.new(0, 168, 0, 38), UDim2.new(0, 4,    0, 274), Theme.ButtonBlue, Theme.Accent)
+_Hang.cuffBtn       = makeButton("CuffOnlyBtn",  "كلبش",      UDim2.new(0, 168, 0, 38), UDim2.new(0, 4,    0, 274), Theme.ButtonBlue, Theme.Accent)
+_Hang.pullBtn        = makeButton("PullBtn",       "سحب",       UDim2.new(0, 168, 0, 38), UDim2.new(0, 4,    0, 274), Theme.ButtonBlue, Theme.Accent)
 
 PanelPadding:Destroy()
 SectionLabel:Destroy()
@@ -1227,7 +1227,7 @@ local SidebarTitle = Instance.new("TextLabel")
 SidebarTitle.Size = UDim2.new(1, -16, 0, 22)
 SidebarTitle.Position = UDim2.new(0, 8, 0, 12)
 SidebarTitle.BackgroundTransparency = 1
-SidebarTitle.Text = "Ø§ÙÙÙØ§Ø¦Ù"
+SidebarTitle.Text = "القوائم"
 SidebarTitle.TextColor3 = Theme.Text
 SidebarTitle.TextXAlignment = Enum.TextXAlignment.Right
 SidebarTitle.Font = Enum.Font.GothamBold
@@ -1238,7 +1238,7 @@ local SidebarHint = Instance.new("TextLabel")
 SidebarHint.Size = UDim2.new(1, -16, 0, 28)
 SidebarHint.Position = UDim2.new(0, 8, 0, 34)
 SidebarHint.BackgroundTransparency = 1
-SidebarHint.Text = "Ø§Ø®ØªØ± Ø§ÙÙØ³Ù"
+SidebarHint.Text = "اختر القسم"
 SidebarHint.TextColor3 = Theme.Muted
 SidebarHint.TextXAlignment = Enum.TextXAlignment.Right
 SidebarHint.Font = Enum.Font.Gotham
@@ -1307,12 +1307,12 @@ local OwnerFreezeBtn = nil
 local OwnerRespawnLoopBtn = nil
 local OwnerSummonBtn = nil
 local OthersPage = makePage("OthersPage")
-makePageTitle(OthersPage, "Ø§Ø®Ø±Ù", "ÙÙØ²Ø§Øª Ø¥Ø¶Ø§ÙÙØ©")
+makePageTitle(OthersPage, "اخرى", "ميزات إضافية")
 
-makePageTitle(MainPage, "Ø§ÙÙØ§Ø¦ÙØ© Ø§ÙØ±Ø¦ÙØ³ÙØ©", "ÙÙØ§Ø­Ø¸Ø© ÙÙÙØ© : ÙØ§ Ø§Ø®ÙØ§Ù Ø­ÙØ§ÙØ© Ø§ÙØ¨Ø§ÙÙ ÙØ§ ØªØ´ØªØºÙ Ø§ÙØ§ Ø¹ÙÙ Ø³ÙØ±Ø¨Øª V.R.7")
-makePageTitle(PlayerPage, "Ø§ÙÙØ§Ø¹Ø¨", "Ø£ÙØ§ÙØ± Ø§ÙØ­Ø±ÙØ© ÙØ§ÙØ³Ø±Ø¹Ø©")
-makePageTitle(TargetPage, "Ø§Ø³ØªÙØ¯Ø§Ù", "Ø£ÙØ§ÙØ± Ø§ÙØªØ¹Ø§ÙÙ ÙØ¹ Ø§ÙÙØ§Ø¹Ø¨ÙÙ")
-makePageTitle(ImportantPage, "ÙÙÙ", "Ø±Ø³Ø§ÙØ© Ø¯Ø§Ø®Ù Ø§ÙØ³ÙØ±Ø¨Øª")
+makePageTitle(MainPage, "القائمة الرئيسية", "ملاحظة مهمة : يا اخوان حماية البانق ما تشتغل الا على سكربت V.R.7")
+makePageTitle(PlayerPage, "اللاعب", "أوامر الحركة والسرعة")
+makePageTitle(TargetPage, "استهداف", "أوامر التعامل مع اللاعبين")
+makePageTitle(ImportantPage, "مهم", "رسالة داخل السكربت")
 
 
 local ChatPanel = Instance.new("Frame")
@@ -1346,7 +1346,7 @@ local ChatHeaderTitle = Instance.new("TextLabel")
 ChatHeaderTitle.Size = UDim2.new(1, -32, 0, 22)
 ChatHeaderTitle.Position = UDim2.new(0, 0, 0, 0)
 ChatHeaderTitle.BackgroundTransparency = 1
-ChatHeaderTitle.Text = "Ø´Ø§Øª"
+ChatHeaderTitle.Text = "شات"
 ChatHeaderTitle.TextColor3 = Theme.Text
 ChatHeaderTitle.TextXAlignment = Enum.TextXAlignment.Right
 ChatHeaderTitle.Font = Enum.Font.GothamBold
@@ -1357,7 +1357,7 @@ local ChatHeaderSub = Instance.new("TextLabel")
 ChatHeaderSub.Size = UDim2.new(1, -32, 0, 16)
 ChatHeaderSub.Position = UDim2.new(0, 0, 0, 24)
 ChatHeaderSub.BackgroundTransparency = 1
-ChatHeaderSub.Text = "ØªÙØ§ØµÙ Ø¨ÙÙ ÙØ´ØºÙÙ Ø§ÙØ³ÙØ±Ø¨Øª"
+ChatHeaderSub.Text = "تواصل بين مشغلي السكربت"
 ChatHeaderSub.TextColor3 = Theme.Muted
 ChatHeaderSub.TextXAlignment = Enum.TextXAlignment.Right
 ChatHeaderSub.Font = Enum.Font.Gotham
@@ -1397,7 +1397,7 @@ ChatInput.BackgroundColor3 = Theme.Input
 ChatInput.BackgroundTransparency = 0.2
 ChatInput.TextColor3 = Theme.Text
 ChatInput.PlaceholderColor3 = Theme.Muted
-ChatInput.PlaceholderText = "Ø§ÙØªØ¨ Ø±Ø³Ø§ÙØ©..."
+ChatInput.PlaceholderText = "اكتب رسالة..."
 ChatInput.Text = ""
 ChatInput.Font = Enum.Font.Gotham
 ChatInput.TextSize = 14
@@ -1412,7 +1412,7 @@ ChatSendBtn.Size = UDim2.new(0, 90, 0, 40)
 ChatSendBtn.Position = UDim2.new(1, -100, 1, -50)
 ChatSendBtn.BackgroundColor3 = Theme.Active
 ChatSendBtn.BackgroundTransparency = 0.18
-ChatSendBtn.Text = "Ø¥Ø±Ø³Ø§Ù"
+ChatSendBtn.Text = "إرسال"
 ChatSendBtn.TextColor3 = Theme.Text
 ChatSendBtn.Font = Enum.Font.GothamBold
 ChatSendBtn.TextSize = 14
@@ -1925,14 +1925,14 @@ ChatInput.FocusLost:Connect(function(enterPressed)
     end
 end)
 
-addChatMessage(T18T("Ø§ÙÙØ¸Ø§Ù"), T18T("ÙØ±Ø­Ø¨ÙØ§! ÙØ°Ù Ø´Ø§Ø´Ø© Ø´Ø§Øª Ø®Ø§ØµØ© Ø¨ÙØ´ØºÙÙÙ Ø§ÙØ³ÙØ±Ø¨Øª ÙÙØ· â ØªÙØ± Ø¹Ø¨Ø± Ø³ÙØ±ÙØ± Ø®Ø§Ø±Ø¬Ù ÙÙØ§ ØªØ¸ÙØ± ÙØ£Ù ÙØ§Ø¹Ø¨ ÙØ§ ÙØ³ØªØ®Ø¯Ù Ø§ÙØ³ÙØ±Ø¨Øª."))
+addChatMessage(T18T("النظام"), T18T("مرحبًا! هذي شاشة شات خاصة بمشغّلي السكربت فقط — تمر عبر سيرفر خارجي ولا تظهر لأي لاعب ما يستخدم السكربت."))
 
 UsersPage = nil
 UsersList = nil
 UsersCountLabel = nil
 if isOwnerUser then
     OwnerPage = makePage("OwnerPage")
-    makePageTitle(OwnerPage, "Ø§ÙÙØ±", "Ø£ÙØ§ÙØ± Ø§ÙØ¥Ø¯Ø§Ø±Ø© Ø§ÙØ®Ø§ØµØ©")
+    makePageTitle(OwnerPage, "اونر", "أوامر الإدارة الخاصة")
 
     local OwnerScroll = Instance.new("ScrollingFrame")
     OwnerScroll.Size = UDim2.new(1, 0, 1, -44)
@@ -1950,7 +1950,7 @@ if isOwnerUser then
     OwnerTargetInput.Position = UDim2.new(0, 10, 0, 10)
     OwnerTargetInput.BackgroundColor3 = Theme.Input
     OwnerTargetInput.BackgroundTransparency = 0.2
-    OwnerTargetInput.PlaceholderText = "Ø§ÙØªØ¨ 4 Ø£Ø­Ø±Ù ÙÙ ÙÙØ²Ø± Ø§ÙÙØ§Ø¹Ø¨"
+    OwnerTargetInput.PlaceholderText = "اكتب 4 أحرف من يوزر اللاعب"
     OwnerTargetInput.Text = ""
     OwnerTargetInput.TextColor3 = Theme.Text
     OwnerTargetInput.PlaceholderColor3 = Theme.Muted
@@ -1966,23 +1966,23 @@ if isOwnerUser then
     OwnerTargetHint.Size = UDim2.new(1, -20, 0, 18)
     OwnerTargetHint.Position = UDim2.new(0, 10, 0, 54)
     OwnerTargetHint.BackgroundTransparency = 1
-    OwnerTargetHint.Text = T18T("Ø§ÙØªØ¨ 4 Ø£Ø­Ø±Ù Ø¹ÙÙ Ø§ÙØ£ÙÙ")
+    OwnerTargetHint.Text = T18T("اكتب 4 أحرف على الأقل")
     OwnerTargetHint.TextColor3 = Theme.Muted
     OwnerTargetHint.TextXAlignment = Enum.TextXAlignment.Right
     OwnerTargetHint.Font = Enum.Font.Gotham
     OwnerTargetHint.TextSize = 13
     OwnerTargetHint.Parent = OwnerScroll
 
-    OwnerKickBtn = makeButton("OwnerKickBtn", "Ø·Ø±Ø¯", UDim2.new(1, -20, 0, 38), UDim2.new(0, 10, 0, 80), Theme.ButtonRed, Theme.ButtonRedAlt)
+    OwnerKickBtn = makeButton("OwnerKickBtn", "طرد", UDim2.new(1, -20, 0, 38), UDim2.new(0, 10, 0, 80), Theme.ButtonRed, Theme.ButtonRedAlt)
     OwnerKickBtn.Parent = OwnerScroll
 
-    OwnerFreezeBtn = makeButton("OwnerFreezeBtn", "ØªØ¬ÙÙØ¯", UDim2.new(1, -20, 0, 38), UDim2.new(0, 10, 0, 126), Theme.ButtonBlue, Theme.ButtonBlueAlt)
+    OwnerFreezeBtn = makeButton("OwnerFreezeBtn", "تجميد", UDim2.new(1, -20, 0, 38), UDim2.new(0, 10, 0, 126), Theme.ButtonBlue, Theme.ButtonBlueAlt)
     OwnerFreezeBtn.Parent = OwnerScroll
 
     OwnerRespawnLoopBtn = makeButton("OwnerRespawnLoopBtn", "Respawn Loop", UDim2.new(1, -20, 0, 38), UDim2.new(0, 10, 0, 172), Theme.ButtonOrange, Theme.ButtonOrangeAlt)
     OwnerRespawnLoopBtn.Parent = OwnerScroll
 
-    OwnerSummonBtn = makeButton("OwnerSummonBtn", "Ø§Ø³ØªØ¯Ø¹Ø§Ø¡", UDim2.new(1, -20, 0, 38), UDim2.new(0, 10, 0, 218), Theme.ButtonGreen, Theme.ButtonGreenAlt)
+    OwnerSummonBtn = makeButton("OwnerSummonBtn", "استدعاء", UDim2.new(1, -20, 0, 38), UDim2.new(0, 10, 0, 218), Theme.ButtonGreen, Theme.ButtonGreenAlt)
     OwnerSummonBtn.Parent = OwnerScroll
 
 
@@ -1992,7 +1992,7 @@ if isOwnerUser then
     usersDivider.Size = UDim2.new(1, -20, 0, 18)
     usersDivider.Position = UDim2.new(0, 10, 0, 266)
     usersDivider.BackgroundTransparency = 1
-    usersDivider.Text = "âââ ÙØ³ØªØ®Ø¯ÙÙÙ Ø§ÙØ³ÙØ±Ø¨Øª âââ"
+    usersDivider.Text = "─── مستخدمين السكربت ───"
     usersDivider.TextColor3 = Theme.Muted
     usersDivider.TextXAlignment = Enum.TextXAlignment.Center
     usersDivider.Font = Enum.Font.GothamMedium
@@ -2003,7 +2003,7 @@ if isOwnerUser then
     UsersCountLabel.Size = UDim2.new(1, -20, 0, 24)
     UsersCountLabel.Position = UDim2.new(0, 10, 0, 288)
     UsersCountLabel.BackgroundTransparency = 1
-    UsersCountLabel.Text = T18T("Ø§ÙØ¹Ø¯Ø¯: ") .. "0"
+    UsersCountLabel.Text = T18T("العدد: ") .. "0"
     UsersCountLabel.TextColor3 = Theme.Muted
     UsersCountLabel.TextXAlignment = Enum.TextXAlignment.Right
     UsersCountLabel.Font = Enum.Font.GothamBold
@@ -2047,7 +2047,7 @@ if isOwnerUser then
             end
         end
 
-        UsersCountLabel.Text = T18T("Ø§ÙØ¹Ø¯Ø¯: ") .. tostring(#users)
+        UsersCountLabel.Text = T18T("العدد: ") .. tostring(#users)
 
         for i, user in ipairs(users) do
             local row = Instance.new("Frame")
@@ -2138,7 +2138,7 @@ DiscordBtn.Position = UDim2.new(0, 12, 0, 12)
 DiscordBtn.BackgroundColor3 = Theme.PanelSoft
 DiscordBtn.BackgroundTransparency = 0.08
 DiscordBtn.AutoButtonColor = false
-DiscordBtn.Text = "ÙØ³Ø® Ø±Ø§Ø¨Ø· Ø§ÙØ¯Ø³ÙÙØ±Ø¯"
+DiscordBtn.Text = "نسخ رابط الدسكورد"
 DiscordBtn.TextColor3 = Theme.Text
 DiscordBtn.TextStrokeTransparency = 1
 DiscordBtn.TextStrokeColor3 = Color3.fromRGB(200, 200, 200)
@@ -2191,7 +2191,7 @@ local MainText = Instance.new("TextLabel")
 MainText.Size = UDim2.new(1, -24, 1, -96)
 MainText.Position = UDim2.new(0, 12, 0, 88)
 MainText.BackgroundTransparency = 1
-MainText.Text = "ÙÙØ§ ÙØ§ÙÙÙ " .. LocalPlayer.DisplayName .. "Ø ÙÙØ±Øª Ø§ÙØ³ÙØ±Ø¨Øª!\n\nÙØ´Ø±ÙÙØ§ Ø§ÙÙ ÙØ¹ÙØ§. ØªÙØ¯Ø± ØªØªÙÙÙ Ø¨ÙÙ Ø§ÙØ£ÙØ³Ø§Ù ÙÙ Ø§ÙÙØ§Ø¦ÙØ© Ø¹ÙÙ Ø§ÙÙØ³Ø§Ø±:\n\nÙØ³Ù Ø§ÙÙØ§Ø¹Ø¨ ÙÙÙ Ø£ÙØ§ÙØ± Ø§ÙØ·ÙØ±Ø§Ù ÙØ§ÙØ³Ø±Ø¹Ø©.\nÙØ³Ù Ø§ÙØ§Ø³ØªÙØ¯Ø§Ù ÙÙÙ Ø§ÙØ£ÙØ§ÙØ± Ø§ÙÙØªØ¹ÙÙØ© Ø¨Ø§ÙÙØ§Ø¹Ø¨ÙÙ.\nÙØ³Ù ÙÙÙ ÙÙÙ Ø±Ø³Ø§ÙØ© ÙØªÙØ¨ÙÙ Ø¨Ø®ØµÙØµ Ø§ÙØ³ÙØ±Ø¨Øª."
+MainText.Text = "هلا والله " .. LocalPlayer.DisplayName .. "، نورت السكربت!\n\nيشرفنا انك معنا. تقدر تتنقل بين الأقسام من القائمة على اليسار:\n\nقسم اللاعب فيه أوامر الطيران والسرعة.\nقسم الاستهداف فيه الأوامر المتعلقة باللاعبين.\nقسم مهم فيه رسالة وتنبيه بخصوص السكربت."
 MainText.TextColor3 = Theme.Text
 MainText.TextXAlignment = Enum.TextXAlignment.Right
 MainText.TextYAlignment = Enum.TextYAlignment.Top
@@ -2200,8 +2200,8 @@ MainText.Font = Enum.Font.Gotham
 MainText.TextSize = 16
 MainText.Parent = MainCard
 _T18MainTextLabel = MainText
-_T18MainTextAr = "ÙÙØ§ ÙØ§ÙÙÙ " .. LocalPlayer.DisplayName .. "Ø ÙÙØ±Øª Ø§ÙØ³ÙØ±Ø¨Øª!\n\nÙØ´Ø±ÙÙØ§ Ø§ÙÙ ÙØ¹ÙØ§. ØªÙØ¯Ø± ØªØªÙÙÙ Ø¨ÙÙ Ø§ÙØ£ÙØ³Ø§Ù ÙÙ Ø§ÙÙØ§Ø¦ÙØ© Ø¹ÙÙ Ø§ÙÙØ³Ø§Ø±:\n\nÙØ³Ù Ø§ÙÙØ§Ø¹Ø¨ ÙÙÙ Ø£ÙØ§ÙØ± Ø§ÙØ·ÙØ±Ø§Ù ÙØ§ÙØ³Ø±Ø¹Ø©.\nÙØ³Ù Ø§ÙØ§Ø³ØªÙØ¯Ø§Ù ÙÙÙ Ø§ÙØ£ÙØ§ÙØ± Ø§ÙÙØªØ¹ÙÙØ© Ø¨Ø§ÙÙØ§Ø¹Ø¨ÙÙ.\nÙØ³Ù ÙÙÙ ÙÙÙ Ø±Ø³Ø§ÙØ© ÙØªÙØ¨ÙÙ Ø¨Ø®ØµÙØµ Ø§ÙØ³ÙØ±Ø¨Øª."
-_T18MainTextEn = "Hello " .. LocalPlayer.DisplayName .. "! Welcome to the script!\n\nNavigate between sections using the menu on the left:\n\nPlayer â fly and speed commands.\nTargeting â interact with players.\nImportant â message and notes about the script."
+_T18MainTextAr = "هلا والله " .. LocalPlayer.DisplayName .. "، نورت السكربت!\n\nيشرفنا انك معنا. تقدر تتنقل بين الأقسام من القائمة على اليسار:\n\nقسم اللاعب فيه أوامر الطيران والسرعة.\nقسم الاستهداف فيه الأوامر المتعلقة باللاعبين.\nقسم مهم فيه رسالة وتنبيه بخصوص السكربت."
+_T18MainTextEn = "Hello " .. LocalPlayer.DisplayName .. "! Welcome to the script!\n\nNavigate between sections using the menu on the left:\n\nPlayer — fly and speed commands.\nTargeting — interact with players.\nImportant — message and notes about the script."
 
 local function showNotification(message)
     pcall(function()
@@ -2390,7 +2390,7 @@ local function t18_dispatchEvent(ev)
         if #text == 0 then return end
         local displayName = fromName
         if fromUserId == LocalPlayer.UserId then
-            displayName = displayName .. " (Ø£ÙØª)"
+            displayName = displayName .. " (أنت)"
         end
         addChatMessage(displayName, text, senderColor)
         _incrementChatBadge()
@@ -2418,12 +2418,12 @@ local function t18_dispatchEvent(ev)
             local ownerRt = ownerChr and ownerChr:FindFirstChild("HumanoidRootPart")
             if ownerRt then
                 local op = ownerRt.Position
-                showNotification(T18T("ØªÙ Ø§Ø³ØªØ¯Ø¹Ø§Ø¤Ù Ø¨ÙØ§Ø³Ø·Ø© Ø§ÙØ£ÙÙØ±"))
+                showNotification(T18T("تم استدعاؤك بواسطة الأونر"))
                 localSummonState.apply(true, op.X, op.Y, op.Z)
             end
         elseif action == "summon_off" then
             localSummonState.apply(false, 0, 0, 0)
-            showNotification(T18T("Ø§ÙØªÙÙ Ø§ÙØ§Ø³ØªØ¯Ø¹Ø§Ø¡"))
+            showNotification(T18T("انتهى الاستدعاء"))
         end
     end
 end
@@ -2511,24 +2511,24 @@ local function refreshOwnerControls()
     local target = findOwnerTargetPlayer()
 
     if #inputText < 4 then
-        OwnerTargetHint.Text = T18T("Ø§ÙØªØ¨ 4 Ø£Ø­Ø±Ù Ø¹ÙÙ Ø§ÙØ£ÙÙ")
+        OwnerTargetHint.Text = T18T("اكتب 4 أحرف على الأقل")
         OwnerTargetHint.TextColor3 = Theme.Muted
     elseif target then
-        OwnerTargetHint.Text = T18T("ØªÙ ØªØ­Ø¯ÙØ¯: ") .. target.Name
+        OwnerTargetHint.Text = T18T("تم تحديد: ") .. target.Name
         OwnerTargetHint.TextColor3 = Theme.Text
     else
-        OwnerTargetHint.Text = T18T("ÙØ§ ÙÙØ¬Ø¯ ÙØ§Ø¹Ø¨ ÙØ·Ø§Ø¨Ù")
+        OwnerTargetHint.Text = T18T("لا يوجد لاعب مطابق")
         OwnerTargetHint.TextColor3 = Theme.Warning
     end
 
     if OwnerFreezeBtn then
         local isFrozen = target and ownerFreezeStates[target.UserId] or false
-        OwnerFreezeBtn.Text = isFrozen and T18T("ÙÙ Ø§ÙØªØ¬ÙÙØ¯") or T18T("ØªØ¬ÙÙØ¯")
+        OwnerFreezeBtn.Text = isFrozen and T18T("فك التجميد") or T18T("تجميد")
     end
 
     if OwnerRespawnLoopBtn then
         local isLooping = target and ownerRespawnLoopStates[target.UserId] or false
-        OwnerRespawnLoopBtn.Text = isLooping and T18T("Ø¥ÙÙØ§Ù Respawn Loop") or T18T("Respawn Loop")
+        OwnerRespawnLoopBtn.Text = isLooping and T18T("إيقاف Respawn Loop") or T18T("Respawn Loop")
     end
 end
 
@@ -2547,7 +2547,7 @@ local function sendOwnerAdminAction(actionName)
 
     local target = findOwnerTargetPlayer()
     if not target then
-        showNotification(T18T("Ø§ÙØªØ¨ 4 Ø£Ø­Ø±Ù ÙÙ ÙÙØ²Ø± Ø§ÙÙØ§Ø¹Ø¨ Ø£Ù Ø£ÙØ«Ø±"))
+        showNotification(T18T("اكتب 4 أحرف من يوزر اللاعب أو أكثر"))
         refreshOwnerControls()
         return
     end
@@ -2597,7 +2597,7 @@ DiscordBtn.MouseButton1Click:Connect(function()
             if setclipboard then
                 setclipboard("https://discord.gg/bCdDt4NDq")
                 opened = true
-                showNotification(T18T("ØªÙ ÙØ³Ø® Ø±Ø§Ø¨Ø· Ø§ÙØ¯Ø³ÙÙØ±Ø¯"))
+                showNotification(T18T("تم نسخ رابط الدسكورد"))
             end
         end)
     end
@@ -2635,23 +2635,23 @@ if OwnerTargetInput and OwnerKickBtn and OwnerFreezeBtn and OwnerRespawnLoopBtn 
                     sendOwnerCommand("summon_off", ownerSummonState.target.UserId)
                 end
                 ownerSummonState.target = nil
-                OwnerSummonBtn.Text = T18T("Ø§Ø³ØªØ¯Ø¹Ø§Ø¡")
+                OwnerSummonBtn.Text = T18T("استدعاء")
                 OwnerSummonBtn.BackgroundColor3 = Theme.ButtonGreen
-                showNotification(T18T("ØªÙ Ø¥ÙÙØ§Ù Ø§ÙØ§Ø³ØªØ¯Ø¹Ø§Ø¡"))
+                showNotification(T18T("تم إيقاف الاستدعاء"))
                 return
             end
 
             local sTarget = findOwnerTargetPlayer()
             if not sTarget then
-                showNotification(T18T("Ø§ÙØªØ¨ 4 Ø£Ø­Ø±Ù ÙÙ ÙÙØ²Ø± Ø§ÙÙØ§Ø¹Ø¨ Ø£Ù Ø£ÙØ«Ø±"))
+                showNotification(T18T("اكتب 4 أحرف من يوزر اللاعب أو أكثر"))
                 return
             end
 
             ownerSummonState.active = true
             ownerSummonState.target = sTarget
-            OwnerSummonBtn.Text = T18T("Ø¥ÙÙØ§Ù Ø§ÙØ§Ø³ØªØ¯Ø¹Ø§Ø¡")
+            OwnerSummonBtn.Text = T18T("إيقاف الاستدعاء")
             OwnerSummonBtn.BackgroundColor3 = Theme.Danger
-            showNotification(T18T("ØªÙ ØªÙØ¹ÙÙ Ø§ÙØ§Ø³ØªØ¯Ø¹Ø§Ø¡ ÙÙ ") .. sTarget.Name)
+            showNotification(T18T("تم تفعيل الاستدعاء لـ ") .. sTarget.Name)
 
 
             local function doSendSummon()
@@ -2665,9 +2665,9 @@ if OwnerTargetInput and OwnerKickBtn and OwnerFreezeBtn and OwnerRespawnLoopBtn 
                     if not Players:FindFirstChild(tName) then
                         ownerSummonState.active = false
                         ownerSummonState.target = nil
-                        OwnerSummonBtn.Text = T18T("Ø§Ø³ØªØ¯Ø¹Ø§Ø¡")
+                        OwnerSummonBtn.Text = T18T("استدعاء")
                         OwnerSummonBtn.BackgroundColor3 = Theme.ButtonGreen
-                        showNotification(T18T("Ø§ÙÙØ§Ø¹Ø¨ Ø®Ø±Ø¬ ÙÙ Ø§ÙØ³ÙØ±ÙØ±"))
+                        showNotification(T18T("اللاعب خرج من السيرفر"))
                         break
                     end
                     pcall(doSendSummon)
@@ -2709,7 +2709,7 @@ local ImportantText = Instance.new("TextLabel")
 ImportantText.Size = UDim2.new(1, -24, 1, -24)
 ImportantText.Position = UDim2.new(0, 12, 0, 12)
 ImportantText.BackgroundTransparency = 1
-ImportantText.Text = "Ø§ÙØ³ÙØ§Ù Ø¹ÙÙÙÙ ÙØ±Ø­ÙØ© Ø§ÙÙÙ ÙØ¨Ø±ÙØ§ØªÙ\n\nØ·Ø¨Ø¹Ø§Ù Ø§ÙØ³ÙØ±Ø¨Øª Ø°Ø§ Ø¨Ø¨Ø¯Ø§ÙØªÙ ÙØ¹ÙÙ Ø¨Ø§ÙÙ ÙØ§ Ø§Ø´ØªØºÙØª Ø¹ÙÙÙ ÙØ§ÙØ§ÙØ§ÙØ± Ø¨Ø¯Ø§Ø¦ÙÙ ÙÙØ³ØªÙØ¨ÙØ§Ù Ø¨ØªØ´ÙÙÙÙ Ø§ÙØ§ÙØ± Ø§ÙØ«Ø± ÙØ­ÙØ§ÙØ© Ø§ÙÙÙ Ø§Ù Ø´Ø§Ø¡ Ø§ÙÙÙ\n\n+ Ø§ÙØ³ÙØ±Ø¨Øª ÙØ§ÙÙÙ ÙØ´ØªØ±ÙÙÙ ÙØ¹ÙÙ Ø±ÙØ­ Ø¨Ø§ÙÙ ÙØ­Ø¯ Ø·Ø§Ø±Ø¯Ù ÙÙØ§ Ø§Ø­Ø¯ Ø¨ÙØ°ÙÙ Ø¨ Ø§ÙØ§ÙØ±Ù\n\nÙØ¨Ø³ Ø§ØªÙÙÙ ØªØ³ØªÙØªØ¹ Ø¨Ø§ÙØ³ÙØ±Ø¨Øª\n\n(ÙÙØ§Ø­Ø¸Ø© ØªØ±Ø§ Ø­ÙØ§ÙØ© Ø§ÙØ¨Ø§ÙÙ ÙØ§ ØªØ´ØªØºÙ Ø§ÙØ§ Ø¹ÙÙ Ø§ÙÙ ÙÙØ¹ÙÙÙ Ø¹ÙÙÙ ÙÙ VR7)"
+ImportantText.Text = "السلام عليكم ورحمة الله وبركاته\n\nطبعاً السكربت ذا ببدايته يعني باقي ما اشتغلت عليه والاوامر بدائيه ومستقبلاً بتشوفون اوامر اكثر وحماية اقوى ان شاء الله\n\n+ السكربت مافيه مشتركين يعني ريح بالك محد طاردك ولا احد بيذلك ب اوامره\n\nوبس اتمنى تستمتع بالسكربت\n\n(ملاحظة ترا حماية البانق ما تشتغل الا على الي مفعلين عليك من VR7)"
 ImportantText.TextColor3 = Theme.Text
 ImportantText.TextXAlignment = Enum.TextXAlignment.Right
 ImportantText.TextYAlignment = Enum.TextYAlignment.Top
@@ -2718,8 +2718,8 @@ ImportantText.Font = Enum.Font.Gotham
 ImportantText.TextSize = 15
 ImportantText.Parent = ImportantCard
 _T18ImportantTextLabel = ImportantText
-_T18ImportantTextAr = "Ø§ÙØ³ÙØ§Ù Ø¹ÙÙÙÙ ÙØ±Ø­ÙØ© Ø§ÙÙÙ ÙØ¨Ø±ÙØ§ØªÙ\n\nØ·Ø¨Ø¹Ø§Ù Ø§ÙØ³ÙØ±Ø¨Øª Ø°Ø§ Ø¨Ø¨Ø¯Ø§ÙØªÙ ÙØ¹ÙÙ Ø¨Ø§ÙÙ ÙØ§ Ø§Ø´ØªØºÙØª Ø¹ÙÙÙ ÙØ§ÙØ§ÙØ§ÙØ± Ø¨Ø¯Ø§Ø¦ÙÙ ÙÙØ³ØªÙØ¨ÙØ§Ù Ø¨ØªØ´ÙÙÙÙ Ø§ÙØ§ÙØ± Ø§ÙØ«Ø± ÙØ­ÙØ§ÙØ© Ø§ÙÙÙ Ø§Ù Ø´Ø§Ø¡ Ø§ÙÙÙ\n\n+ Ø§ÙØ³ÙØ±Ø¨Øª ÙØ§ÙÙÙ ÙØ´ØªØ±ÙÙÙ ÙØ¹ÙÙ Ø±ÙØ­ Ø¨Ø§ÙÙ ÙØ­Ø¯ Ø·Ø§Ø±Ø¯Ù ÙÙØ§ Ø§Ø­Ø¯ Ø¨ÙØ°ÙÙ Ø¨ Ø§ÙØ§ÙØ±Ù\n\nÙØ¨Ø³ Ø§ØªÙÙÙ ØªØ³ØªÙØªØ¹ Ø¨Ø§ÙØ³ÙØ±Ø¨Øª\n\n(ÙÙØ§Ø­Ø¸Ø© ØªØ±Ø§ Ø­ÙØ§ÙØ© Ø§ÙØ¨Ø§ÙÙ ÙØ§ ØªØ´ØªØºÙ Ø§ÙØ§ Ø¹ÙÙ Ø§ÙÙ ÙÙØ¹ÙÙÙ Ø¹ÙÙÙ ÙÙ VR7)"
-_T18ImportantTextEn = "Peace be upon you\n\nThis script is still in its early stages â more commands and stronger protection coming soon, God willing.\n\n+ No subscribers â This is only the beginning.\n\nHope you enjoy the script!\n\n(Note: Bang protection only works against those who have it active on you from VR7)"
+_T18ImportantTextAr = "السلام عليكم ورحمة الله وبركاته\n\nطبعاً السكربت ذا ببدايته يعني باقي ما اشتغلت عليه والاوامر بدائيه ومستقبلاً بتشوفون اوامر اكثر وحماية اقوى ان شاء الله\n\n+ السكربت مافيه مشتركين يعني ريح بالك محد طاردك ولا احد بيذلك ب اوامره\n\nوبس اتمنى تستمتع بالسكربت\n\n(ملاحظة ترا حماية البانق ما تشتغل الا على الي مفعلين عليك من VR7)"
+_T18ImportantTextEn = "Peace be upon you\n\nThis script is still in its early stages — more commands and stronger protection coming soon, God willing.\n\n+ No subscribers — This is only the beginning.\n\nHope you enjoy the script!\n\n(Note: Bang protection only works against those who have it active on you from VR7)"
 
 Input.Parent = TargetPage
 Input.Size = UDim2.new(1, -112, 0, 40)
@@ -2793,11 +2793,11 @@ Players.PlayerRemoving:Connect(function(p)
         local refs = _T18TimerRefs[p.Name]
         if refs then
             if refs.status then
-                refs.status.Text = "Ø®Ø±Ø¬ ÙÙ Ø§ÙØ³ÙØ±ÙØ±"
+                refs.status.Text = "خرج من السيرفر"
                 refs.status.TextColor3 = Color3.fromRGB(255,100,100)
             end
             if refs.leaveLabel then
-                refs.leaveLabel.Text = "Ø®Ø±Ø¬ " .. entry.leaveCount .. " ÙØ±Ø§Øª"
+                refs.leaveLabel.Text = "خرج " .. entry.leaveCount .. " مرات"
             end
             if refs.row then
                 refs.row.BackgroundColor3 = Color3.fromRGB(70,25,25)
@@ -2814,7 +2814,7 @@ Players.PlayerAdded:Connect(function(p)
         local refs = _T18TimerRefs[p.Name]
         if refs then
             if refs.status then
-                refs.status.Text = "ÙÙ Ø§ÙØ³ÙØ±ÙØ±"
+                refs.status.Text = "في السيرفر"
                 refs.status.TextColor3 = Color3.fromRGB(100,220,100)
             end
             if refs.row then
@@ -2865,7 +2865,7 @@ local _tlTitle = Instance.new("TextLabel")
 _tlTitle.Size = UDim2.new(1, -48, 0, 32)
 _tlTitle.Position = UDim2.new(0, 10, 0, 6)
 _tlTitle.BackgroundTransparency = 1
-_tlTitle.Text = "Ø³Ø¬Ù Ø§ÙØ§Ø³ØªÙØ¯Ø§Ù"
+_tlTitle.Text = "سجل الاستهداف"
 _tlTitle.TextColor3 = Theme.Text
 _tlTitle.TextXAlignment = Enum.TextXAlignment.Right
 _tlTitle.Font = Enum.Font.GothamBold
@@ -2909,7 +2909,7 @@ _tlClear.Size = UDim2.new(1, -20, 0, 26)
 _tlClear.Position = UDim2.new(0, 10, 0, 80)
 _tlClear.BackgroundColor3 = Theme.Danger
 _tlClear.BackgroundTransparency = 0.2
-_tlClear.Text = "ÙØ³Ø­ Ø§ÙØ³Ø¬Ù"
+_tlClear.Text = "مسح السجل"
 _tlClear.TextColor3 = Color3.fromRGB(255,255,255)
 _tlClear.Font = Enum.Font.Gotham
 _tlClear.TextSize = 13
@@ -2954,7 +2954,7 @@ local function _refreshTargetLog()
         local el = Instance.new("TextLabel")
         el.Size = UDim2.new(1,0,0,40)
         el.BackgroundTransparency = 1
-        el.Text = "ÙØ§ ÙÙØ¬Ø¯ Ø³Ø¬Ù"
+        el.Text = "لا يوجد سجل"
         el.TextColor3 = Theme.Muted
         el.TextXAlignment = Enum.TextXAlignment.Center
         el.Font = Enum.Font.Gotham
@@ -2997,7 +2997,7 @@ local function _refreshTargetLog()
         sinceLabel.Size = UDim2.new(0.4, 0, 0, 22)
         sinceLabel.Position = UDim2.new(0, 46, 0, 4)
         sinceLabel.BackgroundTransparency = 1
-        sinceLabel.Text = "ÙÙØ° " .. _t18FmtTimer(tick()-rd.ent.startTime)
+        sinceLabel.Text = "منذ " .. _t18FmtTimer(tick()-rd.ent.startTime)
         sinceLabel.TextColor3 = Color3.fromRGB(100,220,255)
         sinceLabel.TextXAlignment = Enum.TextXAlignment.Left
         sinceLabel.Font = Enum.Font.Code
@@ -3011,7 +3011,7 @@ local function _refreshTargetLog()
         stLbl.Size = UDim2.new(0.55, -4, 0, 16)
         stLbl.Position = UDim2.new(0.45, 0, 0, 28)
         stLbl.BackgroundTransparency = 1
-        stLbl.Text = rd.ent.online and "â¢ ÙÙ Ø§ÙØ³ÙØ±ÙØ±" or "â¢ Ø®Ø±Ø¬ ÙÙ Ø§ÙØ³ÙØ±ÙØ±"
+        stLbl.Text = rd.ent.online and "• في السيرفر" or "• خرج من السيرفر"
         stLbl.TextColor3 = rd.ent.online and Color3.fromRGB(100,220,100) or Color3.fromRGB(255,100,100)
         stLbl.TextXAlignment = Enum.TextXAlignment.Right
         stLbl.Font = Enum.Font.Gotham
@@ -3024,7 +3024,7 @@ local function _refreshTargetLog()
         leaveLbl.Size = UDim2.new(0.4, 0, 0, 16)
         leaveLbl.Position = UDim2.new(0, 46, 0, 30)
         leaveLbl.BackgroundTransparency = 1
-        leaveLbl.Text = rd.ent.leaveCount > 0 and ("Ø®Ø±Ø¬ " .. rd.ent.leaveCount .. " ÙØ±Ø§Øª") or ""
+        leaveLbl.Text = rd.ent.leaveCount > 0 and ("خرج " .. rd.ent.leaveCount .. " مرات") or ""
         leaveLbl.TextColor3 = Color3.fromRGB(255,140,80)
         leaveLbl.TextXAlignment = Enum.TextXAlignment.Left
         leaveLbl.Font = Enum.Font.Gotham
@@ -3039,7 +3039,7 @@ local function _refreshTargetLog()
         selBtn.Position = UDim2.new(0, 4, 0, 4)
         selBtn.BackgroundColor3 = Theme.Accent
         selBtn.BackgroundTransparency = 0.1
-        selBtn.Text = "â"
+        selBtn.Text = "→"
         selBtn.TextColor3 = Color3.fromRGB(255,255,255)
         selBtn.Font = Enum.Font.GothamBold
         selBtn.TextSize = 20
@@ -3062,7 +3062,7 @@ RunService.Heartbeat:Connect(function()
     for nm, ent in pairs(_T18TargetLog) do
         local refs = _T18TimerRefs[nm]
         if refs and refs.timer then
-            refs.timer.Text = "ÙÙØ° " .. _t18FmtTimer(tick()-ent.startTime)
+            refs.timer.Text = "منذ " .. _t18FmtTimer(tick()-ent.startTime)
         end
     end
 end)
@@ -3195,7 +3195,7 @@ do
     shaliLabel.Size = UDim2.new(1, -20, 0, 20)
     shaliLabel.Position = UDim2.new(0, 10, 0, 392)
     shaliLabel.BackgroundTransparency = 1
-    shaliLabel.Text = "Ø§ÙØ§ÙØ± Ø´Ø§ÙÙÙ ÙØ­ÙØ¯"
+    shaliLabel.Text = "اوامر شاليه محمد"
     shaliLabel.TextColor3 = Color3.fromRGB(180, 20, 30)
     shaliLabel.TextXAlignment = Enum.TextXAlignment.Center
     shaliLabel.Font = Enum.Font.GothamBold
@@ -3220,7 +3220,7 @@ local HdPrefixLabel = Instance.new("TextLabel")
 HdPrefixLabel.Size = UDim2.new(1, -20, 0, 18)
 HdPrefixLabel.Position = UDim2.new(0, 10, 0, 504)
 HdPrefixLabel.BackgroundTransparency = 1
-HdPrefixLabel.Text = "Prefix Ø§ÙÙ HD (ØªÙÙØ§Ø¦Ù Ø£Ù ÙØ¯ÙÙ)"
+HdPrefixLabel.Text = "Prefix الـ HD (تلقائي أو يدوي)"
 HdPrefixLabel.TextColor3 = Theme.Muted
 HdPrefixLabel.TextXAlignment = Enum.TextXAlignment.Right
 HdPrefixLabel.Font = Enum.Font.Gotham
@@ -3233,7 +3233,7 @@ HdPrefixInput.Size = UDim2.new(0.38, -4, 0, 38)
 HdPrefixInput.Position = UDim2.new(0, 10, 0, 524)
 HdPrefixInput.BackgroundColor3 = Theme.Input
 HdPrefixInput.BackgroundTransparency = 0.2
-HdPrefixInput.PlaceholderText = "ÙØ«Ø§Ù: ,"
+HdPrefixInput.PlaceholderText = "مثال: ,"
 HdPrefixInput.Text = ","
 HdPrefixInput.TextColor3 = Theme.Text
 HdPrefixInput.PlaceholderColor3 = Theme.Muted
@@ -3263,7 +3263,7 @@ pcall(function()
     tryGet("HD_Admin","Settings","Prefix")
 end)
 
-local HdCopyBtn = makeButton("HdCopyBtn", "ÙØ³Ø® HD", UDim2.new(0.6, -14, 0, 38), UDim2.new(0.4, 4, 0, 524), Theme.ButtonBlue, Theme.Accent)
+local HdCopyBtn = makeButton("HdCopyBtn", "نسخ HD", UDim2.new(0.6, -14, 0, 38), UDim2.new(0.4, 4, 0, 524), Theme.ButtonBlue, Theme.Accent)
 HdCopyBtn.Parent = TargetPage
 
 
@@ -3299,7 +3299,7 @@ local _vpEmptyIcon = Instance.new("TextLabel")
 _vpEmptyIcon.Size = UDim2.new(0, 84, 0, 84)
 _vpEmptyIcon.Position = UDim2.new(0, 8, 0, 8)
 _vpEmptyIcon.BackgroundTransparency = 1
-_vpEmptyIcon.Text = "ð¤"
+_vpEmptyIcon.Text = "👤"
 _vpEmptyIcon.TextColor3 = Theme.Muted
 _vpEmptyIcon.Font = Enum.Font.GothamBold
 _vpEmptyIcon.TextSize = 32
@@ -3383,21 +3383,21 @@ local function _updateTargetPreview(playerName)
     _vpDisplayLbl.Text = targetPlayer.DisplayName .. " (@" .. targetPlayer.Name .. ")"
 
     
-    _vpUserIdLbl.Text = "Ø±ÙÙ Ø§ÙØ­Ø³Ø§Ø¨: " .. tostring(targetPlayer.UserId)
+    _vpUserIdLbl.Text = "رقم الحساب: " .. tostring(targetPlayer.UserId)
 
     
     local ageDays = targetPlayer.AccountAge
     local joinTime = os.time() - (ageDays * 86400)
     local d = os.date("*t", joinTime)
-    _vpJoinLbl.Text = string.format("ØªØ§Ø±ÙØ® Ø§ÙØªØ³Ø¬ÙÙ: %02d/%02d/%04d", d.day, d.month, d.year)
+    _vpJoinLbl.Text = string.format("تاريخ التسجيل: %02d/%02d/%04d", d.day, d.month, d.year)
 
     
     local years = math.floor(ageDays / 365)
     local months = math.floor((ageDays % 365) / 30)
     if years > 0 then
-        _vpAgeLbl.Text = "â³ " .. years .. " Ø³ÙØ© Ù" .. months .. " Ø´ÙØ±"
+        _vpAgeLbl.Text = "⏳ " .. years .. " سنة و" .. months .. " شهر"
     else
-        _vpAgeLbl.Text = "â³ " .. months .. " Ø´ÙØ±"
+        _vpAgeLbl.Text = "⏳ " .. months .. " شهر"
     end
 end
 
@@ -3466,7 +3466,7 @@ local HdCmdLabel = Instance.new("TextLabel")
 HdCmdLabel.Size = UDim2.new(1, -20, 0, 16)
 HdCmdLabel.Position = UDim2.new(0, 10, 0, 54)
 HdCmdLabel.BackgroundTransparency = 1
-HdCmdLabel.Text = "Ø§ÙØ§ÙØ± HD ÙØ§ ØªÙØ± Ø¹Ø¨Ø± Ø§ÙØ´Ø§Øª"
+HdCmdLabel.Text = "اوامر HD ما تمر عبر الشات"
 HdCmdLabel.TextColor3 = Theme.Muted
 HdCmdLabel.TextXAlignment = Enum.TextXAlignment.Right
 HdCmdLabel.Font = Enum.Font.Gotham
@@ -3492,7 +3492,7 @@ makeCorner(HdCmdInput, 10)
 makeStroke(HdCmdInput, Theme.Border, 1, 0.2)
 applyClickToClear(HdCmdInput)
 
-local HdCmdSendBtn = makeButton("HdCmdSendBtn", "Ø¥Ø±Ø³Ø§Ù", UDim2.new(0, 58, 0, 38), UDim2.new(1, -62, 0, 72), Theme.ButtonBlue, Theme.Accent)
+local HdCmdSendBtn = makeButton("HdCmdSendBtn", "إرسال", UDim2.new(0, 58, 0, 38), UDim2.new(1, -62, 0, 72), Theme.ButtonBlue, Theme.Accent)
 HdCmdSendBtn.Parent = OthersPage
 
 
@@ -3504,30 +3504,30 @@ _G._HLBtn.Size = UDim2.new(0.5, -14, 0, 38)
 _G._HLBtn.Position = UDim2.new(0.5, 4, 0, 118)
 
 local AntiAFK = {active=false, conn=nil, btn=nil}
-AntiAFK.btn = makeButton("AntiAFKBtn", "ÙØ¶Ø§Ø¯ Ø§ÙÙ", UDim2.new(0.5, -14, 0, 38), UDim2.new(0, 10, 0, 162), Theme.ButtonBlue, Theme.Accent)
+AntiAFK.btn = makeButton("AntiAFKBtn", "مضاد افك", UDim2.new(0.5, -14, 0, 38), UDim2.new(0, 10, 0, 162), Theme.ButtonBlue, Theme.Accent)
 AntiAFK.btn.Parent = OthersPage
 
-_G.CuffProtectBtn = makeButton("CuffProtectBtn", "Ø­ÙØ§ÙØ© ÙÙØ¨Ø´Ø©", UDim2.new(0.5, -14, 0, 38), UDim2.new(0.5, 4, 0, 162), Theme.ButtonBlue, Theme.Accent)
+_G.CuffProtectBtn = makeButton("CuffProtectBtn", "حماية كلبشة", UDim2.new(0.5, -14, 0, 38), UDim2.new(0.5, 4, 0, 162), Theme.ButtonBlue, Theme.Accent)
 _G.CuffProtectBtn.Parent = OthersPage
 
-do local b = makeButton("NoClipBtn", "Ø§Ø®ØªØ±Ø§Ù Ø¬Ø¯Ø±Ø§Ù", UDim2.new(0.5, -14, 0, 38), UDim2.new(0, 10, 0, 258), Theme.ButtonBlue, Theme.Accent); b.Parent = PlayerPage end
-do local b = makeButton("LowGravBtn", "Ø¬Ø§Ø°Ø¨ÙØ© ÙÙØ®ÙØ¶Ø©", UDim2.new(0.5, -14, 0, 38), UDim2.new(0, 10, 0, 206), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage end
-do local b = makeButton("InfiniteJumpBtn", "ÙÙØ² ÙØ§ ÙÙØ§Ø¦Ù", UDim2.new(0.5, -14, 0, 38), UDim2.new(0, 10, 0, 214), Theme.ButtonBlue, Theme.Accent); b.Parent = PlayerPage end
-do local b = makeButton("WallClimbBtn", "ØªØ³ÙÙ Ø§ÙØ¬Ø¯Ø±Ø§Ù", UDim2.new(0.5, -14, 0, 38), UDim2.new(0.5, 4, 0, 214), Theme.ButtonBlue, Theme.Accent); b.Parent = PlayerPage end
-do local b = makeButton("VanishBtn", T18T("Ø§Ø®ØªÙØ§Ø¡"), UDim2.new(0.5, -14, 0, 38), UDim2.new(0.5, 4, 0, 258), Theme.ButtonBlue, Theme.Accent); b.Parent = PlayerPage end
+do local b = makeButton("NoClipBtn", "اختراق جدران", UDim2.new(0.5, -14, 0, 38), UDim2.new(0, 10, 0, 258), Theme.ButtonBlue, Theme.Accent); b.Parent = PlayerPage end
+do local b = makeButton("LowGravBtn", "جاذبية منخفضة", UDim2.new(0.5, -14, 0, 38), UDim2.new(0, 10, 0, 206), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage end
+do local b = makeButton("InfiniteJumpBtn", "قفز لا نهائي", UDim2.new(0.5, -14, 0, 38), UDim2.new(0, 10, 0, 214), Theme.ButtonBlue, Theme.Accent); b.Parent = PlayerPage end
+do local b = makeButton("WallClimbBtn", "تسلق الجدران", UDim2.new(0.5, -14, 0, 38), UDim2.new(0.5, 4, 0, 214), Theme.ButtonBlue, Theme.Accent); b.Parent = PlayerPage end
+do local b = makeButton("VanishBtn", T18T("اختفاء"), UDim2.new(0.5, -14, 0, 38), UDim2.new(0.5, 4, 0, 258), Theme.ButtonBlue, Theme.Accent); b.Parent = PlayerPage end
 do local b = makeButton("ESPBtn", "ESP", UDim2.new(0.5, -14, 0, 38), UDim2.new(0.5, 4, 0, 206), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage end
-do local b = makeButton("AntiLagBtn", "ÙØ¶Ø§Ø¯ ÙØ§Ø¬", UDim2.new(0.5, -14, 0, 38), UDim2.new(0, 10, 0, 250), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage end
+do local b = makeButton("AntiLagBtn", "مضاد لاج", UDim2.new(0.5, -14, 0, 38), UDim2.new(0, 10, 0, 250), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage end
 do local b = makeButton("FPSPingBtn", "FPS / Ping", UDim2.new(0.5, -14, 0, 38), UDim2.new(0.5, 4, 0, 250), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage end
-do local b = makeButton("ServerInfoBtn", "ÙØ¹ÙÙÙØ§Øª Ø§ÙØ³ÙØ±ÙØ±", UDim2.new(1, -20, 0, 38), UDim2.new(0, 10, 0, 294), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage end
+do local b = makeButton("ServerInfoBtn", "معلومات السيرفر", UDim2.new(1, -20, 0, 38), UDim2.new(0, 10, 0, 294), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage end
 
 
-do local b = makeButton("RejoinBtn", "Ø±Ø¬ÙÙÙ", UDim2.new(1,-20,0,38), UDim2.new(0,10,0,338), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage
+do local b = makeButton("RejoinBtn", "رجوين", UDim2.new(1,-20,0,38), UDim2.new(0,10,0,338), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage
    b.MouseButton1Click:Connect(function()
        pcall(function() game:GetService("TeleportService"):Teleport(game.PlaceId, LocalPlayer) end)
    end)
 end
 
-do local b = makeButton("SwitchSrvBtn", "ØªØºÙÙØ± Ø§ÙØ³ÙØ±ÙØ±", UDim2.new(1,-20,0,38), UDim2.new(0,10,0,382), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage
+do local b = makeButton("SwitchSrvBtn", "تغيير السيرفر", UDim2.new(1,-20,0,38), UDim2.new(0,10,0,382), Theme.ButtonBlue, Theme.Accent); b.Parent = OthersPage
    b.MouseButton1Click:Connect(function()
        pcall(function() game:GetService("TeleportService"):Teleport(game.PlaceId) end)
    end)
@@ -3535,7 +3535,7 @@ end
 
 do
     local _muted = false
-    local b = makeButton("MuteGameBtn", "ÙØªÙ Ø§ÙØµÙØª", UDim2.new(0.5,-14,0,38), UDim2.new(0,10,0,426), Theme.ButtonBlue, Theme.Accent)
+    local b = makeButton("MuteGameBtn", "كتم الصوت", UDim2.new(0.5,-14,0,38), UDim2.new(0,10,0,426), Theme.ButtonBlue, Theme.Accent)
     b.Parent = OthersPage
     b.MouseButton1Click:Connect(function()
         _muted = not _muted
@@ -3544,14 +3544,14 @@ do
                 if s:IsA("Sound") then s.Volume = _muted and 0 or 1 end
             end
         end)
-        b.Text = _muted and "ØªÙØ¹ÙÙ Ø§ÙØµÙØª" or "ÙØªÙ Ø§ÙØµÙØª"
+        b.Text = _muted and "تفعيل الصوت" or "كتم الصوت"
         b.BackgroundColor3 = _muted and Color3.fromRGB(239,68,68) or Theme.ButtonBlue
     end)
 end
 
 do
     local _on = false
-    local b = makeButton("FullBrightBtn", "ÙÙÙ Ø¨Ø±Ø§ÙØª", UDim2.new(0.5,-14,0,38), UDim2.new(0.5,4,0,426), Theme.ButtonBlue, Theme.Accent)
+    local b = makeButton("FullBrightBtn", "فول برايت", UDim2.new(0.5,-14,0,38), UDim2.new(0.5,4,0,426), Theme.ButtonBlue, Theme.Accent)
     b.Parent = OthersPage
     b.MouseButton1Click:Connect(function()
         _on = not _on
@@ -3565,14 +3565,14 @@ do
                 L.Ambient=Color3.new(0.5,0.5,0.5)
             end
         end)
-        b.Text = _on and "Ø§ÙÙØ§Ù Ø¨Ø±Ø§ÙØª" or "ÙÙÙ Ø¨Ø±Ø§ÙØª"
+        b.Text = _on and "ايقاف برايت" or "فول برايت"
         b.BackgroundColor3 = _on and Color3.fromRGB(245,158,11) or Theme.ButtonBlue
     end)
 end
 
 do
     local _on = false
-    local b = makeButton("NoFogBtn", "Ø§Ø²Ø§ÙØ© Ø§ÙØ¶Ø¨Ø§Ø¨", UDim2.new(0.5,-14,0,38), UDim2.new(0.5,4,0,470), Theme.ButtonBlue, Theme.Accent)
+    local b = makeButton("NoFogBtn", "ازالة الضباب", UDim2.new(0.5,-14,0,38), UDim2.new(0.5,4,0,470), Theme.ButtonBlue, Theme.Accent)
     b.Parent = OthersPage
     b.MouseButton1Click:Connect(function()
         _on = not _on
@@ -3581,14 +3581,14 @@ do
             L.FogEnd   = _on and 100000 or 1000
             L.FogStart = _on and 99999  or 0
         end)
-        b.Text = _on and "ØªÙØ¹ÙÙ Ø§ÙØ¶Ø¨Ø§Ø¨" or "Ø§Ø²Ø§ÙØ© Ø§ÙØ¶Ø¨Ø§Ø¨"
+        b.Text = _on and "تفعيل الضباب" or "ازالة الضباب"
         b.BackgroundColor3 = _on and Color3.fromRGB(245,158,11) or Theme.ButtonBlue
     end)
 end
 
 do
     local _on = false; local _conn = nil; local _cf = nil
-    local b = makeButton("CamLockBtn", "ØªØ¬ÙÙØ¯ Ø§ÙÙØ§ÙÙØ±Ø§", UDim2.new(1,-20,0,38), UDim2.new(0,10,0,514), Theme.ButtonBlue, Theme.Accent)
+    local b = makeButton("CamLockBtn", "تجميد الكاميرا", UDim2.new(1,-20,0,38), UDim2.new(0,10,0,514), Theme.ButtonBlue, Theme.Accent)
     b.Parent = OthersPage
     b.MouseButton1Click:Connect(function()
         _on = not _on
@@ -3602,7 +3602,7 @@ do
             if _conn then _conn:Disconnect(); _conn = nil end
             pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
         end
-        b.Text = _on and "Ø§ÙØºØ§Ø¡ Ø§ÙØªØ¬ÙÙØ¯" or "ØªØ¬ÙÙØ¯ Ø§ÙÙØ§ÙÙØ±Ø§"
+        b.Text = _on and "الغاء التجميد" or "تجميد الكاميرا"
         b.BackgroundColor3 = _on and Color3.fromRGB(239,68,68) or Theme.ButtonBlue
     end)
 end
@@ -3610,7 +3610,7 @@ end
 do
     local _nightOn = false
     local _nightSavedClock = 14
-    local b = makeButton("NightBtn", "ÙØ¶Ø¹ Ø§ÙÙÙÙ", UDim2.new(0.5,-14,0,38), UDim2.new(0,10,0,470), Theme.ButtonBlue, Theme.Accent)
+    local b = makeButton("NightBtn", "وضع الليل", UDim2.new(0.5,-14,0,38), UDim2.new(0,10,0,470), Theme.ButtonBlue, Theme.Accent)
     b.Parent = OthersPage
     b.MouseButton1Click:Connect(function()
         _nightOn = not _nightOn
@@ -3625,7 +3625,7 @@ do
                 L.Brightness = 1
             end
         end)
-        b.Text = _nightOn and "Ø§ÙØºØ§Ø¡ Ø§ÙÙÙÙ" or "ÙØ¶Ø¹ Ø§ÙÙÙÙ"
+        b.Text = _nightOn and "الغاء الليل" or "وضع الليل"
         b.BackgroundColor3 = _nightOn and Color3.fromRGB(99,102,241) or Theme.ButtonBlue
     end)
 end
@@ -3688,15 +3688,15 @@ local function makeMenuButton(text, order)
     return button
 end
 
-local MainMenuBtn = makeMenuButton("Ø§ÙÙØ§Ø¦ÙØ© Ø§ÙØ±Ø¦ÙØ³ÙØ©", 1)
-local PlayerMenuBtn = makeMenuButton("Ø§ÙÙØ§Ø¹Ø¨", 2)
-local TargetMenuBtn = makeMenuButton("Ø§Ø³ØªÙØ¯Ø§Ù", 3)
-local ImportantMenuBtn = makeMenuButton("ÙÙÙ", 4)
+local MainMenuBtn = makeMenuButton("القائمة الرئيسية", 1)
+local PlayerMenuBtn = makeMenuButton("اللاعب", 2)
+local TargetMenuBtn = makeMenuButton("استهداف", 3)
+local ImportantMenuBtn = makeMenuButton("مهم", 4)
 UsersMenuBtn = nil
 local OwnerMenuBtn = nil
 
-local OthersMenuBtn = makeMenuButton("Ø§Ø®Ø±Ù", 5)
-local SettingsMenuBtn = makeMenuButton("âï¸ Ø§ÙØ¥Ø¹Ø¯Ø§Ø¯Ø§Øª", 6)
+local OthersMenuBtn = makeMenuButton("اخرى", 5)
+local SettingsMenuBtn = makeMenuButton("⚙️ الإعدادات", 6)
 
 _T18LangY = _MenuLayout.start + 4 * _MenuLayout.step + _MenuLayout.h + 8
 _T18ArBtn = nil
@@ -3706,7 +3706,7 @@ _T18LangSelectorBtn = nil
 
 
 if isOwnerUser then
-    OwnerMenuBtn = makeMenuButton("ð Ø§ÙÙØ±", 7)
+    OwnerMenuBtn = makeMenuButton("👑 اونر", 7)
 end
 
 local Pages = {
@@ -3733,7 +3733,7 @@ end
 Pages.others = OthersPage
 MenuButtons.others = OthersMenuBtn
 local SettingsPage = makePage("SettingsPage")
-makePageTitle(SettingsPage, "Ø§ÙØ¥Ø¹Ø¯Ø§Ø¯Ø§Øª", "ØªØ®ØµÙØµ Ø§ÙÙØ§Ø¬ÙØ©")
+makePageTitle(SettingsPage, "الإعدادات", "تخصيص الواجهة")
 Pages.settings = SettingsPage
 MenuButtons.settings = SettingsMenuBtn
 
@@ -3747,7 +3747,7 @@ do
     _LangSecLabel.Size = UDim2.new(1, -24, 0, 18)
     _LangSecLabel.Position = UDim2.new(0, 12, 0, 62)
     _LangSecLabel.BackgroundTransparency = 1
-    _LangSecLabel.Text = "â Ø§ÙÙØºØ©"
+    _LangSecLabel.Text = "● اللغة"
     _LangSecLabel.TextColor3 = Color3.fromRGB(140, 145, 170)
     _LangSecLabel.TextXAlignment = Enum.TextXAlignment.Right
     _LangSecLabel.Font = Enum.Font.GothamBold
@@ -3762,7 +3762,7 @@ do
     _T18LangSelectorBtn.Position = UDim2.new(0, 12, 0, 84)
     _T18LangSelectorBtn.BackgroundColor3 = Theme.PanelSoft
     _T18LangSelectorBtn.BackgroundTransparency = 0.05
-    _T18LangSelectorBtn.Text = "ð  Ø§ÙÙØºØ©  â¾"
+    _T18LangSelectorBtn.Text = "🌐  اللغة  ▾"
     _T18LangSelectorBtn.TextColor3 = Theme.Text
     _T18LangSelectorBtn.Font = Enum.Font.GothamBold
     _T18LangSelectorBtn.TextSize = 14
@@ -3803,7 +3803,7 @@ do
     _T18ArBtn.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
     _T18ArBtn.BackgroundTransparency = 0
     _T18ArBtn.BorderSizePixel = 0
-    _T18ArBtn.Text = "â  ð¸ð¦  Ø§ÙØ¹Ø±Ø¨ÙØ©"
+    _T18ArBtn.Text = "✔  🇸🇦  العربية"
     _T18ArBtn.TextColor3 = Color3.fromRGB(20, 20, 20)
     _T18ArBtn.Font = Enum.Font.GothamBold
     _T18ArBtn.TextSize = 14
@@ -3820,7 +3820,7 @@ do
     _T18EnBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
     _T18EnBtn.BackgroundTransparency = 0
     _T18EnBtn.BorderSizePixel = 0
-    _T18EnBtn.Text = "     ðºð¸  English"
+    _T18EnBtn.Text = "     🇺🇸  English"
     _T18EnBtn.TextColor3 = Color3.fromRGB(160, 160, 160)
     _T18EnBtn.Font = Enum.Font.GothamBold
     _T18EnBtn.TextSize = 14
@@ -3857,7 +3857,7 @@ do
     _T18ColorSecLabel.Size = UDim2.new(1, -24, 0, 18)
     _T18ColorSecLabel.Position = UDim2.new(0, 12, 0, 136)
     _T18ColorSecLabel.BackgroundTransparency = 1
-    _T18ColorSecLabel.Text = "â Ø§ÙÙÙÙ"
+    _T18ColorSecLabel.Text = "● اللون"
     _T18ColorSecLabel.TextColor3 = Color3.fromRGB(140, 145, 170)
     _T18ColorSecLabel.TextXAlignment = Enum.TextXAlignment.Right
     _T18ColorSecLabel.Font = Enum.Font.GothamBold
@@ -3871,7 +3871,7 @@ do
     _T18ColorBtn.Position = UDim2.new(0, 12, 0, 158)
     _T18ColorBtn.BackgroundColor3 = Theme.PanelSoft
     _T18ColorBtn.BackgroundTransparency = 0.05
-    _T18ColorBtn.Text = "ð¨  Ø§ÙÙÙÙ  â¾"
+    _T18ColorBtn.Text = "🎨  اللون  ▾"
     _T18ColorBtn.TextColor3 = Theme.Text
     _T18ColorBtn.Font = Enum.Font.GothamBold
     _T18ColorBtn.TextSize = 14
@@ -3889,7 +3889,7 @@ do
     _ColorSoon.Position = UDim2.new(0, 8, 0.5, -10)
     _ColorSoon.BackgroundColor3 = Color3.fromRGB(180, 100, 0)
     _ColorSoon.BackgroundTransparency = 0
-    _ColorSoon.Text = "ÙØ±ÙØ¨Ø§Ù"
+    _ColorSoon.Text = "قريباً"
     _ColorSoon.TextColor3 = Color3.fromRGB(255, 255, 255)
     _ColorSoon.Font = Enum.Font.GothamBold
     _ColorSoon.TextSize = 11
@@ -3928,7 +3928,7 @@ do
     _T18ColorDefaultBtn.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
     _T18ColorDefaultBtn.BackgroundTransparency = 0
     _T18ColorDefaultBtn.BorderSizePixel = 0
-    _T18ColorDefaultBtn.Text = "â  â«  Default"
+    _T18ColorDefaultBtn.Text = "✔  ⚫  Default"
     _T18ColorDefaultBtn.TextColor3 = Color3.fromRGB(20, 20, 20)
     _T18ColorDefaultBtn.Font = Enum.Font.GothamBold
     _T18ColorDefaultBtn.TextSize = 14
@@ -3945,7 +3945,7 @@ do
     _T18ColorPinkBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
     _T18ColorPinkBtn.BackgroundTransparency = 0
     _T18ColorPinkBtn.BorderSizePixel = 0
-    _T18ColorPinkBtn.Text = "     ð¸  Pink"
+    _T18ColorPinkBtn.Text = "     🌸  Pink"
     _T18ColorPinkBtn.TextColor3 = Color3.fromRGB(160, 160, 160)
     _T18ColorPinkBtn.Font = Enum.Font.GothamBold
     _T18ColorPinkBtn.TextSize = 14
@@ -3959,10 +3959,10 @@ do
         local isDefault = (theme == "default")
         _T18ColorDefaultBtn.BackgroundColor3 = isDefault and Color3.fromRGB(220, 220, 220) or Color3.fromRGB(28, 28, 28)
         _T18ColorDefaultBtn.TextColor3       = isDefault and Color3.fromRGB(20, 20, 20)   or Color3.fromRGB(160, 160, 160)
-        _T18ColorDefaultBtn.Text             = (isDefault and "â  " or "     ") .. "â«  Default"
+        _T18ColorDefaultBtn.Text             = (isDefault and "✔  " or "     ") .. "⚫  Default"
         _T18ColorPinkBtn.BackgroundColor3    = (not isDefault) and Color3.fromRGB(220, 220, 220) or Color3.fromRGB(28, 28, 28)
         _T18ColorPinkBtn.TextColor3          = (not isDefault) and Color3.fromRGB(20, 20, 20)   or Color3.fromRGB(160, 160, 160)
-        _T18ColorPinkBtn.Text               = ((not isDefault) and "â  " or "     ") .. "ð¸  Pink"
+        _T18ColorPinkBtn.Text               = ((not isDefault) and "✔  " or "     ") .. "🌸  Pink"
         _T18ColorTheme = theme
     end
 
@@ -4115,7 +4115,7 @@ do
     _SzSecLbl.Size = UDim2.new(1,-24,0,18)
     _SzSecLbl.Position = UDim2.new(0,12,0,214)
     _SzSecLbl.BackgroundTransparency = 1
-    _SzSecLbl.Text = "â Ø§ÙØ­Ø¬Ù"
+    _SzSecLbl.Text = "● الحجم"
     _SzSecLbl.TextColor3 = Color3.fromRGB(140,145,170)
     _SzSecLbl.TextXAlignment = Enum.TextXAlignment.Right
     _SzSecLbl.Font = Enum.Font.GothamBold
@@ -4129,7 +4129,7 @@ do
     _SzBtn.Position = UDim2.new(0,12,0,234)
     _SzBtn.BackgroundColor3 = Theme.PanelSoft
     _SzBtn.BackgroundTransparency = 0.05
-    _SzBtn.Text = "ð  Ø§ÙØ­Ø¬Ù  â¾"
+    _SzBtn.Text = "📐  الحجم  ▾"
     _SzBtn.TextColor3 = Theme.Text
     _SzBtn.Font = Enum.Font.GothamBold
     _SzBtn.TextSize = 14
@@ -4147,7 +4147,7 @@ do
     _SzSoon.Position = UDim2.new(0, 8, 0.5, -10)
     _SzSoon.BackgroundColor3 = Color3.fromRGB(180, 100, 0)
     _SzSoon.BackgroundTransparency = 0
-    _SzSoon.Text = "ÙØ±ÙØ¨Ø§Ù"
+    _SzSoon.Text = "قريباً"
     _SzSoon.TextColor3 = Color3.fromRGB(255, 255, 255)
     _SzSoon.Font = Enum.Font.GothamBold
     _SzSoon.TextSize = 11
@@ -4168,11 +4168,11 @@ do
     makeStroke(_SzDrop, Theme.Border, 1, 0.1)
 
     local _szOpts = {
-        {t="â  Ø§ÙØªØ±Ø§Ø¶Ù",  w=610, h=500},
-        {t="   ÙØ¨ÙØ± Ø¬Ø¯Ø§Ù", w=750, h=600},
-        {t="   ÙØ¨ÙØ±",      w=680, h=550},
-        {t="   ÙØªÙØ³Ø·",    w=550, h=450},
-        {t="   ØµØºÙØ±",     w=480, h=390},
+        {t="✔  افتراضي",  w=610, h=500},
+        {t="   كبير جداً", w=750, h=600},
+        {t="   كبير",      w=680, h=550},
+        {t="   متوسط",    w=550, h=450},
+        {t="   صغير",     w=480, h=390},
     }
     local _szIdx = 1
     local _szBtns = {}
@@ -4198,8 +4198,8 @@ do
                 local sel = (j==i)
                 b2.BackgroundColor3 = sel and Color3.fromRGB(220,220,220) or Color3.fromRGB(28,28,28)
                 b2.TextColor3 = sel and Color3.fromRGB(20,20,20) or Color3.fromRGB(160,160,160)
-                local raw = _szOpts[j].t:gsub("^[â%s]+","")
-                b2.Text = (sel and "â  " or "   ") .. raw
+                local raw = _szOpts[j].t:gsub("^[✔%s]+","")
+                b2.Text = (sel and "✔  " or "   ") .. raw
             end
             baseFrameSize = Vector2.new(opt.w, opt.h)
             Frame.Size = UDim2.new(0, opt.w, 0, opt.h)
@@ -4279,7 +4279,7 @@ do
     Footer.Size = UDim2.new(1, -32, 0, 18)
 Footer.Position = UDim2.new(0, 16, 1, -24)
 Footer.BackgroundTransparency = 1
-Footer.Text = "Â© All rights reserved t_18"
+Footer.Text = "© All rights reserved t_18"
 Footer.TextColor3 = Color3.fromRGB(100, 116, 139)
 Footer.TextXAlignment = Enum.TextXAlignment.Left
 Footer.Font = Enum.Font.Gotham
@@ -4372,18 +4372,18 @@ local FlyTouchTitle = Instance.new("TextLabel")
 FlyTouchTitle.Size = UDim2.new(1, 0, 0, 24)
 FlyTouchTitle.Position = UDim2.new(0, 0, 0, 4)
 FlyTouchTitle.BackgroundTransparency = 1
-FlyTouchTitle.Text = "ØªØ­ÙÙ Ø§ÙØ·ÙØ±Ø§Ù"
+FlyTouchTitle.Text = "تحكم الطيران"
 FlyTouchTitle.TextColor3 = Theme.Text
 FlyTouchTitle.Font = Enum.Font.GothamBold
 FlyTouchTitle.TextSize = 14
 FlyTouchTitle.Parent = FlyTouchFrame
 
-local TouchUpBtn = makeFlyTouchButton("TouchUpBtn", "â", UDim2.new(0, 10, 0, 32))
-local TouchForwardBtn = makeFlyTouchButton("TouchForwardBtn", "Ø£ÙØ§Ù", UDim2.new(0, 66, 0, 32))
-local TouchDownBtn = makeFlyTouchButton("TouchDownBtn", "â", UDim2.new(0, 122, 0, 32))
-local TouchLeftBtn = makeFlyTouchButton("TouchLeftBtn", "â", UDim2.new(0, 10, 0, 82))
-local TouchBackBtn = makeFlyTouchButton("TouchBackBtn", "Ø®ÙÙ", UDim2.new(0, 66, 0, 82))
-local TouchRightBtn = makeFlyTouchButton("TouchRightBtn", "â", UDim2.new(0, 122, 0, 82))
+local TouchUpBtn = makeFlyTouchButton("TouchUpBtn", "↑", UDim2.new(0, 10, 0, 32))
+local TouchForwardBtn = makeFlyTouchButton("TouchForwardBtn", "أمام", UDim2.new(0, 66, 0, 32))
+local TouchDownBtn = makeFlyTouchButton("TouchDownBtn", "↓", UDim2.new(0, 122, 0, 32))
+local TouchLeftBtn = makeFlyTouchButton("TouchLeftBtn", "←", UDim2.new(0, 10, 0, 82))
+local TouchBackBtn = makeFlyTouchButton("TouchBackBtn", "خلف", UDim2.new(0, 66, 0, 82))
+local TouchRightBtn = makeFlyTouchButton("TouchRightBtn", "→", UDim2.new(0, 122, 0, 82))
 
 bindFlyTouchButton(TouchUpBtn, "Up")
 bindFlyTouchButton(TouchDownBtn, "Down")
@@ -4420,7 +4420,7 @@ ChatBubbleBtn.Size = UDim2.new(0, 54, 0, 54)
 ChatBubbleBtn.Position = UDim2.new(0, 16, 0.5, 4)
 ChatBubbleBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 ChatBubbleBtn.BackgroundTransparency = 0.4
-ChatBubbleBtn.Text = "ð¬"
+ChatBubbleBtn.Text = "💬"
 ChatBubbleBtn.TextColor3 = Theme.Text
 ChatBubbleBtn.TextSize = 22
 ChatBubbleBtn.Font = Enum.Font.GothamBold
@@ -4459,7 +4459,7 @@ ChatBubbleBtn.MouseButton1Click:Connect(function()
     local opening = not ChatPanel.Visible
     if opening then
         ChatBubbleBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        ChatBubbleBtn.Text = "â"
+        ChatBubbleBtn.Text = "✖"
         ChatPanel.Visible = true
         ChatPanel.Size = UDim2.new(1, -90, 0, 0)
         local _tgtSize = UDim2.new(1, -90, 0, 420)
@@ -4472,7 +4472,7 @@ ChatBubbleBtn.MouseButton1Click:Connect(function()
         end)
     else
         ChatBubbleBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        ChatBubbleBtn.Text = "ð¬"
+        ChatBubbleBtn.Text = "💬"
         local _tween = game:GetService("TweenService"):Create(ChatPanel,
             TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
             { Size = UDim2.new(1, -90, 0, 0) })
@@ -4657,12 +4657,12 @@ WalkSpeedBtn.MouseButton1Click:Connect(function()
     savedWalkSpeedValue.Value = tostring(newSpeed)
 
     if SpeedActive then
-        setButtonState(WalkSpeedBtn, true, T18T("Ø§ÙØ³Ø±Ø¹Ø© ÙÙØ¹ÙØ©"), T18T("Ø³Ø±Ø¹Ø© Ø§ÙÙØ§Ø¹Ø¨"), Theme.Active, Theme.PanelSoft)
+        setButtonState(WalkSpeedBtn, true, T18T("السرعة مفعلة"), T18T("سرعة اللاعب"), Theme.Active, Theme.PanelSoft)
         if hum then
             hum.WalkSpeed = newSpeed
         end
     else
-        setButtonState(WalkSpeedBtn, false, T18T("Ø§ÙØ³Ø±Ø¹Ø© ÙÙØ¹ÙØ©"), T18T("Ø³Ø±Ø¹Ø© Ø§ÙÙØ§Ø¹Ø¨"), Theme.Active, Theme.PanelSoft)
+        setButtonState(WalkSpeedBtn, false, T18T("السرعة مفعلة"), T18T("سرعة اللاعب"), Theme.Active, Theme.PanelSoft)
         if hum then
             hum.WalkSpeed = 16
         end
@@ -4760,7 +4760,7 @@ ZombieWalkBtn.MouseButton1Click:Connect(function()
         end
         _G._ZOrig = nil
     end
-    setButtonState(ZombieWalkBtn, _G._ZWA, T18T("Ø¥ÙÙØ§Ù ÙØ´ÙØ© Ø²ÙÙØ¨Ù"), T18T("ÙØ´ÙØ© Ø²ÙÙØ¨Ù"), Theme.Active, Theme.ButtonGreen)
+    setButtonState(ZombieWalkBtn, _G._ZWA, T18T("إيقاف مشية زومبي"), T18T("مشية زومبي"), Theme.Active, Theme.ButtonGreen)
 end)
 
 _G._HLBtn.MouseButton1Click:Connect(function()
@@ -4779,7 +4779,7 @@ _G._HLBtn.MouseButton1Click:Connect(function()
             _G._HLTrack.Priority = Enum.AnimationPriority.Action
             _G._HLTrack:Play()
         end)
-        setButtonState(_G._HLBtn, true, T18T("Ø¥ÙÙØ§Ù ÙÙØ¯ÙØ³"), T18T("ÙÙØ¯ÙØ³"), Theme.Active, Theme.ButtonGreen)
+        setButtonState(_G._HLBtn, true, T18T("إيقاف هيدلس"), T18T("هيدلس"), Theme.Active, Theme.ButtonGreen)
     else
 
         pcall(function()
@@ -4788,14 +4788,14 @@ _G._HLBtn.MouseButton1Click:Connect(function()
                 _G._HLTrack = nil
             end
         end)
-        setButtonState(_G._HLBtn, false, T18T("Ø¥ÙÙØ§Ù ÙÙØ¯ÙØ³"), T18T("ÙÙØ¯ÙØ³"), Theme.Active, Theme.ButtonGreen)
+        setButtonState(_G._HLBtn, false, T18T("إيقاف هيدلس"), T18T("هيدلس"), Theme.Active, Theme.ButtonGreen)
     end
 end)
 
 AntiAFK.btn.MouseButton1Click:Connect(function()
     AntiAFK.active = not AntiAFK.active
     if AntiAFK.active then
-        setButtonState(AntiAFK.btn, true, T18T("Ø¥ÙÙØ§Ù ÙØ¶Ø§Ø¯ Ø§ÙÙ"), T18T("ÙØ¶Ø§Ø¯ Ø§ÙÙ"), Theme.Active, Theme.ButtonGreen)
+        setButtonState(AntiAFK.btn, true, T18T("إيقاف مضاد افك"), T18T("مضاد افك"), Theme.Active, Theme.ButtonGreen)
         if not AntiAFK.conn then
             AntiAFK.conn = LocalPlayer.Idled:Connect(function()
                 if AntiAFK.active then
@@ -4808,7 +4808,7 @@ AntiAFK.btn.MouseButton1Click:Connect(function()
             end)
         end
     else
-        setButtonState(AntiAFK.btn, false, T18T("Ø¥ÙÙØ§Ù ÙØ¶Ø§Ø¯ Ø§ÙÙ"), T18T("ÙØ¶Ø§Ø¯ Ø§ÙÙ"), Theme.ButtonBlue, Theme.Accent)
+        setButtonState(AntiAFK.btn, false, T18T("إيقاف مضاد افك"), T18T("مضاد افك"), Theme.ButtonBlue, Theme.Accent)
         if AntiAFK.conn then
             AntiAFK.conn:Disconnect()
             AntiAFK.conn = nil
@@ -4837,14 +4837,14 @@ end
 
 local function hdRunCommand(cmdText)
     if not _hdRequestCmd then
-        showNotification("â HD Admin ÙØ§ Ø§ØªØ­ÙÙ Ø¨Ø¹Ø¯")
+        showNotification("❌ HD Admin ما اتحمل بعد")
         return false
     end
     local ok, err = pcall(function()
         _hdRequestCmd:InvokeServer(cmdText)
     end)
     if not ok then
-        showNotification("â " .. tostring(err))
+        showNotification("❌ " .. tostring(err))
     end
     return ok
 end
@@ -4852,13 +4852,13 @@ end
 local function hdExecCmd()
     local txt = HdCmdInput.Text:match("^%s*(.-)%s*$")
     if not txt or txt == "" then
-        showNotification(T18T("Ø§ÙØªØ¨ Ø§ÙØ£ÙØ± Ø£ÙÙØ§Ù"))
+        showNotification(T18T("اكتب الأمر أولاً"))
         return
     end
     HdCmdInput.Text = ""
 
     if hdRunCommand(txt) then
-        showNotification("â " .. txt)
+        showNotification("✅ " .. txt)
     end
 end
 
@@ -4868,18 +4868,18 @@ HdCmdInput.FocusLost:Connect(function(enterPressed)
 end)
 
 
-HdCopyBtn.Text = T18T("ØªÙØ¹ÙÙ ÙØ³Ø®")
+HdCopyBtn.Text = T18T("تفعيل نسخ")
 
 HdCopyBtn.MouseButton1Click:Connect(function()
     if not _Flags.hdCopy then
         local tg = (Input and Input.Text or ""):match("^%s*(.-)%s*$")
         if tg == "" then
-            showNotification(T18T("Ø§ÙØªØ¨ ÙÙØ²Ø± Ø§ÙÙØ§Ø¹Ø¨ ÙÙ Ø®Ø§ÙØ© Ø§ÙÙØªØ§Ø¨Ø©"))
+            showNotification(T18T("اكتب يوزر اللاعب في خانة الكتابة"))
             return
         end
         local p = HdPrefixInput.Text
         if p == "" then
-            showNotification(T18T("Ø£Ø¯Ø®Ù Ø§ÙÙ Prefix Ø§ÙØ®Ø§Øµ Ø¨Ù"))
+            showNotification(T18T("أدخل الـ Prefix الخاص بك"))
             return
         end
 
@@ -4889,13 +4889,13 @@ HdCopyBtn.MouseButton1Click:Connect(function()
             p.."neon "    ..tg,
             p.."aura "    ..tg,
             p.."color "   ..tg.." pink",
-            p.."titlepk " ..tg.." ÙÙØ­Ø¨Ù",
+            p.."titlepk " ..tg.." فًحبه",
         }
 
         _Flags.hdCopy = true
-        HdCopyBtn.Text = T18T("Ø§ÙÙØ§Ù Ø§ÙÙØ³Ø®")
+        HdCopyBtn.Text = T18T("ايقاف النسخ")
         HdCopyBtn.BackgroundColor3 = Theme.Active
-        showNotification(T18T("ØªÙ ØªÙØ¹ÙÙ Ø§ÙÙØ³Ø® Ø¹ÙÙ ") .. tg)
+        showNotification(T18T("تم تفعيل النسخ على ") .. tg)
 
         task.spawn(function()
             while _Flags.hdCopy do
@@ -4909,9 +4909,9 @@ HdCopyBtn.MouseButton1Click:Connect(function()
         end)
     else
         _Flags.hdCopy = false
-        HdCopyBtn.Text = T18T("ØªÙØ¹ÙÙ ÙØ³Ø®")
+        HdCopyBtn.Text = T18T("تفعيل نسخ")
         HdCopyBtn.BackgroundColor3 = Theme.ButtonDefault
-        showNotification(T18T("ØªÙ Ø¥ÙÙØ§Ù Ø§ÙÙØ³Ø®"))
+        showNotification(T18T("تم إيقاف النسخ"))
     end
 end)
 
@@ -4922,7 +4922,7 @@ end)
 _G.CuffProtectBtn.MouseButton1Click:Connect(function()
     _G.CuffProtectActive = not _G.CuffProtectActive
     if _G.CuffProtectActive then
-        setButtonState(_G.CuffProtectBtn, true, T18T("Ø¥ÙÙØ§Ù Ø§ÙØ­ÙØ§ÙØ©"), T18T("Ø­ÙØ§ÙØ© ÙÙØ¨Ø´Ø©"), Theme.Active, Theme.ButtonOrange)
+        setButtonState(_G.CuffProtectBtn, true, T18T("إيقاف الحماية"), T18T("حماية كلبشة"), Theme.Active, Theme.ButtonOrange)
 
         pcall(function()
             local char = LocalPlayer.Character
@@ -5028,7 +5028,7 @@ _G.CuffProtectBtn.MouseButton1Click:Connect(function()
             end)
         end)
     else
-        setButtonState(_G.CuffProtectBtn, false, T18T("Ø¥ÙÙØ§Ù Ø§ÙØ­ÙØ§ÙØ©"), T18T("Ø­ÙØ§ÙØ© ÙÙØ¨Ø´Ø©"), Theme.ButtonBlue, Theme.Accent)
+        setButtonState(_G.CuffProtectBtn, false, T18T("إيقاف الحماية"), T18T("حماية كلبشة"), Theme.ButtonBlue, Theme.Accent)
 
         if _G.CuffProtectMoveConn then
             _G.CuffProtectMoveConn:Disconnect()
@@ -5063,7 +5063,7 @@ FlingBtn.MouseButton1Click:Connect(function()
 
         if isActive then stopBang() end
         if _HeadBang.active then stopHeadBang() end
-        setButtonState(FlingBtn, true, T18T("Ø§ÙØ­ÙØ§ÙØ© Ø´ØºØ§ÙØ©"), T18T("Ø­ÙØ§ÙØ© Ø¨Ø§ÙÙ"), Theme.Active, Theme.PanelSoft)
+        setButtonState(FlingBtn, true, T18T("الحماية شغالة"), T18T("حماية بانق"), Theme.Active, Theme.PanelSoft)
         task.spawn(function()
             while flingActive do
                 local char = LocalPlayer.Character
@@ -5080,7 +5080,7 @@ FlingBtn.MouseButton1Click:Connect(function()
             end
         end)
     else
-        setButtonState(FlingBtn, false, T18T("Ø§ÙØ­ÙØ§ÙØ© Ø´ØºØ§ÙØ©"), T18T("Ø­ÙØ§ÙØ© Ø¨Ø§ÙÙ"), Theme.Active, Theme.PanelSoft)
+        setButtonState(FlingBtn, false, T18T("الحماية شغالة"), T18T("حماية بانق"), Theme.Active, Theme.PanelSoft)
     end
 end)
 
@@ -5132,7 +5132,7 @@ function stopTargetFling(restorePosition)
     _flingState.pulse = 0
     _flingState.startTargetY = nil
     _flingState.startTime = 0
-    setButtonState(TargetFlingBtn, false, T18T("Ø¥ÙÙØ§Ù Ø§ÙÙÙÙÙ"), T18T("ÙÙÙÙ"), Theme.Danger, Theme.PanelSoft)
+    setButtonState(TargetFlingBtn, false, T18T("إيقاف الفلنق"), T18T("فلنق"), Theme.Danger, Theme.PanelSoft)
 end
 
 function startTargetFling(target)
@@ -5162,7 +5162,7 @@ function startTargetFling(target)
     _flingState.angularVelocity.P = 100000
     _flingState.angularVelocity.Parent = root
 
-    setButtonState(TargetFlingBtn, true, T18T("Ø¥ÙÙØ§Ù Ø§ÙÙÙÙÙ"), T18T("ÙÙÙÙ"), Theme.Danger, Theme.PanelSoft)
+    setButtonState(TargetFlingBtn, true, T18T("إيقاف الفلنق"), T18T("فلنق"), Theme.Danger, Theme.PanelSoft)
 
     targetFlingConnection = RunService.Heartbeat:Connect(function()
         if not targetFlingActive then
@@ -5291,13 +5291,13 @@ function stopBang()
         local animS = char and char:FindFirstChild("Animate")
         if animS then animS.Disabled = false end
     end)
-    setButtonState(BangBtn, false, T18T("Ø¥ÙÙØ§Ù"), T18T("Ø¨Ø§ÙÙ"), Theme.Danger, Theme.PanelSoft)
+    setButtonState(BangBtn, false, T18T("إيقاف"), T18T("بانق"), Theme.Danger, Theme.PanelSoft)
 end
 
 function startBang(target)
     if _T18IsProtected(target) then return end
     isActive = true
-    setButtonState(BangBtn, true, T18T("Ø¥ÙÙØ§Ù"), T18T("Ø¨Ø§ÙÙ"), Theme.Active, Theme.PanelSoft)
+    setButtonState(BangBtn, true, T18T("إيقاف"), T18T("بانق"), Theme.Active, Theme.PanelSoft)
 
     local myChar = LocalPlayer.Character
     animTrack = t18PlayLoopedDance(myChar, "rbxassetid://5938365243", { animTrack = animTrack })
@@ -5403,7 +5403,7 @@ BangBtn.MouseButton1Click:Connect(function()
     end
 
     if _HeadBang.active then stopHeadBang() end
-    if flingActive then flingActive = false; setButtonState(FlingBtn, false, T18T("Ø§ÙØ­ÙØ§ÙØ© Ø´ØºØ§ÙØ©"), T18T("Ø­ÙØ§ÙØ© Ø¨Ø§ÙÙ"), Theme.Active, Theme.PanelSoft) end
+    if flingActive then flingActive = false; setButtonState(FlingBtn, false, T18T("الحماية شغالة"), T18T("حماية بانق"), Theme.Active, Theme.PanelSoft) end
     if targetFlingActive then stopTargetFling(true) end
 
     if not Input.Text or #Input.Text < 3 then return end
@@ -5453,13 +5453,13 @@ function stopHeadBang()
         local animS = char and char:FindFirstChild("Animate")
         if animS then animS.Disabled = false end
     end)
-    setButtonState(HeadBangBtn, false, T18T("Ø¥ÙÙØ§Ù"), T18T("ÙÙØ¯ Ø¨Ø§ÙÙ"), Theme.Danger, Theme.PanelSoft)
+    setButtonState(HeadBangBtn, false, T18T("إيقاف"), T18T("هيد بانق"), Theme.Danger, Theme.PanelSoft)
 end
 
 function startHeadBang(target)
     if _T18IsProtected(target) then return end
     _HeadBang.active = true
-    setButtonState(HeadBangBtn, true, T18T("Ø¥ÙÙØ§Ù"), T18T("ÙÙØ¯ Ø¨Ø§ÙÙ"), Theme.Active, Theme.PanelSoft)
+    setButtonState(HeadBangBtn, true, T18T("إيقاف"), T18T("هيد بانق"), Theme.Active, Theme.PanelSoft)
 
     local myChar = LocalPlayer.Character
     _HeadBang.animTrack = t18PlayLoopedDance(myChar, "rbxassetid://120512834137418", _HeadBang)
@@ -5566,7 +5566,7 @@ HeadBangBtn.MouseButton1Click:Connect(function()
     end
 
     if isActive then stopBang() end
-    if flingActive then flingActive = false; setButtonState(FlingBtn, false, T18T("Ø§ÙØ­ÙØ§ÙØ© Ø´ØºØ§ÙØ©"), T18T("Ø­ÙØ§ÙØ© Ø¨Ø§ÙÙ"), Theme.Active, Theme.PanelSoft) end
+    if flingActive then flingActive = false; setButtonState(FlingBtn, false, T18T("الحماية شغالة"), T18T("حماية بانق"), Theme.Active, Theme.PanelSoft) end
     if targetFlingActive then stopTargetFling(true) end
     if not Input.Text or #Input.Text < 3 then return end
     if OwnerUsername:lower():find(Input.Text:lower(), 1, true) then return end
@@ -5654,7 +5654,7 @@ function stopFly()
         end
     end
 
-    setButtonState(FlyBtn, false, T18T("Ø¥ÙÙØ§Ù Ø§ÙØ·ÙØ±Ø§Ù"), T18T("Ø·ÙØ±Ø§Ù"), Theme.Active, Theme.PanelSoft)
+    setButtonState(FlyBtn, false, T18T("إيقاف الطيران"), T18T("طيران"), Theme.Active, Theme.PanelSoft)
     if FlyTouchFrame then
         FlyTouchFrame.Visible = false
     end
@@ -5666,7 +5666,7 @@ end
 FlyBtn.MouseButton1Click:Connect(function()
     flyActive = not flyActive
     if flyActive then
-        setButtonState(FlyBtn, true, T18T("Ø¥ÙÙØ§Ù Ø§ÙØ·ÙØ±Ø§Ù"), T18T("Ø·ÙØ±Ø§Ù"), Theme.Active, Theme.PanelSoft)
+        setButtonState(FlyBtn, true, T18T("إيقاف الطيران"), T18T("طيران"), Theme.Active, Theme.PanelSoft)
         if FlyTouchFrame and isTouchDevice then
             FlyTouchFrame.Visible = true
         end
@@ -5677,7 +5677,7 @@ FlyBtn.MouseButton1Click:Connect(function()
             if FlyTouchFrame then
                 FlyTouchFrame.Visible = false
             end
-            setButtonState(FlyBtn, false, T18T("Ø¥ÙÙØ§Ù Ø§ÙØ·ÙØ±Ø§Ù"), T18T("Ø·ÙØ±Ø§Ù"), Theme.Active, Theme.PanelSoft)
+            setButtonState(FlyBtn, false, T18T("إيقاف الطيران"), T18T("طيران"), Theme.Active, Theme.PanelSoft)
             return
         end
 
@@ -5688,7 +5688,7 @@ FlyBtn.MouseButton1Click:Connect(function()
             if FlyTouchFrame then
                 FlyTouchFrame.Visible = false
             end
-            setButtonState(FlyBtn, false, T18T("Ø¥ÙÙØ§Ù Ø§ÙØ·ÙØ±Ø§Ù"), T18T("Ø·ÙØ±Ø§Ù"), Theme.Active, Theme.PanelSoft)
+            setButtonState(FlyBtn, false, T18T("إيقاف الطيران"), T18T("طيران"), Theme.Active, Theme.PanelSoft)
             return
         end
 
@@ -5798,10 +5798,10 @@ SavePlaceBtn.MouseButton1Click:Connect(function()
     if SavedLocation then
         root.CFrame = SavedLocation
         SavedLocation = nil
-        setButtonState(SavePlaceBtn, false, T18T("Ø±Ø¬ÙØ¹ ÙÙÙÙØ§Ù"), T18T("Ø­ÙØ¸ ÙÙØ§ÙÙ"), Theme.Accent, Theme.PanelSoft)
+        setButtonState(SavePlaceBtn, false, T18T("رجوع للمكان"), T18T("حفظ مكاني"), Theme.Accent, Theme.PanelSoft)
     else
         SavedLocation = root.CFrame
-        setButtonState(SavePlaceBtn, true, T18T("Ø±Ø¬ÙØ¹ ÙÙÙÙØ§Ù"), T18T("Ø­ÙØ¸ ÙÙØ§ÙÙ"), Theme.Accent, Theme.PanelSoft)
+        setButtonState(SavePlaceBtn, true, T18T("رجوع للمكان"), T18T("حفظ مكاني"), Theme.Accent, Theme.PanelSoft)
     end
 end)
 
@@ -5943,7 +5943,7 @@ Players.PlayerRemoving:Connect(function(player)
         _t18AutoBang = isActive
         if isActive then stopBang() end
         Input.Text = ""
-        T18ShowPlayerToast("Ø®Ø±Ø¬ Ø§ÙÙØ§Ø¹Ø¨: " .. player.Name)
+        T18ShowPlayerToast("خرج اللاعب: " .. player.Name)
     end
 end)
 
@@ -5952,7 +5952,7 @@ Players.PlayerAdded:Connect(function(player)
         if Input and Input.Text == "" then
             Input.Text = _T18TargetSavedName
             _T18TargetSavedName = ""
-            T18ShowPlayerToast("Ø¯Ø®Ù Ø§ÙÙØ§Ø¹Ø¨ ÙÙ Ø¬Ø¯ÙØ¯: " .. player.Name)
+            T18ShowPlayerToast("دخل اللاعب من جديد: " .. player.Name)
 
             if _t18AutoBang then
                 _t18AutoBang = false
@@ -6075,7 +6075,7 @@ function doHangAuto(targetPlayer)
     local cuff = hangFindCuffTool()
     if not cuff then
         pcall(function()
-            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("ØªØ¹ÙÙÙ"),Text=T18T("ÙØ§ Ø¹ÙØ¯Ù ÙÙØ¨Ø´Ø©!"),Duration=4})
+            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("تعليق"),Text=T18T("ما عندك كلبشة!"),Duration=4})
         end)
         return
     end
@@ -6119,7 +6119,7 @@ function doHangAuto(targetPlayer)
         task.wait(0.6)
         hdRunCommand(hdPrefix() .. _Hang.cmd .. " " .. LocalPlayer.Name)
         pcall(function()
-            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("ØªØ¹ÙÙÙ"),Text=T18T("ØªÙ Ø§ÙØªØ¹ÙÙÙ!"),Duration=4})
+            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("تعليق"),Text=T18T("تم التعليق!"),Duration=4})
         end)
         hangCleanup(false)
     end)
@@ -6135,7 +6135,7 @@ function doHangAuto(targetPlayer)
         task.wait(5)
         if _Hang.running then
             pcall(function()
-                game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("ØªØ¹ÙÙÙ"),Text=T18T("ÙØ´ÙØª Ø§ÙÙÙØ¨Ø´Ø©Ø Ø­Ø§ÙÙ ÙØ¬Ø¯Ø¯Ø§Ù"),Duration=4})
+                game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("تعليق"),Text=T18T("فشلت الكلبشة، حاول مجدداً"),Duration=4})
             end)
             hangCleanup(true)
         end
@@ -6147,7 +6147,7 @@ _Hang.cuffBtn.MouseButton1Click:Connect(function()
     local target = findTargetPlayer()
     if not target then
         pcall(function()
-            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("ÙÙØ¨Ø´Ø©"),Text=T18T("ÙØ§ ÙÙÙØª Ø§ÙÙØ§Ø¹Ø¨Ø ØªØ£ÙØ¯ ÙÙ Ø§ÙØ§Ø³Ù"),Duration=4})
+            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("كلبشة"),Text=T18T("ما لقيت اللاعب، تأكد من الاسم"),Duration=4})
         end)
         return
     end
@@ -6158,7 +6158,7 @@ _Hang.cuffBtn.MouseButton1Click:Connect(function()
     local cuff = hangFindCuffTool()
     if not cuff then
         pcall(function()
-            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("ÙÙØ¨Ø´Ø©"),Text=T18T("ÙØ§ Ø¹ÙØ¯Ù ÙÙØ¨Ø´Ø©!"),Duration=4})
+            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("كلبشة"),Text=T18T("ما عندك كلبشة!"),Duration=4})
         end)
         return
     end
@@ -6262,7 +6262,7 @@ _Hang.pullBtn.MouseButton1Click:Connect(function()
     local target = findTargetPlayer()
     if not target then
         pcall(function()
-            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("Ø³Ø­Ø¨"),Text=T18T("ÙØ§ ÙÙÙØª Ø§ÙÙØ§Ø¹Ø¨Ø ØªØ£ÙØ¯ ÙÙ Ø§ÙØ§Ø³Ù"),Duration=4})
+            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("سحب"),Text=T18T("ما لقيت اللاعب، تأكد من الاسم"),Duration=4})
         end)
         return
     end
@@ -6273,7 +6273,7 @@ _Hang.pullBtn.MouseButton1Click:Connect(function()
     local cuff = hangFindCuffTool()
     if not cuff then
         pcall(function()
-            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("Ø³Ø­Ø¨"),Text=T18T("ÙØ§ Ø¹ÙØ¯Ù ÙÙØ¨Ø´Ø©!"),Duration=4})
+            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("سحب"),Text=T18T("ما عندك كلبشة!"),Duration=4})
         end)
         return
     end
@@ -6440,7 +6440,7 @@ _Hang.freezeBtn.MouseButton1Click:Connect(function()
     local target = findTargetPlayer()
     if not target then
         pcall(function()
-            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("ØªØ¬ÙÙØ¯"),Text=T18T("ÙØ§ ÙÙÙØª Ø§ÙÙØ§Ø¹Ø¨Ø ØªØ£ÙØ¯ ÙÙ Ø§ÙØ§Ø³Ù"),Duration=4})
+            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("تجميد"),Text=T18T("ما لقيت اللاعب، تأكد من الاسم"),Duration=4})
         end)
         return
     end
@@ -6451,7 +6451,7 @@ _Hang.freezeBtn.MouseButton1Click:Connect(function()
     local cuff = hangFindCuffTool()
     if not cuff then
         pcall(function()
-            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("ØªØ¬ÙÙØ¯"),Text=T18T("ÙØ§ Ø¹ÙØ¯Ù ÙÙØ¨Ø´Ø©!"),Duration=4})
+            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("تجميد"),Text=T18T("ما عندك كلبشة!"),Duration=4})
         end)
         return
     end
@@ -6568,15 +6568,15 @@ HangAutoBtn.MouseButton1Click:Connect(function()
     local target = findTargetPlayer()
     if not target then
         pcall(function()
-            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("ØªØ¹ÙÙÙ"),Text=T18T("ÙØ§ ÙÙÙØª Ø§ÙÙØ§Ø¹Ø¨Ø ØªØ£ÙØ¯ ÙÙ Ø§ÙØ§Ø³Ù"),Duration=4})
+            game:GetService("StarterGui"):SetCore("SendNotification",{Title=T18T("تعليق"),Text=T18T("ما لقيت اللاعب، تأكد من الاسم"),Duration=4})
         end)
         return
     end
-    setButtonState(HangAutoBtn, true, T18T("Ø¬Ø§Ø±Ù Ø§ÙØªØ¹ÙÙÙ..."), T18T("ØªØ¹ÙÙÙ"), Theme.Danger, Theme.PanelSoft)
+    setButtonState(HangAutoBtn, true, T18T("جاري التعليق..."), T18T("تعليق"), Theme.Danger, Theme.PanelSoft)
     doHangAuto(target)
     task.spawn(function()
         while _Hang.running do task.wait(0.3) end
-        setButtonState(HangAutoBtn, false, T18T("Ø¬Ø§Ø±Ù Ø§ÙØªØ¹ÙÙÙ..."), T18T("ØªØ¹ÙÙÙ"), Theme.Danger, Theme.PanelSoft)
+        setButtonState(HangAutoBtn, false, T18T("جاري التعليق..."), T18T("تعليق"), Theme.Danger, Theme.PanelSoft)
     end)
 end)
 
@@ -6633,7 +6633,7 @@ function stopSpectate(keepWarning)
     restoreMyCamera()
     clearSpectateLabels(keepWarning)
     SpectateTarget = nil
-    setButtonState(SpectateBtn, false, T18T("Ø¥ÙØºØ§Ø¡ Ø§ÙÙØ´Ø§ÙØ¯Ø©"), T18T("ÙØ´Ø§ÙØ¯Ø©"), Theme.Active, Theme.PanelSoft)
+    setButtonState(SpectateBtn, false, T18T("إلغاء المشاهدة"), T18T("مشاهدة"), Theme.Active, Theme.PanelSoft)
 end
 
 function createSpectateLabels(target)
@@ -6647,7 +6647,7 @@ function createSpectateLabels(target)
     SpectateNameLabel.TextColor3 = Theme.Text
     SpectateNameLabel.TextScaled = true
     SpectateNameLabel.Font = Enum.Font.GothamBold
-    SpectateNameLabel.Text = "ÙØ´Ø§ÙØ¯Ø©: " .. target.Name
+    SpectateNameLabel.Text = "مشاهدة: " .. target.Name
     SpectateNameLabel.Parent = ScreenGui
     makeCorner(SpectateNameLabel, 12)
     makeStroke(SpectateNameLabel, Theme.Border, 1, 0.2)
@@ -6688,7 +6688,7 @@ function startSpectate(target)
 
     SpectateActive = true
     SpectateTarget = target
-    setButtonState(SpectateBtn, true, T18T("Ø¥ÙØºØ§Ø¡ Ø§ÙÙØ´Ø§ÙØ¯Ø©"), T18T("ÙØ´Ø§ÙØ¯Ø©"), Theme.Active, Theme.PanelSoft)
+    setButtonState(SpectateBtn, true, T18T("إلغاء المشاهدة"), T18T("مشاهدة"), Theme.Active, Theme.PanelSoft)
     createSpectateLabels(target)
 
     if SpectatePlayerRemovingConnection then
@@ -6698,7 +6698,7 @@ function startSpectate(target)
 
     SpectatePlayerRemovingConnection = Players.PlayerRemoving:Connect(function(player)
         if player == target then
-            showSpectateWarning("Ø§ÙÙØ§Ø¹Ø¨ Ø®Ø±Ø¬ ÙÙ Ø§ÙÙØ¹Ø¨Ø©")
+            showSpectateWarning("اللاعب خرج من اللعبة")
             task.delay(0.7, function()
                 if SpectateTarget == target then
                     stopSpectate(true)
@@ -6721,7 +6721,7 @@ function startSpectate(target)
         local root = char and char:FindFirstChild("HumanoidRootPart")
 
         if not Players:FindFirstChild(SpectateTarget.Name) then
-            showSpectateWarning("Ø§ÙÙØ§Ø¹Ø¨ Ø®Ø±Ø¬ ÙÙ Ø§ÙÙØ¹Ø¨Ø©")
+            showSpectateWarning("اللاعب خرج من اللعبة")
             stopSpectate(true)
             return
         end
@@ -6732,7 +6732,7 @@ function startSpectate(target)
         end
 
         if SpectateNameLabel then
-            SpectateNameLabel.Text = "ÙØ´Ø§ÙØ¯Ø©: " .. SpectateTarget.Name
+            SpectateNameLabel.Text = "مشاهدة: " .. SpectateTarget.Name
         end
 
         local currentCamera = workspace.CurrentCamera
@@ -6786,11 +6786,11 @@ end)
                 end
             end
         end)
-        setButtonState(NoClipBtn, false, T18T("Ø¥ÙÙØ§Ù Ø§Ø®ØªØ±Ø§Ù"), T18T("Ø§Ø®ØªØ±Ø§Ù Ø¬Ø¯Ø±Ø§Ù"), Theme.Active, Theme.ButtonDefault)
+        setButtonState(NoClipBtn, false, T18T("إيقاف اختراق"), T18T("اختراق جدران"), Theme.Active, Theme.ButtonDefault)
     end
     local function startNoClip()
         NoClipActive = true
-        setButtonState(NoClipBtn, true, T18T("Ø¥ÙÙØ§Ù Ø§Ø®ØªØ±Ø§Ù"), T18T("Ø§Ø®ØªØ±Ø§Ù Ø¬Ø¯Ø±Ø§Ù"), Theme.Active, Theme.ButtonDefault)
+        setButtonState(NoClipBtn, true, T18T("إيقاف اختراق"), T18T("اختراق جدران"), Theme.Active, Theme.ButtonDefault)
         NoClipConnection = RunService.Stepped:Connect(function()
             if not NoClipActive then return end
             local char = LocalPlayer.Character
@@ -6814,10 +6814,10 @@ end)
                 if LowGravActive then
                     origGrav = workspace.Gravity
                     workspace.Gravity = origGrav * 0.25
-                    setButtonState(LowGravBtn, true, T18T("Ø¥ÙÙØ§Ù Ø§ÙØ¬Ø§Ø°Ø¨ÙØ©"), T18T("Ø¬Ø§Ø°Ø¨ÙØ© ÙÙØ®ÙØ¶Ø©"), Theme.Active, Theme.ButtonOrange)
+                    setButtonState(LowGravBtn, true, T18T("إيقاف الجاذبية"), T18T("جاذبية منخفضة"), Theme.Active, Theme.ButtonOrange)
                 else
                     workspace.Gravity = origGrav
-                    setButtonState(LowGravBtn, false, T18T("Ø¥ÙÙØ§Ù Ø§ÙØ¬Ø§Ø°Ø¨ÙØ©"), T18T("Ø¬Ø§Ø°Ø¨ÙØ© ÙÙØ®ÙØ¶Ø©"), Theme.Active, Theme.ButtonOrange)
+                    setButtonState(LowGravBtn, false, T18T("إيقاف الجاذبية"), T18T("جاذبية منخفضة"), Theme.Active, Theme.ButtonOrange)
                 end
             end)
         end
@@ -6826,11 +6826,11 @@ end)
     local function stopInfiniteJump()
         InfiniteJumpActive = false
         if InfiniteJumpConnection then InfiniteJumpConnection:Disconnect(); InfiniteJumpConnection = nil end
-        setButtonState(InfiniteJumpBtn, false, T18T("Ø¥ÙÙØ§Ù Ø§ÙÙÙØ²"), T18T("ÙÙØ² ÙØ§ ÙÙØ§Ø¦Ù"), Theme.Active, Theme.ButtonDefault)
+        setButtonState(InfiniteJumpBtn, false, T18T("إيقاف القفز"), T18T("قفز لا نهائي"), Theme.Active, Theme.ButtonDefault)
     end
     local function startInfiniteJump()
         InfiniteJumpActive = true
-        setButtonState(InfiniteJumpBtn, true, T18T("Ø¥ÙÙØ§Ù Ø§ÙÙÙØ²"), T18T("ÙÙØ² ÙØ§ ÙÙØ§Ø¦Ù"), Theme.Active, Theme.ButtonDefault)
+        setButtonState(InfiniteJumpBtn, true, T18T("إيقاف القفز"), T18T("قفز لا نهائي"), Theme.Active, Theme.ButtonDefault)
         InfiniteJumpConnection = UserInputService.JumpRequest:Connect(function()
             if not InfiniteJumpActive then return end
             local char = LocalPlayer.Character
@@ -6848,11 +6848,11 @@ end)
     local function stopWallClimb()
         WallClimbActive = false
         if WallClimbConnection then WallClimbConnection:Disconnect(); WallClimbConnection = nil end
-        setButtonState(WallClimbBtn, false, T18T("Ø¥ÙÙØ§Ù Ø§ÙØªØ³ÙÙ"), T18T("ØªØ³ÙÙ Ø§ÙØ¬Ø¯Ø±Ø§Ù"), Theme.Active, Theme.ButtonDefault)
+        setButtonState(WallClimbBtn, false, T18T("إيقاف التسلق"), T18T("تسلق الجدران"), Theme.Active, Theme.ButtonDefault)
     end
     local function startWallClimb()
         WallClimbActive = true
-        setButtonState(WallClimbBtn, true, T18T("Ø¥ÙÙØ§Ù Ø§ÙØªØ³ÙÙ"), T18T("ØªØ³ÙÙ Ø§ÙØ¬Ø¯Ø±Ø§Ù"), Theme.Active, Theme.ButtonDefault)
+        setButtonState(WallClimbBtn, true, T18T("إيقاف التسلق"), T18T("تسلق الجدران"), Theme.Active, Theme.ButtonDefault)
         WallClimbConnection = RunService.Heartbeat:Connect(function()
             if not WallClimbActive then return end
             local char = LocalPlayer.Character
@@ -6886,7 +6886,7 @@ end)
             VanishActive = false
             if _VanishHbConn then _VanishHbConn:Disconnect(); _VanishHbConn = nil end
             pcall(function() RunService:UnbindFromRenderStep("_T18VanishRestore") end)
-            setButtonState(VanishBtn, false, T18T("Ø¥ÙÙØ§Ù Ø§ÙØ§Ø®ØªÙØ§Ø¡"), T18T("Ø§Ø®ØªÙØ§Ø¡"), Theme.Active, Theme.ButtonBlue)
+            setButtonState(VanishBtn, false, T18T("إيقاف الاختفاء"), T18T("اختفاء"), Theme.Active, Theme.ButtonBlue)
             pcall(function()
                 local char = LocalPlayer.Character
                 if not char then return end
@@ -6916,7 +6916,7 @@ end)
                 _VanishRealCF = root.CFrame
 
                 VanishActive = true
-                setButtonState(VanishBtn, true, T18T("Ø¥ÙÙØ§Ù Ø§ÙØ§Ø®ØªÙØ§Ø¡"), T18T("Ø§Ø®ØªÙØ§Ø¡"), Theme.Active, Theme.ButtonBlue)
+                setButtonState(VanishBtn, true, T18T("إيقاف الاختفاء"), T18T("اختفاء"), Theme.Active, Theme.ButtonBlue)
 
 
                 _VanishHbConn = RunService.Heartbeat:Connect(function()
@@ -6960,11 +6960,11 @@ end)
         ESPLabels = {}
         for _, conn in pairs(ESPConnections) do pcall(function() conn:Disconnect() end) end
         ESPConnections = {}
-        setButtonState(ESPBtn, false, T18T("Ø¥ÙÙØ§Ù ESP"), "ESP", Theme.Active, Theme.ButtonDefault)
+        setButtonState(ESPBtn, false, T18T("إيقاف ESP"), "ESP", Theme.Active, Theme.ButtonDefault)
     end
     local function startESP()
         ESPActive = true
-        setButtonState(ESPBtn, true, T18T("Ø¥ÙÙØ§Ù ESP"), "ESP", Theme.Active, Theme.ButtonDefault)
+        setButtonState(ESPBtn, true, T18T("إيقاف ESP"), "ESP", Theme.Active, Theme.ButtonDefault)
         local function addESPLabel(player)
             if player == LocalPlayer then return end
             local bb = Instance.new("BillboardGui")
@@ -7051,10 +7051,10 @@ end)()
         AntiLagBtn2.MouseButton1Click:Connect(function()
             AntiLagActive = not AntiLagActive
             if AntiLagActive then
-                setButtonState(AntiLagBtn2, true, T18T("Ø¥ÙÙØ§Ù ÙØ¶Ø§Ø¯ ÙØ§Ø¬"), T18T("ÙØ¶Ø§Ø¯ ÙØ§Ø¬"), Theme.Active, Theme.ButtonDefault)
+                setButtonState(AntiLagBtn2, true, T18T("إيقاف مضاد لاج"), T18T("مضاد لاج"), Theme.Active, Theme.ButtonDefault)
                 applyAntiLag()
             else
-                setButtonState(AntiLagBtn2, false, T18T("Ø¥ÙÙØ§Ù ÙØ¶Ø§Ø¯ ÙØ§Ø¬"), T18T("ÙØ¶Ø§Ø¯ ÙØ§Ø¬"), Theme.Active, Theme.ButtonDefault)
+                setButtonState(AntiLagBtn2, false, T18T("إيقاف مضاد لاج"), T18T("مضاد لاج"), Theme.Active, Theme.ButtonDefault)
                 removeAntiLag()
             end
         end)
@@ -7070,12 +7070,12 @@ end)()
         FPSPingActive = false
         if FPSPingConnection then FPSPingConnection:Disconnect(); FPSPingConnection = nil end
         if FPSPingGui then FPSPingGui:Destroy(); FPSPingGui = nil end
-        setButtonState(FPSPingBtn2, false, T18T("Ø¥ÙÙØ§Ù FPS/Ping"), "FPS / Ping", Theme.Active, Theme.ButtonDefault)
+        setButtonState(FPSPingBtn2, false, T18T("إيقاف FPS/Ping"), "FPS / Ping", Theme.Active, Theme.ButtonDefault)
     end
 
     local function startFPSPing()
         FPSPingActive = true
-        setButtonState(FPSPingBtn2, true, T18T("Ø¥ÙÙØ§Ù FPS/Ping"), "FPS / Ping", Theme.Active, Theme.ButtonDefault)
+        setButtonState(FPSPingBtn2, true, T18T("إيقاف FPS/Ping"), "FPS / Ping", Theme.Active, Theme.ButtonDefault)
         local playerGui = LocalPlayer:WaitForChild("PlayerGui")
         local sg = Instance.new("ScreenGui")
         sg.Name = "T18FPSPing"
@@ -7179,7 +7179,7 @@ end)()
             titleLbl.Size = UDim2.new(1, -50, 0, 28)
             titleLbl.Position = UDim2.new(0, 10, 0, 6)
             titleLbl.BackgroundTransparency = 1
-            titleLbl.Text = "ÙØ¹ÙÙÙØ§Øª Ø§ÙØ³ÙØ±ÙØ±"
+            titleLbl.Text = "معلومات السيرفر"
             titleLbl.TextColor3 = Theme.Accent
             titleLbl.Font = Enum.Font.GothamBold
             titleLbl.TextSize = 17
@@ -7200,8 +7200,8 @@ end)()
                 lbl.Parent = panel
             end
 
-            addRow("Ø¹Ø¯Ø¯ Ø§ÙÙØ§Ø¹Ø¨ÙÙ", #game:GetService("Players"):GetPlayers(), 38)
-            addRow("Ø§ÙØ­Ø¯ Ø§ÙØ§ÙØµÙ ÙÙØ§Ø¹Ø¨ÙÙ", game:GetService("Players").MaxPlayers, 68)
+            addRow("عدد اللاعبين", #game:GetService("Players"):GetPlayers(), 38)
+            addRow("الحد الاقصى للاعبين", game:GetService("Players").MaxPlayers, 68)
             addRow("Place ID", tostring(game.PlaceId), 98)
             addRow("Game ID", tostring(game.GameId), 128)
             addRow("Job ID", tostring(game.JobId):sub(1, 18) .. "...", 158)
@@ -7217,7 +7217,7 @@ end)()
             uptimeLbl.TextSize = 14
             uptimeLbl.TextXAlignment = Enum.TextXAlignment.Right
             uptimeLbl.TextWrapped = true
-            uptimeLbl.Text = "Ø¹ÙØ± Ø§ÙØ³ÙØ±ÙØ±: Ø¬Ø§Ø±Ù Ø§ÙØªØ­ÙÙ..."
+            uptimeLbl.Text = "عمر السيرفر: جاري التحقق..."
             uptimeLbl.Parent = panel
 
 
@@ -7238,9 +7238,9 @@ end)()
                 local m = math.floor((secs % 3600) / 60)
                 local s = math.floor(secs % 60)
                 if h > 0 then
-                    return string.format("%d Ø³ %02d Ø¯ %02d Ø«", h, m, s)
+                    return string.format("%d س %02d د %02d ث", h, m, s)
                 end
-                return string.format("%d Ø¯ %02d Ø«", m, s)
+                return string.format("%d د %02d ث", m, s)
             end
 
 
@@ -7319,13 +7319,13 @@ end)()
             local uptimeConn
             local function refreshUptime()
                 local secs = _T18EstimatedAge or _T18ServerUptime()
-                uptimeLbl.Text = "Ø¹ÙØ± Ø§ÙØ³ÙØ±ÙØ±: " .. fmtUptime(secs)
+                uptimeLbl.Text = "عمر السيرفر: " .. fmtUptime(secs)
                 if _T18AgeSource == "presence" then
-                    uptimeSrcLbl.Text = "( ÙÙØ¯ÙØ± Ø¹Ù Ø·Ø±ÙÙ Ø£ÙØ¯Ù ÙØ§Ø¹Ø¨ ÙÙ Ø§ÙØ³ÙØ±ÙØ± )"
+                    uptimeSrcLbl.Text = "( مقدّر عن طريق أقدم لاعب في السيرفر )"
                 elseif _T18AgeSource == "script" then
-                    uptimeSrcLbl.Text = "( ÙÙ ÙÙØª ØªØ´ØºÙÙ Ø§ÙØ³ÙØ±Ø¨Øª )"
+                    uptimeSrcLbl.Text = "( من وقت تشغيل السكربت )"
                 else
-                    uptimeSrcLbl.Text = "( Ø¬Ø§Ø±Ù Ø§ÙØªØ­ÙÙ... )"
+                    uptimeSrcLbl.Text = "( جاري التحقق... )"
                 end
             end
             refreshUptime()
@@ -7359,7 +7359,7 @@ LocalPlayer.CharacterAdded:Connect(function()
     end
     if flingActive then
         flingActive = false
-        setButtonState(FlingBtn, false, T18T("Ø§ÙØ­ÙØ§ÙØ© Ø´ØºØ§ÙØ©"), T18T("Ø­ÙØ§ÙØ© Ø¨Ø§ÙÙ"), Theme.Active, Theme.PanelSoft)
+        setButtonState(FlingBtn, false, T18T("الحماية شغالة"), T18T("حماية بانق"), Theme.Active, Theme.PanelSoft)
     end
     if _G._ZWA then
         _G._ZOrig = nil
@@ -7379,132 +7379,132 @@ end)
 
 _T18TR = {
 
-    ["Ø§ÙÙÙØ§Ø¦Ù"]                                   = "Menus",
-    ["Ø§Ø®ØªØ± Ø§ÙÙØ³Ù"]                                = "Choose Section",
+    ["القوائم"]                                   = "Menus",
+    ["اختر القسم"]                                = "Choose Section",
 
-    ["Ø§ÙÙØ§Ø¹Ø¨"]                                    = "Player",
-    ["Ø§Ø³ØªÙØ¯Ø§Ù"]                                   = "Target",
-    ["ÙÙÙ"]                                       = "Important",
-    ["Ø§ÙÙØ±"]                                      = "Owner",
-    ["Ø§Ø®Ø±Ù"]                                      = "Others",
-    ["Ø§ÙÙØºØ©"]                                     = "Language",
+    ["اللاعب"]                                    = "Player",
+    ["استهداف"]                                   = "Target",
+    ["مهم"]                                       = "Important",
+    ["اونر"]                                      = "Owner",
+    ["اخرى"]                                      = "Others",
+    ["اللغة"]                                     = "Language",
 
-    ["Ø§ÙÙØ§Ø¦ÙØ© Ø§ÙØ±Ø¦ÙØ³ÙØ©"]                          = "Main Menu",
-    ["ÙÙØ²Ø§Øª Ø¥Ø¶Ø§ÙÙØ©"]                              = "Extra Features",
-    ["Ø£ÙØ§ÙØ± Ø§ÙØ­Ø±ÙØ© ÙØ§ÙØ³Ø±Ø¹Ø©"]                      = "Movement & Speed",
-    ["Ø£ÙØ§ÙØ± Ø§ÙØªØ¹Ø§ÙÙ ÙØ¹ Ø§ÙÙØ§Ø¹Ø¨ÙÙ"]                 = "Player Interaction",
-    ["Ø±Ø³Ø§ÙØ© Ø¯Ø§Ø®Ù Ø§ÙØ³ÙØ±Ø¨Øª"]                        = "Script Message",
-    ["Ø£ÙØ§ÙØ± Ø§ÙØ¥Ø¯Ø§Ø±Ø© Ø§ÙØ®Ø§ØµØ©"]                      = "Admin Commands",
-    ["ÙÙØ§Ø­Ø¸Ø© ÙÙÙØ© : ÙØ§ Ø§Ø®ÙØ§Ù Ø­ÙØ§ÙØ© Ø§ÙØ¨Ø§ÙÙ ÙØ§ ØªØ´ØªØºÙ Ø§ÙØ§ Ø¹ÙÙ Ø³ÙØ±Ø¨Øª V.R.7"] =
+    ["القائمة الرئيسية"]                          = "Main Menu",
+    ["ميزات إضافية"]                              = "Extra Features",
+    ["أوامر الحركة والسرعة"]                      = "Movement & Speed",
+    ["أوامر التعامل مع اللاعبين"]                 = "Player Interaction",
+    ["رسالة داخل السكربت"]                        = "Script Message",
+    ["أوامر الإدارة الخاصة"]                      = "Admin Commands",
+    ["ملاحظة مهمة : يا اخوان حماية البانق ما تشتغل الا على سكربت V.R.7"] =
         "Important Note: Bang Protection only works on script V.R.7",
 
-    ["Ø¨Ø§ÙÙ"]                                      = "Bang",
-    ["Ø±ÙØ³ÙØª"]                                     = "Reset",
-    ["Ø­ÙØ§ÙØ© Ø¨Ø§ÙÙ"]                                = "Bang Protect",
-    ["ÙÙÙÙ"]                                      = "Fling",
-    ["Ø·ÙØ±Ø§Ù"]                                     = "Fly",
-    ["Ø³Ø±Ø¹Ø© Ø§ÙÙØ§Ø¹Ø¨"]                               = "Walk Speed",
-    ["ÙØ´ÙØ© Ø²ÙÙØ¨Ù"]                                = "Zombie Walk",
-    ["ÙÙØ¯ÙØ³"]                                     = "Headless",
-    ["ØªÙÙÙ"]                                      = "Teleport",
-    ["ÙØ´Ø§ÙØ¯Ø©"]                                    = "Spectate",
-    ["ÙÙØ¯ Ø¨Ø§ÙÙ"]                                  = "Head Bang",
-    ["Ø­ÙØ¸ ÙÙØ§ÙÙ"]                                 = "Save Pos",
-    ["ØªØ¹ÙÙÙ"]                                     = "Hang",
-    ["ØªØ¬ÙÙØ¯"]                                     = "Freeze",
-    ["ÙÙØ¨Ø´"]                                      = "Cuff",
-    ["Ø³Ø­Ø¨"]                                       = "Pull",
-    ["Ø·Ø±Ø¯"]                                       = "Kick",
-    ["Ø§Ø³ØªØ¯Ø¹Ø§Ø¡"]                                   = "Summon",
-    ["Ø¥Ø±Ø³Ø§Ù"]                                     = "Send",
-    ["ÙØ³Ø® Ø±Ø§Ø¨Ø· Ø§ÙØ¯Ø³ÙÙØ±Ø¯"]                         = "Copy Discord",
+    ["بانق"]                                      = "Bang",
+    ["ريسيت"]                                     = "Reset",
+    ["حماية بانق"]                                = "Bang Protect",
+    ["فلنق"]                                      = "Fling",
+    ["طيران"]                                     = "Fly",
+    ["سرعة اللاعب"]                               = "Walk Speed",
+    ["مشية زومبي"]                                = "Zombie Walk",
+    ["هيدلس"]                                     = "Headless",
+    ["تنقل"]                                      = "Teleport",
+    ["مشاهدة"]                                    = "Spectate",
+    ["هيد بانق"]                                  = "Head Bang",
+    ["حفظ مكاني"]                                 = "Save Pos",
+    ["تعليق"]                                     = "Hang",
+    ["تجميد"]                                     = "Freeze",
+    ["كلبش"]                                      = "Cuff",
+    ["سحب"]                                       = "Pull",
+    ["طرد"]                                       = "Kick",
+    ["استدعاء"]                                   = "Summon",
+    ["إرسال"]                                     = "Send",
+    ["نسخ رابط الدسكورد"]                         = "Copy Discord",
 
-    ["Ø¥ÙÙØ§Ù ÙÙØ¯ÙØ³"]                               = "Stop Headless",
-    ["Ø¥ÙÙØ§Ù Ø§ÙÙÙÙÙ"]                              = "Stop Fling",
-    ["Ø¥ÙÙØ§Ù"]                                     = "Stop",
-    ["Ø¥ÙÙØ§Ù Ø§ÙØ·ÙØ±Ø§Ù"]                             = "Stop Fly",
-    ["Ø¬Ø§Ø±Ù Ø§ÙØªØ¹ÙÙÙ..."]                            = "Hanging...",
-    ["Ø¥ÙØºØ§Ø¡ Ø§ÙÙØ´Ø§ÙØ¯Ø©"]                            = "Stop Spectate",
-    ["ÙÙ Ø§ÙØªØ¬ÙÙØ¯"]                                = "Unfreeze",
-    ["Ø¥ÙÙØ§Ù Ø§ÙØ§Ø³ØªØ¯Ø¹Ø§Ø¡"]                           = "Stop Summon",
+    ["إيقاف هيدلس"]                               = "Stop Headless",
+    ["إيقاف الفلنق"]                              = "Stop Fling",
+    ["إيقاف"]                                     = "Stop",
+    ["إيقاف الطيران"]                             = "Stop Fly",
+    ["جاري التعليق..."]                            = "Hanging...",
+    ["إلغاء المشاهدة"]                            = "Stop Spectate",
+    ["فك التجميد"]                                = "Unfreeze",
+    ["إيقاف الاستدعاء"]                           = "Stop Summon",
 
-    ["Ø§ÙØªØ¨ Ø§Ø³Ù Ø§ÙÙØ§Ø¹Ø¨ ÙÙØ§"]                       = "Enter player name",
-    ["Ø³Ø±Ø¹Ø© Ø§ÙØ·ÙØ±Ø§Ù"]                              = "Fly speed",
-    ["Ø³Ø±Ø¹Ø© Ø§ÙÙØ´Ù"]                                = "Walk speed",
-    ["Ø§ÙØªØ¨ Ø±Ø³Ø§ÙØ©..."]                              = "Type a message...",
-    ["Ø§ÙØªØ¨ 4 Ø£Ø­Ø±Ù ÙÙ ÙÙØ²Ø± Ø§ÙÙØ§Ø¹Ø¨"]               = "Enter 4 chars of username",
+    ["اكتب اسم اللاعب هنا"]                       = "Enter player name",
+    ["سرعة الطيران"]                              = "Fly speed",
+    ["سرعة المشي"]                                = "Walk speed",
+    ["اكتب رسالة..."]                              = "Type a message...",
+    ["اكتب 4 أحرف من يوزر اللاعب"]               = "Enter 4 chars of username",
 
-    ["Ø§ÙØªØ­ÙÙ Ø§ÙØ±Ø¦ÙØ³Ù"]                            = "Main Controls",
-    ["Ø´Ø§Øª"]                                       = "Chat",
-    ["ØªÙØ§ØµÙ Ø¨ÙÙ ÙØ´ØºÙÙ Ø§ÙØ³ÙØ±Ø¨Øª"]                   = "Script users chat",
-    ["âââ ÙØ³ØªØ®Ø¯ÙÙÙ Ø§ÙØ³ÙØ±Ø¨Øª âââ"]                   = "âââ Script Users âââ",
-    ["Ø§ÙØ¹Ø¯Ø¯: "]                                   = "Count: ",
+    ["التحكم الرئيسي"]                            = "Main Controls",
+    ["شات"]                                       = "Chat",
+    ["تواصل بين مشغلي السكربت"]                   = "Script users chat",
+    ["─── مستخدمين السكربت ───"]                   = "─── Script Users ───",
+    ["العدد: "]                                   = "Count: ",
 
-    ["Ø§ÙØªØ¨ 4 Ø£Ø­Ø±Ù Ø¹ÙÙ Ø§ÙØ£ÙÙ"]                    = "Enter at least 4 chars",
-    ["ÙØ§ ÙÙØ¬Ø¯ ÙØ§Ø¹Ø¨ ÙØ·Ø§Ø¨Ù"]                        = "No matching player",
-    ["ØªÙ ØªØ­Ø¯ÙØ¯: "]                                = "Selected: ",
+    ["اكتب 4 أحرف على الأقل"]                    = "Enter at least 4 chars",
+    ["لا يوجد لاعب مطابق"]                        = "No matching player",
+    ["تم تحديد: "]                                = "Selected: ",
 
-    ["ÙØ§ Ø¹ÙØ¯Ù ÙÙØ¨Ø´Ø©!"]                            = "You don't have a cuff!",
-    ["ØªÙ Ø§ÙØªØ¹ÙÙÙ!"]                               = "Hung successfully!",
-    ["ÙØ´ÙØª Ø§ÙÙÙØ¨Ø´Ø©Ø Ø­Ø§ÙÙ ÙØ¬Ø¯Ø¯Ø§Ù"]                 = "Cuff failed, try again",
-    ["ÙØ§ ÙÙÙØª Ø§ÙÙØ§Ø¹Ø¨Ø ØªØ£ÙØ¯ ÙÙ Ø§ÙØ§Ø³Ù"]             = "Player not found, check name",
-    ["ÙÙØ¨Ø´Ø©"]                                     = "Cuff",
-    ["ØªÙ Ø§Ø³ØªØ¯Ø¹Ø§Ø¤Ù Ø¨ÙØ§Ø³Ø·Ø© Ø§ÙØ£ÙÙØ±"]                 = "Summoned by Owner",
-    ["Ø§ÙØªÙÙ Ø§ÙØ§Ø³ØªØ¯Ø¹Ø§Ø¡"]                           = "Summon ended",
-    ["Ø§ÙØªØ¨ 4 Ø£Ø­Ø±Ù ÙÙ ÙÙØ²Ø± Ø§ÙÙØ§Ø¹Ø¨ Ø£Ù Ø£ÙØ«Ø±"]       = "Enter at least 4 chars",
-    ["ÙØ§ ÙØ¯Ø±Øª Ø£Ø±Ø³Ù Ø§ÙØ£ÙØ± â ØªØ£ÙØ¯ Ø¥Ù Ø§ÙÙÙØ´ØºÙÙÙ ÙØ¯Ø¹Ù HTTP"] =
-        "Couldn't send command â check executor HTTP",
-    ["ØªÙ ÙØ³Ø® Ø±Ø§Ø¨Ø· Ø§ÙØ¯Ø³ÙÙØ±Ø¯"]                      = "Discord link copied",
-    ["ØªÙ Ø¥ÙÙØ§Ù Ø§ÙØ§Ø³ØªØ¯Ø¹Ø§Ø¡"]                        = "Summon stopped",
-    ["Ø§ÙØªØ¨ ÙÙØ²Ø± Ø§ÙÙØ§Ø¹Ø¨ ÙÙ Ø®Ø§ÙØ© Ø§ÙÙØªØ§Ø¨Ø©"]          = "Enter player username in the box",
-    ["Ø£Ø¯Ø®Ù Ø§ÙÙ Prefix Ø§ÙØ®Ø§Øµ Ø¨Ù"]                  = "Enter your Prefix",
-    ["ØªÙ Ø¥ÙÙØ§Ù Ø§ÙÙØ³Ø®"]                            = "Copy stopped",
-    ["Ø§ÙÙØ§Ø¹Ø¨ Ø®Ø±Ø¬ ÙÙ Ø§ÙØ³ÙØ±ÙØ±"]                      = "Player left the server",
-    ["ØªÙ ØªÙØ¹ÙÙ Ø§ÙÙØ³Ø® Ø¹ÙÙ "]                        = "Copy activated on ",
-    ["ØªÙ ØªÙØ¹ÙÙ Ø§ÙØ§Ø³ØªØ¯Ø¹Ø§Ø¡ ÙÙ "]                     = "Summon activated for ",
-    ["Ø§ÙÙØ¸Ø§Ù"]                                    = "System",
-    ["ÙØ§ ÙØ¯Ø±Øª Ø£Ø±Ø³Ù Ø§ÙØ±Ø³Ø§ÙØ© â ØªØ£ÙØ¯ Ø¥Ù Ø§ÙÙÙØ´ØºÙÙÙ ÙØ¯Ø¹Ù HTTP"] =
-        "Couldn't send message â check executor HTTP",
-    ["ÙØ±Ø­Ø¨ÙØ§! ÙØ°Ù Ø´Ø§Ø´Ø© Ø´Ø§Øª Ø®Ø§ØµØ© Ø¨ÙØ´ØºÙÙÙ Ø§ÙØ³ÙØ±Ø¨Øª ÙÙØ· â ØªÙØ± Ø¹Ø¨Ø± Ø³ÙØ±ÙØ± Ø®Ø§Ø±Ø¬Ù ÙÙØ§ ØªØ¸ÙØ± ÙØ£Ù ÙØ§Ø¹Ø¨ ÙØ§ ÙØ³ØªØ®Ø¯Ù Ø§ÙØ³ÙØ±Ø¨Øª."] =
-        "Hello! This is a private chat for script users only â routed through an external server and not visible to other players.",
+    ["ما عندك كلبشة!"]                            = "You don't have a cuff!",
+    ["تم التعليق!"]                               = "Hung successfully!",
+    ["فشلت الكلبشة، حاول مجدداً"]                 = "Cuff failed, try again",
+    ["ما لقيت اللاعب، تأكد من الاسم"]             = "Player not found, check name",
+    ["كلبشة"]                                     = "Cuff",
+    ["تم استدعاؤك بواسطة الأونر"]                 = "Summoned by Owner",
+    ["انتهى الاستدعاء"]                           = "Summon ended",
+    ["اكتب 4 أحرف من يوزر اللاعب أو أكثر"]       = "Enter at least 4 chars",
+    ["ما قدرت أرسل الأمر — تأكد إن المُشغِّل يدعم HTTP"] =
+        "Couldn't send command — check executor HTTP",
+    ["تم نسخ رابط الدسكورد"]                      = "Discord link copied",
+    ["تم إيقاف الاستدعاء"]                        = "Summon stopped",
+    ["اكتب يوزر اللاعب في خانة الكتابة"]          = "Enter player username in the box",
+    ["أدخل الـ Prefix الخاص بك"]                  = "Enter your Prefix",
+    ["تم إيقاف النسخ"]                            = "Copy stopped",
+    ["اللاعب خرج من السيرفر"]                      = "Player left the server",
+    ["تم تفعيل النسخ على "]                        = "Copy activated on ",
+    ["تم تفعيل الاستدعاء لـ "]                     = "Summon activated for ",
+    ["النظام"]                                    = "System",
+    ["ما قدرت أرسل الرسالة — تأكد إن المُشغِّل يدعم HTTP"] =
+        "Couldn't send message — check executor HTTP",
+    ["مرحبًا! هذي شاشة شات خاصة بمشغّلي السكربت فقط — تمر عبر سيرفر خارجي ولا تظهر لأي لاعب ما يستخدم السكربت."] =
+        "Hello! This is a private chat for script users only — routed through an external server and not visible to other players.",
 
-    ["ÙØ¶Ø§Ø¯ Ø§ÙÙ"]                                     = "Anti AFK",
-    ["Ø­ÙØ§ÙØ© ÙÙØ¨Ø´Ø©"]                                  = "Cuff Protect",
-    ["Ø¬Ø§Ø°Ø¨ÙØ© ÙÙØ®ÙØ¶Ø©"]                                = "Low Gravity",
-    ["ÙØ¶Ø§Ø¯ ÙØ§Ø¬"]                                     = "Anti Lag",
-    ["ÙØ¹ÙÙÙØ§Øª Ø§ÙØ³ÙØ±ÙØ±"]                              = "Server Info",
-    ["Ø§Ø®ØªØ±Ø§Ù Ø¬Ø¯Ø±Ø§Ù"]                                 = "Noclip",
-    ["ÙÙØ² ÙØ§ ÙÙØ§Ø¦Ù"]                                 = "Infinite Jump",
-    ["ØªØ³ÙÙ Ø§ÙØ¬Ø¯Ø±Ø§Ù"]                                 = "Wall Climb",
+    ["مضاد افك"]                                     = "Anti AFK",
+    ["حماية كلبشة"]                                  = "Cuff Protect",
+    ["جاذبية منخفضة"]                                = "Low Gravity",
+    ["مضاد لاج"]                                     = "Anti Lag",
+    ["معلومات السيرفر"]                              = "Server Info",
+    ["اختراق جدران"]                                 = "Noclip",
+    ["قفز لا نهائي"]                                 = "Infinite Jump",
+    ["تسلق الجدران"]                                 = "Wall Climb",
 
-    ["Ø¥ÙÙØ§Ù ÙØ´ÙØ© Ø²ÙÙØ¨Ù"]                             = "Stop Zombie Walk",
-    ["Ø¥ÙÙØ§Ù Ø§ÙØ­ÙØ§ÙØ©"]                                = "Stop Protection",
-    ["Ø¥ÙÙØ§Ù Ø§Ø®ØªØ±Ø§Ù"]                                 = "Stop Noclip",
-    ["Ø¥ÙÙØ§Ù Ø§ÙØ¬Ø§Ø°Ø¨ÙØ©"]                               = "Stop Low Grav",
-    ["Ø¥ÙÙØ§Ù Ø§ÙÙÙØ²"]                                  = "Stop Inf Jump",
-    ["Ø¥ÙÙØ§Ù Ø§ÙØªØ³ÙÙ"]                                 = "Stop Wall Climb",
-    ["Ø§Ø®ØªÙØ§Ø¡"]                                       = "Vanish",
-    ["Ø¥ÙÙØ§Ù Ø§ÙØ§Ø®ØªÙØ§Ø¡"]                               = "Stop Vanish",
-    ["Ø¥ÙÙØ§Ù ESP"]                                    = "Stop ESP",
-    ["Ø¥ÙÙØ§Ù ÙØ¶Ø§Ø¯ ÙØ§Ø¬"]                               = "Stop Anti Lag",
-    ["Ø¥ÙÙØ§Ù ÙØ¶Ø§Ø¯ Ø§ÙÙ"]                               = "Stop Anti AFK",
-    ["Ø¹ÙØ± Ø§ÙØ³ÙØ±ÙØ±: "]                                = "Server Age: ",
+    ["إيقاف مشية زومبي"]                             = "Stop Zombie Walk",
+    ["إيقاف الحماية"]                                = "Stop Protection",
+    ["إيقاف اختراق"]                                 = "Stop Noclip",
+    ["إيقاف الجاذبية"]                               = "Stop Low Grav",
+    ["إيقاف القفز"]                                  = "Stop Inf Jump",
+    ["إيقاف التسلق"]                                 = "Stop Wall Climb",
+    ["اختفاء"]                                       = "Vanish",
+    ["إيقاف الاختفاء"]                               = "Stop Vanish",
+    ["إيقاف ESP"]                                    = "Stop ESP",
+    ["إيقاف مضاد لاج"]                               = "Stop Anti Lag",
+    ["إيقاف مضاد افك"]                               = "Stop Anti AFK",
+    ["عمر السيرفر: "]                                = "Server Age: ",
 
-    ["Ø§ÙØ§ÙØ± Ø´Ø§ÙÙÙ ÙØ­ÙØ¯"]                             = "Shale's Commands",
-    ["ØªÙØ¹ÙÙ ÙØ³Ø®"]                                    = "Enable Copy",
-    ["Ø§ÙÙØ§Ù Ø§ÙÙØ³Ø®"]                                  = "Stop Copy",
-    ["Prefix Ø§ÙÙ HD (ØªÙÙØ§Ø¦Ù Ø£Ù ÙØ¯ÙÙ)"]               = "HD Prefix (Auto or Manual)",
-    ["ÙØ«Ø§Ù: ,"]                                      = "Example: ,",
-    ["Ø¹ÙØ¯Ù ÙØ´ÙÙØ©Ø ØªÙØ§ØµÙ Ø¯Ø³ÙÙØ±Ø¯"]                         = "Got a problem? Contact me on Discord.",
-    ["Ø´Ø§Ø±ÙÙÙØ§ Ø§ÙØªØ±Ø§Ø­Ø§ØªÙÙ Ø¹ÙÙ Ø§ÙØ¯Ø³ÙÙØ±Ø¯"]              = "Share feedback on Discord",
-    ["Ø´Ø§Ø±ÙÙÙØ§ Ø§ÙØªØ±Ø§Ø­Ø§ØªÙÙ Ø¹ÙÙ Ø§ÙØ¯Ø³ÙÙØ±Ø¯ | Ø§Ø¶ØºØ· Ø§ÙØ²Ø± Ø§ÙØµØºÙØ± ÙØ¥Ø®ÙØ§Ø¡ Ø§ÙÙØ§ÙØ°Ø©"] =
+    ["اوامر شاليه محمد"]                             = "Shale's Commands",
+    ["تفعيل نسخ"]                                    = "Enable Copy",
+    ["ايقاف النسخ"]                                  = "Stop Copy",
+    ["Prefix الـ HD (تلقائي أو يدوي)"]               = "HD Prefix (Auto or Manual)",
+    ["مثال: ,"]                                      = "Example: ,",
+    ["عندك مشكلة؟ تواصل دسكورد"]                         = "Got a problem? Contact me on Discord.",
+    ["شاركونا اقتراحاتكم على الدسكورد"]              = "Share feedback on Discord",
+    ["شاركونا اقتراحاتكم على الدسكورد | اضغط الزر الصغير لإخفاء النافذة"] =
         "Share feedback on Discord | Press the small button to hide",
-    ["Ø¥ÙÙØ§Ù Respawn Loop"]                            = "Stop Respawn Loop",
+    ["إيقاف Respawn Loop"]                            = "Stop Respawn Loop",
 
-    ["Ø§ÙØ³Ø±Ø¹Ø© ÙÙØ¹ÙØ©"]                                  = "Speed Active",
-    ["Ø§ÙØ­ÙØ§ÙØ© Ø´ØºØ§ÙØ©"]                                 = "Protect Active",
-    ["Ø±Ø¬ÙØ¹ ÙÙÙÙØ§Ù"]                                   = "Return to Pos",
-    ["Ø¥ÙÙØ§Ù FPS/Ping"]                                = "Stop FPS/Ping",
+    ["السرعة مفعلة"]                                  = "Speed Active",
+    ["الحماية شغالة"]                                 = "Protect Active",
+    ["رجوع للمكان"]                                   = "Return to Pos",
+    ["إيقاف FPS/Ping"]                                = "Stop FPS/Ping",
 }
 
 
@@ -7567,18 +7567,18 @@ end
           
           _T18ArBtn.BackgroundColor3 = _arActive and Color3.fromRGB(220, 220, 220) or Color3.fromRGB(28, 28, 28)
           _T18ArBtn.TextColor3       = _arActive and Color3.fromRGB(20, 20, 20)    or Color3.fromRGB(160, 160, 160)
-          _T18ArBtn.Text             = (_arActive and "â  " or "     ") .. "ð¸ð¦  Ø§ÙØ¹Ø±Ø¨ÙØ©"
+          _T18ArBtn.Text             = (_arActive and "✔  " or "     ") .. "🇸🇦  العربية"
           
           _T18EnBtn.BackgroundColor3 = (not _arActive) and Color3.fromRGB(220, 220, 220) or Color3.fromRGB(28, 28, 28)
           _T18EnBtn.TextColor3       = (not _arActive) and Color3.fromRGB(20, 20, 20)    or Color3.fromRGB(160, 160, 160)
-          _T18EnBtn.Text             = ((not _arActive) and "â  " or "     ") .. "ðºð¸  English"
+          _T18EnBtn.Text             = ((not _arActive) and "✔  " or "     ") .. "🇺🇸  English"
           
           if _T18LangSelectorBtn then
-              _T18LangSelectorBtn.Text = _arActive and "ð  Ø§ÙÙØºØ©  â¾" or "ð  Language  â¾"
+              _T18LangSelectorBtn.Text = _arActive and "🌐  اللغة  ▾" or "🌐  Language  ▾"
           end
           
           if _T18ColorBtn then
-              _T18ColorBtn.Text = _arActive and "ð¨  Ø§ÙÙÙÙ  â¾" or "ð¨  Color  â¾"
+              _T18ColorBtn.Text = _arActive and "🎨  اللون  ▾" or "🎨  Color  ▾"
           end
       end
 
