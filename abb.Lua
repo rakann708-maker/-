@@ -459,7 +459,11 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 						local original = root.CFrame
 						root.CFrame = CFrame.new(99999999999, 99999999999, 99999999999)
 						task.wait(0.04)
-						root.CFrame = original
+						if bangProtectActive and root and root.Parent then
+							root.CFrame = original
+						elseif root and root.Parent then
+							root.CFrame = original
+						end
 					end
 				end
 
@@ -611,9 +615,8 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 	end
 
 
-		local katanaTaskId = 0
-	local katanaAnim = Instance.new("Animation")
-	katanaAnim.AnimationId = "rbxassetid://18396187889" -- رقصت 2 / انيميشن كاتانا
+	local katanaTaskId = 0
+	local KATANA_ANIMATION_ID = "rbxassetid://18396187889"
 	local katanaTrack = nil
 	local katanaConns = {}
 	local katanaCharConn = nil
@@ -630,9 +633,40 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 
 	local function stopKatanaTrack()
 		if katanaTrack then
-			pcall(function() katanaTrack:Stop() end)
+			pcall(function() katanaTrack:Stop(0.1) end)
 			katanaTrack = nil
 		end
+	end
+
+	local function playKatanaAnimation(hum)
+		if not AUTO.KatanaAnim or not hum or not hum.Parent then return false end
+		stopKatanaTrack()
+
+		local animator = hum:FindFirstChildOfClass("Animator")
+		if not animator then
+			animator = Instance.new("Animator")
+			animator.Parent = hum
+		end
+
+		local anim = Instance.new("Animation")
+		anim.AnimationId = KATANA_ANIMATION_ID
+
+		local ok, track = pcall(function()
+			return animator:LoadAnimation(anim)
+		end)
+		anim:Destroy()
+
+		if not ok or not track then
+			return false
+		end
+
+		katanaTrack = track
+		katanaTrack.Looped = false
+		katanaTrack.Priority = Enum.AnimationPriority.Action
+		local played = pcall(function()
+			katanaTrack:Play(0.1, 1, 1)
+		end)
+		return played
 	end
 
 	local function bindKatanaToChar(char, myId)
@@ -649,27 +683,31 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 
 			table.insert(katanaConns, tool.Equipped:Connect(function()
 				if not AUTO.KatanaAnim or myId ~= katanaTaskId then return end
-				stopKatanaTrack()
-				local ok, track = pcall(function()
-					return hum:LoadAnimation(katanaAnim)
-				end)
-				if not ok or not track then return end
-				katanaTrack = track
-				katanaTrack.Looped = false
-				pcall(function()
-					katanaTrack:Play()
-				end)
+				playKatanaAnimation(hum)
 			end))
 
+			table.insert(katanaConns, tool.Unequipped:Connect(function()
+				if myId ~= katanaTaskId then return end
+				stopKatanaTrack()
+			end))
 		end
 
 		for _,child in ipairs(char:GetChildren()) do
 			hookTool(child)
 		end
 		table.insert(katanaConns, char.ChildAdded:Connect(hookTool))
+
+		-- إذا شغلت السويتش وأنت ماسك أداة بالفعل، شغل الانيميشن مباشرة.
+		for _,child in ipairs(char:GetChildren()) do
+			if child:IsA("Tool") then
+				playKatanaAnimation(hum)
+				break
+			end
+		end
 	end
 
 	local function startKatanaAnim()
+		AUTO.KatanaAnim = true
 		katanaTaskId += 1
 		local myId = katanaTaskId
 
@@ -687,12 +725,14 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 		end
 
 		katanaCharConn = plr.CharacterAdded:Connect(function(newChar)
-			if not AUTO.KatanaAnim then return end
+			if not AUTO.KatanaAnim or myId ~= katanaTaskId then return end
+			task.wait(0.2)
 			bindKatanaToChar(newChar, myId)
 		end)
 	end
 
 	local function stopKatanaAnim()
+		AUTO.KatanaAnim = false
 		katanaTaskId += 1
 		if katanaCharConn then
 			katanaCharConn:Disconnect()
@@ -741,6 +781,370 @@ local function startAntiBots()
 
 				-- أسرع
 				task.wait(0.01)
+			end
+		end)
+	end
+
+
+	-- ====== Extra player/visual features ======
+	local FPSPingActive = false
+	local FPSPingConnection = nil
+	local FPSPingGui = nil
+
+	local ESPActive = false
+	local ESPConnections = {}
+	local ESPObjects = {}
+
+	local AntiLagActive = false
+	local antiLagSaved = {
+		lighting = nil,
+		quality = nil,
+		effects = {},
+	}
+
+	local VanishActive = false
+	local vanishSavedTransparency = {}
+	local vanishCharConn = nil
+
+	local NoClipActive = false
+	local noClipConnection = nil
+	local noClipSaved = {}
+
+	local function getGuiParent()
+		local parent = nil
+		pcall(function() parent = CoreGui end)
+		if not parent then
+			parent = plr:WaitForChild("PlayerGui")
+		end
+		return parent
+	end
+
+	-- FPS / Ping: كرت صغير أسود.
+	local function stopFPSPing()
+		FPSPingActive = false
+		if FPSPingConnection then
+			FPSPingConnection:Disconnect()
+			FPSPingConnection = nil
+		end
+		if FPSPingGui then
+			FPSPingGui:Destroy()
+			FPSPingGui = nil
+		end
+	end
+
+	local function startFPSPing()
+		if FPSPingActive then return end
+		FPSPingActive = true
+		stopFPSPing()
+		FPSPingActive = true
+
+		local sg = Instance.new("ScreenGui")
+		sg.Name = "SKY_FPSPing"
+		sg.ResetOnSpawn = false
+		sg.IgnoreGuiInset = true
+		sg.DisplayOrder = 2147483647
+		local parent = getGuiParent()
+		pcall(function() sg.Parent = parent end)
+		if not sg.Parent then sg.Parent = plr:WaitForChild("PlayerGui") end
+		FPSPingGui = sg
+
+		local frame = Instance.new("Frame")
+		frame.Size = UDim2.new(0, 132, 0, 52)
+		frame.Position = UDim2.new(1, -145, 0, 10)
+		frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		frame.BackgroundTransparency = 0.05
+		frame.BorderSizePixel = 0
+		frame.Parent = sg
+		round(frame, 10)
+
+		local stroke = Instance.new("UIStroke")
+		stroke.Parent = frame
+		stroke.Color = Color3.fromRGB(75,75,75)
+		stroke.Thickness = 1
+		stroke.Transparency = 0.25
+
+		local fpsLbl = Instance.new("TextLabel")
+		fpsLbl.Parent = frame
+		fpsLbl.BackgroundTransparency = 1
+		fpsLbl.Size = UDim2.new(1, -12, 0, 24)
+		fpsLbl.Position = UDim2.new(0, 7, 0, 2)
+		fpsLbl.Font = Enum.Font.GothamBold
+		fpsLbl.TextSize = 14
+		fpsLbl.TextXAlignment = Enum.TextXAlignment.Left
+		fpsLbl.TextColor3 = Color3.fromRGB(100, 230, 110)
+		fpsLbl.Text = "FPS: --"
+
+		local pingLbl = Instance.new("TextLabel")
+		pingLbl.Parent = frame
+		pingLbl.BackgroundTransparency = 1
+		pingLbl.Size = UDim2.new(1, -12, 0, 24)
+		pingLbl.Position = UDim2.new(0, 7, 0, 26)
+		pingLbl.Font = Enum.Font.GothamBold
+		pingLbl.TextSize = 14
+		pingLbl.TextXAlignment = Enum.TextXAlignment.Left
+		pingLbl.TextColor3 = Color3.fromRGB(80, 175, 255)
+		pingLbl.Text = "Ping: --"
+
+		local fpsCount, elapsed = 0, 0
+		FPSPingConnection = RunService.RenderStepped:Connect(function(dt)
+			if not FPSPingActive or not frame.Parent then return end
+			fpsCount += 1
+			elapsed += dt
+			if elapsed >= 0.5 then
+				local fps = math.floor((fpsCount / elapsed) + 0.5)
+				local ping = 0
+				pcall(function()
+					ping = math.floor(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue() + 0.5)
+				end)
+				fpsLbl.Text = "FPS: " .. tostring(fps)
+				pingLbl.Text = "Ping: " .. tostring(ping) .. " ms"
+
+				if fps >= 55 then
+					fpsLbl.TextColor3 = Color3.fromRGB(100, 230, 110)
+				elseif fps >= 30 then
+					fpsLbl.TextColor3 = Color3.fromRGB(255, 205, 70)
+				else
+					fpsLbl.TextColor3 = Color3.fromRGB(255, 90, 90)
+				end
+				fpsCount, elapsed = 0, 0
+			end
+		end)
+	end
+
+	-- ESP: اسم + هايلايت، مع تنظيف كامل عند الإيقاف.
+	local function removeESPForPlayer(player)
+		local data = ESPObjects[player]
+		if data then
+			for _,obj in ipairs(data) do
+				pcall(function() obj:Destroy() end)
+			end
+			ESPObjects[player] = nil
+		end
+	end
+
+	local function addESPForPlayer(player)
+		if not ESPActive or not player or player == plr then return end
+		removeESPForPlayer(player)
+
+		local created = {}
+		ESPObjects[player] = created
+
+		local function attach(char)
+			if not ESPActive or not char then return end
+			for i = #created, 1, -1 do
+				pcall(function() created[i]:Destroy() end)
+				created[i] = nil
+			end
+
+			local root = char:FindFirstChild("HumanoidRootPart") or char:WaitForChild("HumanoidRootPart", 5)
+			if not root then return end
+
+			local hl = Instance.new("Highlight")
+			hl.Name = "SKY_ESP_Highlight"
+			hl.Adornee = char
+			hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+			hl.FillTransparency = 0.82
+			hl.OutlineTransparency = 0.05
+			hl.FillColor = Color3.fromRGB(255,80,80)
+			hl.OutlineColor = Color3.fromRGB(255,255,255)
+			hl.Parent = char
+			table.insert(created, hl)
+
+			local bb = Instance.new("BillboardGui")
+			bb.Name = "SKY_ESP_Name"
+			bb.Size = UDim2.new(0, 150, 0, 32)
+			bb.StudsOffset = Vector3.new(0, 3.2, 0)
+			bb.AlwaysOnTop = true
+			bb.Adornee = root
+			bb.Parent = root
+			table.insert(created, bb)
+
+			local lbl = Instance.new("TextLabel")
+			lbl.Parent = bb
+			lbl.Size = UDim2.new(1, 0, 1, 0)
+			lbl.BackgroundTransparency = 1
+			lbl.Font = Enum.Font.GothamBold
+			lbl.TextSize = 14
+			lbl.TextStrokeTransparency = 0.45
+			lbl.TextColor3 = Color3.fromRGB(255,255,255)
+			lbl.Text = player.Name
+		end
+
+		if player.Character then
+			attach(player.Character)
+		end
+		table.insert(ESPConnections, player.CharacterAdded:Connect(function(char)
+			task.wait(0.15)
+			attach(char)
+		end))
+	end
+
+	local function stopESP()
+		ESPActive = false
+		for player,_ in pairs(ESPObjects) do
+			removeESPForPlayer(player)
+		end
+		for _,conn in ipairs(ESPConnections) do
+			pcall(function() conn:Disconnect() end)
+		end
+		ESPConnections = {}
+	end
+
+	local function startESP()
+		if ESPActive then return end
+		stopESP()
+		ESPActive = true
+		for _,player in ipairs(Players:GetPlayers()) do
+			addESPForPlayer(player)
+		end
+		table.insert(ESPConnections, Players.PlayerAdded:Connect(function(player)
+			addESPForPlayer(player)
+		end))
+		table.insert(ESPConnections, Players.PlayerRemoving:Connect(function(player)
+			removeESPForPlayer(player)
+		end))
+	end
+
+	-- مضاد لاق قابل للعكس: يحفظ القيم قبل تعطيل المؤثرات.
+	local function stopAntiLag()
+		if not AntiLagActive then return end
+		AntiLagActive = false
+
+		if antiLagSaved.lighting then
+			local Lighting = game:GetService("Lighting")
+			pcall(function()
+				Lighting.GlobalShadows = antiLagSaved.lighting.GlobalShadows
+				Lighting.FogEnd = antiLagSaved.lighting.FogEnd
+				Lighting.Brightness = antiLagSaved.lighting.Brightness
+			end)
+		end
+		if antiLagSaved.quality ~= nil then
+			pcall(function() settings().Rendering.QualityLevel = antiLagSaved.quality end)
+		end
+		for obj,wasEnabled in pairs(antiLagSaved.effects) do
+			if obj and obj.Parent then
+				pcall(function() obj.Enabled = wasEnabled end)
+			end
+		end
+		antiLagSaved = {lighting=nil, quality=nil, effects={}}
+	end
+
+	local function startAntiLag()
+		if AntiLagActive then return end
+		AntiLagActive = true
+		local Lighting = game:GetService("Lighting")
+		antiLagSaved.lighting = {
+			GlobalShadows = Lighting.GlobalShadows,
+			FogEnd = Lighting.FogEnd,
+			Brightness = Lighting.Brightness,
+		}
+		pcall(function() antiLagSaved.quality = settings().Rendering.QualityLevel end)
+
+		pcall(function()
+			Lighting.GlobalShadows = false
+			Lighting.FogEnd = 1000000
+			Lighting.Brightness = math.min(Lighting.Brightness, 1)
+		end)
+		pcall(function()
+			settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+		end)
+
+		for _,v in ipairs(workspace:GetDescendants()) do
+			if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles") or v:IsA("Trail") or v:IsA("Beam") then
+				if antiLagSaved.effects[v] == nil then
+					antiLagSaved.effects[v] = v.Enabled
+				end
+				v.Enabled = false
+			end
+		end
+	end
+
+	-- اختفاء محلي بصري للشخصية، ويرجع كل قيم الشفافية عند الإيقاف.
+	local function applyVanishToCharacter(char)
+		if not char then return end
+		for _,obj in ipairs(char:GetDescendants()) do
+			if obj:IsA("BasePart") then
+				if vanishSavedTransparency[obj] == nil then
+					vanishSavedTransparency[obj] = obj.LocalTransparencyModifier
+				end
+				obj.LocalTransparencyModifier = 1
+			elseif obj:IsA("Decal") then
+				if vanishSavedTransparency[obj] == nil then
+					vanishSavedTransparency[obj] = obj.Transparency
+				end
+				obj.Transparency = 1
+			end
+		end
+	end
+
+	local function stopVanish()
+		VanishActive = false
+		if vanishCharConn then
+			vanishCharConn:Disconnect()
+			vanishCharConn = nil
+		end
+		for obj,old in pairs(vanishSavedTransparency) do
+			if obj and obj.Parent then
+				pcall(function()
+					if obj:IsA("BasePart") then
+						obj.LocalTransparencyModifier = old
+					elseif obj:IsA("Decal") then
+						obj.Transparency = old
+					end
+				end)
+			end
+		end
+		vanishSavedTransparency = {}
+	end
+
+	local function startVanish()
+		if VanishActive then return end
+		stopVanish()
+		VanishActive = true
+		if plr.Character then
+			applyVanishToCharacter(plr.Character)
+		end
+		vanishCharConn = plr.CharacterAdded:Connect(function(char)
+			if not VanishActive then return end
+			task.wait(0.2)
+			applyVanishToCharacter(char)
+		end)
+	end
+
+	-- اختراق الجدران (Noclip) مع حفظ CanCollide الأصلي.
+	local function restoreNoClipParts()
+		for part,old in pairs(noClipSaved) do
+			if part and part.Parent then
+				pcall(function() part.CanCollide = old end)
+			end
+		end
+		noClipSaved = {}
+	end
+
+	local function stopNoClip()
+		NoClipActive = false
+		if noClipConnection then
+			noClipConnection:Disconnect()
+			noClipConnection = nil
+		end
+		restoreNoClipParts()
+	end
+
+	local function startNoClip()
+		if NoClipActive then return end
+		stopNoClip()
+		NoClipActive = true
+		noClipConnection = RunService.Stepped:Connect(function()
+			if not NoClipActive then return end
+			local char = plr.Character
+			if not char then return end
+			for _,part in ipairs(char:GetDescendants()) do
+				if part:IsA("BasePart") then
+					if noClipSaved[part] == nil then
+						noClipSaved[part] = part.CanCollide
+					end
+					part.CanCollide = false
+				end
 			end
 		end)
 	end
@@ -986,7 +1390,7 @@ local function startAntiBots()
 			local grid = Instance.new("Frame")
 			grid.Parent = sf
 			grid.BackgroundTransparency = 1
-			grid.Size = UDim2.new(1, 0, 0, 420)
+			grid.Size = UDim2.new(1, 0, 0, 480)
 
 			local left = Instance.new("Frame")
 			left.Parent = grid
@@ -1046,8 +1450,27 @@ local function startAntiBots()
 			end)
 
 			
+			MakeSwitch(left,  "FPS / Ping", function() return FPSPingActive end, function(v)
+				if v then startFPSPing() else stopFPSPing() end
+			end)
+
+			MakeSwitch(left,  "ESP", function() return ESPActive end, function(v)
+				if v then startESP() else stopESP() end
+			end)
+
+			MakeSwitch(left,  "مضاد لاق", function() return AntiLagActive end, function(v)
+				if v then startAntiLag() else stopAntiLag() end
+			end)
+
+			MakeSwitch(right, "اختفاء", function() return VanishActive end, function(v)
+				if v then startVanish() else stopVanish() end
+			end)
+
+			MakeSwitch(right, "اختراق جدران", function() return NoClipActive end, function(v)
+				if v then startNoClip() else stopNoClip() end
+			end)
+
 			MakeSwitch(right, "انيميشن كاتانا", function() return AUTO.KatanaAnim end, function(v)
-				AUTO.KatanaAnim = v and true or false
 				if v then
 					startKatanaAnim()
 				else
@@ -1439,6 +1862,221 @@ local function startAntiBots()
 
 	-- تم اختيار لاعب (يختفي بعد 2 ثانية)
 	-- توست (تم اختيار لاعب) مع صورة اللاعب ويختفي بعد مدة
+
+
+	-- ====== CHAT UI: HD Commands + Prefix + تفعيل نسخ ======
+	local chatCopyActive = false
+	local chatCopyTaskId = 0
+
+	local function makeChatUI()
+		local sf = findOrionScrollBySentinel("##CHAT_CONTAINER##")
+		if not (sf and sf:IsA("ScrollingFrame")) then return end
+
+		sf.Active = true
+		sf.ScrollingEnabled = true
+		sf.ScrollBarThickness = 6
+		sf.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+		for _,ch in ipairs(sf:GetChildren()) do
+			if not ch:IsA("UIListLayout") and not ch:IsA("UIPadding") then
+				ch:Destroy()
+			end
+		end
+
+		local list = sf:FindFirstChildOfClass("UIListLayout") or Instance.new("UIListLayout", sf)
+		list.SortOrder = Enum.SortOrder.LayoutOrder
+		list.Padding = UDim.new(0, 12)
+
+		local pad = sf:FindFirstChildOfClass("UIPadding") or Instance.new("UIPadding", sf)
+		pad.PaddingTop = UDim.new(0, 12)
+		pad.PaddingLeft = UDim.new(0, 12)
+		pad.PaddingRight = UDim.new(0, 12)
+		pad.PaddingBottom = UDim.new(0, 12)
+
+		local title = Instance.new("TextLabel")
+		title.Parent = sf
+		title.BackgroundTransparency = 1
+		title.Size = UDim2.new(1, 0, 0, 42)
+		title.Font = Enum.Font.GothamBold
+		title.TextSize = 26
+		title.TextColor3 = Color3.fromRGB(255,255,255)
+		title.Text = "Chat"
+		title.TextXAlignment = Enum.TextXAlignment.Center
+
+		local cmdCard = Instance.new("Frame")
+		cmdCard.Parent = sf
+		cmdCard.BackgroundColor3 = Color3.fromRGB(18,18,18)
+		cmdCard.BackgroundTransparency = 0.08
+		cmdCard.BorderSizePixel = 0
+		cmdCard.Size = UDim2.new(1, 0, 0, 142)
+		round(cmdCard, 14)
+
+		local cmdLabel = Instance.new("TextLabel")
+		cmdLabel.Parent = cmdCard
+		cmdLabel.BackgroundTransparency = 1
+		cmdLabel.Position = UDim2.new(0, 12, 0, 8)
+		cmdLabel.Size = UDim2.new(1, -24, 0, 22)
+		cmdLabel.Font = Enum.Font.GothamBold
+		cmdLabel.TextSize = 16
+		cmdLabel.TextColor3 = Color3.fromRGB(235,235,235)
+		cmdLabel.TextXAlignment = Enum.TextXAlignment.Right
+		cmdLabel.Text = "أوامر HD"
+
+		local cmdInput = Instance.new("TextBox")
+		cmdInput.Parent = cmdCard
+		cmdInput.BackgroundColor3 = Color3.fromRGB(28,28,28)
+		cmdInput.BorderSizePixel = 0
+		cmdInput.Position = UDim2.new(0, 12, 0, 38)
+		cmdInput.Size = UDim2.new(1, -126, 0, 42)
+		cmdInput.ClearTextOnFocus = false
+		cmdInput.PlaceholderText = "اكتب الأمر..."
+		cmdInput.Text = ""
+		cmdInput.Font = Enum.Font.Gotham
+		cmdInput.TextSize = 15
+		cmdInput.TextColor3 = Color3.fromRGB(255,255,255)
+		cmdInput.PlaceholderColor3 = Color3.fromRGB(170,170,170)
+		round(cmdInput, 10)
+
+		local sendBtn = Instance.new("TextButton")
+		sendBtn.Parent = cmdCard
+		sendBtn.BackgroundColor3 = Color3.fromRGB(235,235,235)
+		sendBtn.BorderSizePixel = 0
+		sendBtn.Position = UDim2.new(1, -104, 0, 38)
+		sendBtn.Size = UDim2.new(0, 92, 0, 42)
+		sendBtn.Font = Enum.Font.GothamBold
+		sendBtn.TextSize = 15
+		sendBtn.TextColor3 = Color3.fromRGB(0,0,0)
+		sendBtn.Text = "إرسال"
+		round(sendBtn, 10)
+
+		local targetInput = Instance.new("TextBox")
+		targetInput.Parent = cmdCard
+		targetInput.BackgroundColor3 = Color3.fromRGB(28,28,28)
+		targetInput.BorderSizePixel = 0
+		targetInput.Position = UDim2.new(0, 12, 0, 91)
+		targetInput.Size = UDim2.new(1, -24, 0, 38)
+		targetInput.ClearTextOnFocus = false
+		targetInput.PlaceholderText = "يوزر اللاعب لميزة النسخ"
+		targetInput.Text = ""
+		targetInput.Font = Enum.Font.Gotham
+		targetInput.TextSize = 14
+		targetInput.TextColor3 = Color3.fromRGB(255,255,255)
+		targetInput.PlaceholderColor3 = Color3.fromRGB(170,170,170)
+		round(targetInput, 10)
+
+		local copyCard = Instance.new("Frame")
+		copyCard.Parent = sf
+		copyCard.BackgroundColor3 = Color3.fromRGB(18,18,18)
+		copyCard.BackgroundTransparency = 0.08
+		copyCard.BorderSizePixel = 0
+		copyCard.Size = UDim2.new(1, 0, 0, 108)
+		round(copyCard, 14)
+
+		local prefixLabel = Instance.new("TextLabel")
+		prefixLabel.Parent = copyCard
+		prefixLabel.BackgroundTransparency = 1
+		prefixLabel.Position = UDim2.new(0, 12, 0, 7)
+		prefixLabel.Size = UDim2.new(1, -24, 0, 20)
+		prefixLabel.Font = Enum.Font.Gotham
+		prefixLabel.TextSize = 12
+		prefixLabel.TextColor3 = Color3.fromRGB(185,185,185)
+		prefixLabel.TextXAlignment = Enum.TextXAlignment.Right
+		prefixLabel.Text = "Prefix الـ HD (تلقائي أو يدوي)"
+
+		local prefixInput = Instance.new("TextBox")
+		prefixInput.Parent = copyCard
+		prefixInput.BackgroundColor3 = Color3.fromRGB(28,28,28)
+		prefixInput.BorderSizePixel = 0
+		prefixInput.Position = UDim2.new(0, 12, 0, 36)
+		prefixInput.Size = UDim2.new(0.38, -6, 0, 42)
+		prefixInput.ClearTextOnFocus = false
+		prefixInput.PlaceholderText = "مثال: ,"
+		prefixInput.Text = ","
+		prefixInput.Font = Enum.Font.GothamBold
+		prefixInput.TextSize = 18
+		prefixInput.TextColor3 = Color3.fromRGB(255,255,255)
+		prefixInput.PlaceholderColor3 = Color3.fromRGB(170,170,170)
+		round(prefixInput, 10)
+
+		local copyBtn = Instance.new("TextButton")
+		copyBtn.Parent = copyCard
+		copyBtn.BackgroundColor3 = Color3.fromRGB(235,235,235)
+		copyBtn.BorderSizePixel = 0
+		copyBtn.Position = UDim2.new(0.4, 4, 0, 36)
+		copyBtn.Size = UDim2.new(0.6, -16, 0, 42)
+		copyBtn.Font = Enum.Font.GothamBold
+		copyBtn.TextSize = 16
+		copyBtn.TextColor3 = Color3.fromRGB(0,0,0)
+		copyBtn.Text = "تفعيل نسخ"
+		round(copyBtn, 10)
+
+		local function runManualCommand()
+			local txt = tostring(cmdInput.Text or ""):match("^%s*(.-)%s*$")
+			if txt == "" then
+				makeAutoNotif("الأوامر", "اكتب الأمر أولاً", 1.5)
+				return
+			end
+			sendHDCommand(txt)
+			cmdInput.Text = ""
+			makeAutoNotif("تم إرسال الأمر", txt, 1.5)
+		end
+
+		sendBtn.MouseButton1Click:Connect(runManualCommand)
+		cmdInput.FocusLost:Connect(function(enterPressed)
+			if enterPressed then
+				runManualCommand()
+			end
+		end)
+
+		copyBtn.MouseButton1Click:Connect(function()
+			if not chatCopyActive then
+				local tg = tostring(targetInput.Text or ""):match("^%s*(.-)%s*$")
+				local prefix = tostring(prefixInput.Text or "")
+				if tg == "" then
+					makeAutoNotif("ميزة النسخ", "اكتب يوزر اللاعب أولاً", 1.8)
+					return
+				end
+				if prefix == "" then
+					makeAutoNotif("ميزة النسخ", "أدخل Prefix الخاص بك", 1.8)
+					return
+				end
+
+				local cmds = {
+					prefix .. "size " .. tg .. " 3",
+					prefix .. "height " .. tg .. " 0",
+					prefix .. "neon " .. tg,
+					prefix .. "aura " .. tg,
+					prefix .. "color " .. tg .. " pink",
+				}
+
+				chatCopyActive = true
+				chatCopyTaskId += 1
+				local myId = chatCopyTaskId
+				copyBtn.Text = "ايقاف النسخ"
+				copyBtn.BackgroundColor3 = Color3.fromRGB(80,80,80)
+				copyBtn.TextColor3 = Color3.fromRGB(255,255,255)
+				makeAutoNotif("تم تفعيل النسخ", "على " .. tg, 1.8)
+
+				task.spawn(function()
+					while chatCopyActive and myId == chatCopyTaskId do
+						for _,cmd in ipairs(cmds) do
+							if not chatCopyActive or myId ~= chatCopyTaskId then break end
+							sendHDCommand(cmd)
+							task.wait(0.15)
+						end
+						task.wait(5)
+					end
+				end)
+			else
+				chatCopyActive = false
+				chatCopyTaskId += 1
+				copyBtn.Text = "تفعيل نسخ"
+				copyBtn.BackgroundColor3 = Color3.fromRGB(235,235,235)
+				copyBtn.TextColor3 = Color3.fromRGB(0,0,0)
+				makeAutoNotif("ميزة النسخ", "تم إيقاف النسخ", 1.5)
+			end
+		end)
+	end
 
 	local function makeToastSelected(username, display, userId)
 		ensureNotifGui()
@@ -3189,6 +3827,7 @@ strongBangBtn.AutoButtonColor = false
 		refresh()
 	end
 
+	makeChatUI()
 	makeCounterUI()
 	makeTargetUI()
 
