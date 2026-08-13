@@ -1061,19 +1061,7 @@ local function startAntiBots()
 				saveAutoSettings()
 			end)
 
-			MakeSwitch(right, "أوامر مخفية", function() return AUTO.HiddenCommandEnabled end, function(v)
-				AUTO.HiddenCommandEnabled = v and true or false
-				AUTO.CommandField = v and true or false
-				setCommandFieldVisible(AUTO.CommandField)
-				saveAutoSettings()
-			end)
-
-			MakeSwitch(right, "حذف بعد الإرسال", function() return AUTO.ClearCommandAfterSend end, function(v)
-				AUTO.ClearCommandAfterSend = v and true or false
-				saveAutoSettings()
-			end)
-
-MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(v) AUTO.AntiAFK = v end)
+			MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(v) AUTO.AntiAFK = v end)
 		end
 	end
 
@@ -1510,28 +1498,34 @@ MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(
 	local CommandFieldGui
 	local CommandFieldFrame
 	local CommandFieldBox
+	local dragging = false
+	local dragStart, dragStartPos
 
 	local function ensureCommandFieldGui()
-		if CommandFieldGui and CommandFieldGui.Parent then return end
+		if CommandFieldGui and CommandFieldGui.Parent then
+			CommandFieldGui.Enabled = true
+			return
+		end
+
 		local parent = nil
 		pcall(function() parent = game:GetService("CoreGui") end)
 		if not parent then parent = plr:WaitForChild("PlayerGui") end
 
 		CommandFieldGui = Instance.new("ScreenGui")
-		CommandFieldGui.Name = "SKY_HiddenCommands"
+		CommandFieldGui.Name = "SKY_HDCommands"
 		CommandFieldGui.ResetOnSpawn = false
 		CommandFieldGui.IgnoreGuiInset = true
-		CommandFieldGui.Enabled = false
+		CommandFieldGui.Enabled = true
 		CommandFieldGui.Parent = parent
 
 		local main = Instance.new("Frame")
 		main.Name = "CommandFieldMain"
-		main.Size = UDim2.new(0, 300, 0, 148)
-		main.Position = UDim2.new(0.5, -150, 0.5, -74)
+		main.Size = UDim2.new(0, 340, 0, 180)
+		main.Position = UDim2.new(0.5, -170, 0.5, -90)
 		main.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 		main.BorderSizePixel = 0
 		main.Parent = CommandFieldGui
-		round(main, 12)
+		round(main, 14)
 		CommandFieldFrame = main
 
 		local stroke = Instance.new("UIStroke")
@@ -1543,7 +1537,7 @@ MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(
 		local header = Instance.new("TextLabel")
 		header.Parent = main
 		header.BackgroundTransparency = 1
-		header.Size = UDim2.new(1, -20, 0, 26)
+		header.Size = UDim2.new(1, -20, 0, 28)
 		header.Position = UDim2.new(0, 10, 0, 8)
 		header.Font = Enum.Font.GothamBold
 		header.TextSize = 14
@@ -1551,11 +1545,13 @@ MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(
 		header.Text = "HD Commands"
 		header.TextXAlignment = Enum.TextXAlignment.Left
 		header.TextYAlignment = Enum.TextYAlignment.Center
+		header.Active = true
+		header.Parent = main
 
 		local closeBtn = Instance.new("TextButton")
 		closeBtn.Parent = main
-		closeBtn.Size = UDim2.new(0, 24, 0, 24)
-		closeBtn.Position = UDim2.new(1, -30, 0, 8)
+		closeBtn.Size = UDim2.new(0, 26, 0, 26)
+		closeBtn.Position = UDim2.new(1, -34, 0, 8)
 		closeBtn.BackgroundColor3 = Color3.fromRGB(38,38,38)
 		closeBtn.BorderSizePixel = 0
 		closeBtn.Font = Enum.Font.GothamBold
@@ -1564,16 +1560,41 @@ MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(
 		closeBtn.Text = "X"
 		round(closeBtn, 8)
 		closeBtn.MouseButton1Click:Connect(function()
-			AUTO.HiddenCommandEnabled = false
-			AUTO.CommandField = false
-			setCommandFieldVisible(false)
-			saveAutoSettings()
+			if CommandFieldGui then
+				CommandFieldGui.Enabled = false
+			end
+		end)
+
+		header.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = true
+				dragStart = input.Position
+				dragStartPos = main.Position
+			end
+		end)
+
+		header.InputChanged:Connect(function(input)
+			if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+				local delta = input.Position - dragStart
+				main.Position = UDim2.new(
+					dragStartPos.X.Scale,
+					dragStartPos.X.Offset + delta.X,
+					dragStartPos.Y.Scale,
+					dragStartPos.Y.Offset + delta.Y
+				)
+			end
+		end)
+
+		header.InputEnded:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = false
+			end
 		end)
 
 		local tb = Instance.new("TextBox")
 		tb.Parent = main
-		tb.Size = UDim2.new(1, -20, 0, 36)
-		tb.Position = UDim2.new(0, 10, 0, 38)
+		tb.Size = UDim2.new(1, -20, 0, 40)
+		tb.Position = UDim2.new(0, 10, 0, 46)
 		tb.BackgroundColor3 = Color3.fromRGB(28,28,28)
 		tb.BorderSizePixel = 0
 		tb.Font = Enum.Font.Gotham
@@ -1587,8 +1608,8 @@ MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(
 
 		local sendBtn = Instance.new("TextButton")
 		sendBtn.Parent = main
-		sendBtn.Size = UDim2.new(0, 118, 0, 32)
-		sendBtn.Position = UDim2.new(0, 10, 0, 82)
+		sendBtn.Size = UDim2.new(1, -20, 0, 34)
+		sendBtn.Position = UDim2.new(0, 10, 0, 96)
 		sendBtn.BackgroundColor3 = Color3.fromRGB(155, 40, 40)
 		sendBtn.BorderSizePixel = 0
 		sendBtn.Font = Enum.Font.GothamBold
@@ -1604,24 +1625,6 @@ MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(
 					CommandFieldBox.Text = ""
 				end
 			end
-		end)
-
-		local toggleBtn = Instance.new("TextButton")
-		toggleBtn.Parent = main
-		toggleBtn.Size = UDim2.new(0, 132, 0, 32)
-		toggleBtn.Position = UDim2.new(1, -142, 0, 82)
-		toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 80)
-		toggleBtn.BorderSizePixel = 0
-		toggleBtn.Font = Enum.Font.GothamBold
-		toggleBtn.TextSize = 12
-		toggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
-		toggleBtn.Text = "إخفاء الحقل"
-		round(toggleBtn, 8)
-		toggleBtn.MouseButton1Click:Connect(function()
-			AUTO.HiddenCommandEnabled = false
-			AUTO.CommandField = false
-			setCommandFieldVisible(false)
-			saveAutoSettings()
 		end)
 
 		tb.FocusLost:Connect(function(enter)
@@ -1645,6 +1648,8 @@ MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(
 			if CommandFieldGui then CommandFieldGui.Enabled = false end
 		end
 	end
+
+	setCommandFieldVisible(true)
 
 
 
