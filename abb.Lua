@@ -465,9 +465,20 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 	end
 
 	local function startBangProtect()
+		if bangProtectActive then
+			return
+		end
+
 		bangProtectActive = true
 
-		local function runBangProtect()
+		if bangProtectConn then
+			bangProtectConn:Disconnect()
+			bangProtectConn = nil
+		end
+
+		bangProtectConn = RunService.Heartbeat:Connect(function()
+			if not bangProtectActive then return end
+
 			local char = plr.Character
 			local root = char and char:FindFirstChild("HumanoidRootPart")
 			local hum = char and char:FindFirstChildOfClass("Humanoid")
@@ -505,11 +516,6 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 
 				bv.Velocity = vel.Magnitude > 0 and vel.Unit * speed or Vector3.zero
 			end
-		end
-
-		bangProtectConn = RunService.Heartbeat:Connect(function()
-			if not bangProtectActive then return end
-			runBangProtect()
 		end)
 	end
 
