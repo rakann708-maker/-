@@ -3572,7 +3572,7 @@ local function startAntiBots()
 			if humanoid then humanoid.Sit = true end
 
 			local firstTrack = playMadriAnimation("2506281703", 1)
-			local secondTrack = playMadriAnimation("10714068222", 3)
+			local secondTrack = playMadriAnimation("10714068222", 1000)
 			madriBothTracks = {}
 			if firstTrack then table.insert(madriBothTracks, firstTrack) end
 			if secondTrack then table.insert(madriBothTracks, secondTrack) end
