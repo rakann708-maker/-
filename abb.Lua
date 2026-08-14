@@ -3376,6 +3376,163 @@ local function startAntiBots()
 			end)
 		end
 
+		-- زرا "مدري 1" و"مدري 2" المنقولان من السكربت القديم.
+		-- كلاهما يستخدم اللاعب المحدد حاليًا في صفحة Target.
+		local madri1On, madri2On = false, false
+		local madri1Track, madri2Track = nil, nil
+		local madri1RunId, madri2RunId = 0, 0
+		local madri1Btn, madri2Btn = nil, nil
+		local stopMadri1, stopMadri2
+
+		local function setMadriButtonState(button, enabled, label)
+			if not button then return end
+			button.Text = enabled and ("إيقاف " .. label) or label
+			button.BackgroundColor3 = enabled
+				and Color3.fromRGB(170,170,170)
+				or Color3.fromRGB(20,20,20)
+		end
+
+		local function stopAnimationTrack(track)
+			if track then
+				pcall(function() track:Stop() end)
+			end
+		end
+
+		local function playMadriAnimation(animationId, speed)
+			local character = Players.LocalPlayer.Character
+			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+			if not humanoid then return nil end
+
+			local animator = humanoid:FindFirstChildOfClass("Animator")
+			if not animator then
+				animator = Instance.new("Animator")
+				animator.Parent = humanoid
+			end
+
+			local animation = Instance.new("Animation")
+			animation.AnimationId = "rbxassetid://" .. tostring(animationId)
+			local ok, track = pcall(function()
+				return animator:LoadAnimation(animation)
+			end)
+			animation:Destroy()
+
+			if not (ok and track) then return nil end
+			pcall(function()
+				track:Play()
+				track:AdjustSpeed(speed or 1)
+			end)
+			return track
+		end
+
+		stopMadri1 = function()
+			madri1On = false
+			madri1RunId += 1
+			stopAnimationTrack(madri1Track)
+			madri1Track = nil
+
+			local character = Players.LocalPlayer.Character
+			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+			if humanoid then humanoid.Sit = false end
+			setMadriButtonState(madri1Btn, false, "مدري 1")
+		end
+
+		stopMadri2 = function()
+			madri2On = false
+			madri2RunId += 1
+			stopAnimationTrack(madri2Track)
+			madri2Track = nil
+			setMadriButtonState(madri2Btn, false, "مدري 2")
+		end
+
+		local function toggleMadri1()
+			if madri1On then
+				stopMadri1()
+				return
+			end
+			if not (currentTarget and currentTarget.Character) then
+				makeAutoNotif("Target", "حدد لاعب أولاً", 1.5)
+				return
+			end
+
+			-- الوظيفتان تحركان HumanoidRootPart؛ لا نشغلهما معًا.
+			stopMadri2()
+			madri1On = true
+			madri1RunId += 1
+			local thisRun = madri1RunId
+			setMadriButtonState(madri1Btn, true, "مدري 1")
+
+			local character = Players.LocalPlayer.Character
+			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+			if humanoid then humanoid.Sit = true end
+			madri1Track = playMadriAnimation("2506281703", 1)
+
+			local distance = 1.5
+			local movingInward = true
+			while madri1On and thisRun == madri1RunId and sf and sf.Parent do
+				local myCharacter = Players.LocalPlayer.Character
+				local myRoot = myCharacter and myCharacter:FindFirstChild("HumanoidRootPart")
+				local myHumanoid = myCharacter and myCharacter:FindFirstChildOfClass("Humanoid")
+				local targetCharacter = currentTarget and currentTarget.Character
+				local targetHead = targetCharacter and targetCharacter:FindFirstChild("Head")
+
+				if not (myRoot and myHumanoid and targetHead) then break end
+				myHumanoid.Sit = true
+
+				if movingInward then
+					distance -= 0.2
+					if distance <= 0.5 then movingInward = false end
+				else
+					distance += 0.2
+					if distance >= 2.5 then movingInward = true end
+				end
+
+				local position = targetHead.Position + targetHead.CFrame.LookVector * distance
+				myRoot.CFrame = CFrame.new(
+					Vector3.new(position.X, targetHead.Position.Y, position.Z),
+					targetHead.Position
+				)
+				myRoot.Velocity = Vector3.new(0, 2, 0)
+				RunService.Heartbeat:Wait()
+			end
+
+			if madri1On and thisRun == madri1RunId then
+				stopMadri1()
+			end
+		end
+
+		local function toggleMadri2()
+			if madri2On then
+				stopMadri2()
+				return
+			end
+			if not (currentTarget and currentTarget.Character) then
+				makeAutoNotif("Target", "حدد لاعب أولاً", 1.5)
+				return
+			end
+
+			stopMadri1()
+			madri2On = true
+			madri2RunId += 1
+			local thisRun = madri2RunId
+			setMadriButtonState(madri2Btn, true, "مدري 2")
+			madri2Track = playMadriAnimation("10714068222", 3)
+
+			while madri2On and thisRun == madri2RunId and sf and sf.Parent do
+				local myCharacter = Players.LocalPlayer.Character
+				local myRoot = myCharacter and myCharacter:FindFirstChild("HumanoidRootPart")
+				local targetCharacter = currentTarget and currentTarget.Character
+				local targetRoot = targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart")
+
+				if not (myRoot and targetRoot) then break end
+				myRoot.CFrame = targetRoot.CFrame * CFrame.new(0, 0, 1)
+				RunService.Heartbeat:Wait()
+			end
+
+			if madri2On and thisRun == madri2RunId then
+				stopMadri2()
+			end
+		end
+
 		-- إنشاء الأزرار الأساسية
 		local toBtn = makeBtn("to", function() teleportToTarget() end)
 		viewBtn = makeBtn("view", function() toggleSpectate() end)
@@ -3539,6 +3696,15 @@ local function startAntiBots()
 		end)
 strongBangBtn.AutoButtonColor = false
 		strongBangBtn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+
+		-- الزران الجديدان داخل شبكة صفحة Target.
+		madri1Btn = makeBtn("مدري 1", toggleMadri1)
+		madri1Btn.AutoButtonColor = false
+		setMadriButtonState(madri1Btn, false, "مدري 1")
+
+		madri2Btn = makeBtn("مدري 2", toggleMadri2)
+		madri2Btn.AutoButtonColor = false
+		setMadriButtonState(madri2Btn, false, "مدري 2")
 
 		
 
