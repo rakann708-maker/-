@@ -1,0 +1,4478 @@
+--[[
+سكربت SKY (مُشروح)
+- تم إضافة تعليقات فوق أهم الدوال وعناصر الواجهة لتوضيح وظيفتها/وش تمثل.
+- أي تعليق يبدأ بـ "--" وما يأثر على تشغيل السكربت.
+]]--
+
+-- AUTO-FIX: wrapped whole script to ensure blocks are closed properly
+
+do
+--[[
+SKY (OrionLib) - نسخة كاملة (Fix v4)
+تعديلات هالمرة:
+1) AntiThrow (مضاد رمي) صار يطفي/يشتغل صح + يرجعك لنفس مكانك "على الأرض" (يضبطك على الأرض وما يعلقك بالطيران)
+2) AntiBots (مضاد بوتات) انصلح: يرجع يتنقّل على كل الكراسي + يجلس فعلياً على الكرسي
+3) AntiBang (مضاد بانق) صار: إذا شغلته يوديك بعيد تحت الأرض ويخليك هناك لين تطفيه (بدون رجعة تلقائية)
+
+ملاحظة: بعض الخرائط ما فيها Seats حقيقية (Seat/VehicleSeat). وقتها AntiBots ما بيلاقي كراسي.
+]]
+
+	-- ====== عدّل الرابط ======
+	local DISCORD_LINK = "https://discord.gg/hKKebtnbbk"
+
+	-- ====== Services ======
+	-- خدمة اللاعبين
+	local Players = game:GetService("Players")
+
+	local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local hdCommandRemote = nil
+
+	-- تهيئة HD Admin (نفس سكربت 1st) + محاولة أخذ ريموت الأوامر
+	pcall(function()
+		local hdClient = ReplicatedStorage:FindFirstChild("HDAdminHDClient")
+		if hdClient and hdClient:FindFirstChild("Signals") then
+			local sigs = hdClient.Signals
+			if sigs:FindFirstChild("ChangeSetting") then
+				pcall(function()
+					sigs.ChangeSetting:InvokeServer(sigs.ChangeSetting)
+				end)
+			end
+			if sigs:FindFirstChild("Command") then
+				hdCommandRemote = sigs.Command
+			end
+		end
+	end)
+
+	local function sendHDCommand(cmd)
+		cmd = tostring(cmd or "")
+		if cmd == "" then return end
+		pcall(function()
+			if hdCommandRemote then
+				hdCommandRemote:InvokeServer(cmd)
+			else
+				Players:Chat(cmd)
+			end
+		end)
+	end
+
+
+	local function ResolvePlayerByName(name)
+		if not name then return nil end
+		name = tostring(name)
+		name = name:gsub("^%s+", ""):gsub("%s+$", "")
+		if name == "" then return nil end
+		-- exact match
+		local p = Players:FindFirstChild(name)
+		if p and p:IsA("Player") then return p end
+		-- case-insensitive partial
+		local lower = name:lower()
+		for _,pl in ipairs(Players:GetPlayers()) do
+			if pl.Name:lower() == lower then return pl end
+		end
+		for _,pl in ipairs(Players:GetPlayers()) do
+			if pl.Name:lower():find(lower, 1, true) then
+				return pl
+			end
+		end
+		return nil
+	end
+
+	local TeleportService = game:GetService("TeleportService")
+	local HttpService = game:GetService("HttpService")
+	-- خدمة إدخال المستخدم (ماوس/كيبورد/جوال)
+	local UserInputService = game:GetService("UserInputService")
+	-- RunService للتحديثات/اللوب
+	local RunService = game:GetService("RunService")
+	-- TweenService مسؤول عن كل الحركات الناعمة في واجهة SKY
+	local TweenService = game:GetService("TweenService")
+	local SKY_TargetConnAdd, SKY_TargetConnRem = nil, nil
+	-- CoreGui (مكان واجهات الكثير من الـExecutors)
+	local CoreGui = game:GetService("CoreGui")
+	local Workspace = game:GetService("Workspace")
+
+	local plr = Players.LocalPlayer
+
+	local VirtualUser = nil
+	pcall(function() VirtualUser = game:GetService("VirtualUser") end)
+
+	-- ====== SKY Aurora UI ======
+	local UI_TITLE = "SKY • AURORA"
+	local THEME = {
+		Background   = Color3.fromRGB(8, 11, 24),
+		Surface      = Color3.fromRGB(17, 22, 43),
+		SurfaceAlt   = Color3.fromRGB(24, 31, 57),
+		SurfaceHover = Color3.fromRGB(31, 40, 72),
+		Accent       = Color3.fromRGB(112, 92, 255),
+		Accent2      = Color3.fromRGB(49, 210, 255),
+		Accent3      = Color3.fromRGB(210, 78, 255),
+		Text         = Color3.fromRGB(246, 248, 255),
+		Muted        = Color3.fromRGB(167, 177, 207),
+		Stroke       = Color3.fromRGB(91, 105, 166),
+		Success      = Color3.fromRGB(65, 218, 150),
+		Danger       = Color3.fromRGB(255, 91, 121),
+	}
+
+	-- ====== Orion ======
+	local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/AlaaEmad23557/Neon-Hub-Lib/main/Lib')))()
+
+	OrionLib.Themes.SOFTBLACK = {
+		Main     = THEME.Background,
+		Second   = THEME.Surface,
+		Stroke   = THEME.Stroke,
+		Divider  = THEME.SurfaceAlt,
+		Text     = THEME.Text,
+		TextDark = THEME.Muted
+	}
+	OrionLib.SelectedTheme = "SOFTBLACK"
+
+	local Window = OrionLib:MakeWindow({
+		Name = UI_TITLE,
+		SearchBar = { Default = "بحث", ClearTextOnFocus = true },
+		HidePremium = false,
+		SaveConfig = true,
+		ConfigFolder = "SKY"
+	})
+
+	local ICON = "rbxassetid://4483345998"
+
+	-- Tabs order (مثل طلبك)
+	Window:MakeTab({ Name="Welcome",     Icon=ICON, PremiumOnly=false }):AddLabel("##WELCOME_CONTAINER##")
+	Window:MakeTab({ Name="Counter",     Icon=ICON, PremiumOnly=false }):AddLabel("##COUNTER_CONTAINER##")
+	Window:MakeTab({ Name="Target",      Icon=ICON, PremiumOnly=false }):AddLabel("##TARGET_CONTAINER##")
+	Window:MakeTab({ Name="Bot Control", Icon=ICON, PremiumOnly=false }):AddLabel("##BOT_CONTROL_CONTAINER##")
+	Window:MakeTab({ Name="Scripts",     Icon=ICON, PremiumOnly=false }):AddLabel("##SCRIPTS_CONTAINER##")
+	Window:MakeTab({ Name="Chat",        Icon=ICON, PremiumOnly=false }):AddLabel("##CHAT_CONTAINER##")
+	Window:MakeTab({ Name="Auto button", Icon=ICON, PremiumOnly=false }):AddLabel("##AUTO_CONTAINER##")
+	Window:MakeTab({ Name="Settings",    Icon=ICON, PremiumOnly=false }):AddLabel("##SETTINGS_CONTAINER##") -- مخفي من القائمة ويفتح من الترس
+
+	OrionLib:Init()
+	task.wait(0.9)
+
+	-- ====== Helpers ======
+	local function round(obj, r)
+		local c = Instance.new("UICorner")
+		c.CornerRadius = UDim.new(0, r)
+		c.Parent = obj
+		return c
+	end
+
+	local function uiTween(obj, duration, properties, style, direction)
+		if not obj or not obj.Parent then return nil end
+		local tween = TweenService:Create(
+			obj,
+			TweenInfo.new(duration or 0.22, style or Enum.EasingStyle.Quint, direction or Enum.EasingDirection.Out),
+			properties
+		)
+		tween:Play()
+		return tween
+	end
+
+	local function addStroke(obj, color, thickness, transparency)
+		local stroke = obj:FindFirstChild("SKYStroke")
+		if not stroke then
+			stroke = Instance.new("UIStroke")
+			stroke.Name = "SKYStroke"
+			stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			stroke.Parent = obj
+		end
+		stroke.Color = color or THEME.Stroke
+		stroke.Thickness = thickness or 1
+		stroke.Transparency = transparency or 0.48
+		return stroke
+	end
+
+	local function addGradient(obj, colorA, colorB, rotation)
+		local gradient = obj:FindFirstChild("SKYGradient")
+		if not gradient then
+			gradient = Instance.new("UIGradient")
+			gradient.Name = "SKYGradient"
+			gradient.Parent = obj
+		end
+		gradient.Color = ColorSequence.new(colorA or THEME.Accent, colorB or THEME.Accent2)
+		gradient.Rotation = rotation or 0
+		return gradient
+	end
+
+	local function getScale(obj)
+		local scale = obj:FindFirstChild("SKYScale")
+		if not scale then
+			scale = Instance.new("UIScale")
+			scale.Name = "SKYScale"
+			scale.Scale = 1
+			scale.Parent = obj
+		end
+		return scale
+	end
+
+	-- حركة موحدة للأزرار: تكبير خفيف عند المرور + ضغطة مرنة + وميض للإطار.
+	local function animateButton(button, hoverScale)
+		if not button or not button:IsA("GuiButton") or button:GetAttribute("SKYAnimated") then return end
+		button:SetAttribute("SKYAnimated", true)
+		button.AutoButtonColor = false
+		local scale = getScale(button)
+		local restingTransparency = button.BackgroundTransparency
+		local over = hoverScale or 1.025
+
+		button.MouseEnter:Connect(function()
+			uiTween(scale, 0.18, {Scale = over})
+			if restingTransparency < 0.95 then
+				uiTween(button, 0.18, {BackgroundTransparency = math.max(0, restingTransparency - 0.07)})
+			end
+		end)
+		button.MouseLeave:Connect(function()
+			uiTween(scale, 0.2, {Scale = 1})
+			uiTween(button, 0.2, {BackgroundTransparency = restingTransparency})
+		end)
+		button.MouseButton1Down:Connect(function()
+			uiTween(scale, 0.1, {Scale = 0.965}, Enum.EasingStyle.Quad)
+		end)
+		button.MouseButton1Up:Connect(function()
+			uiTween(scale, 0.22, {Scale = over}, Enum.EasingStyle.Back)
+		end)
+		button.Activated:Connect(function()
+			local stroke = addStroke(button, THEME.Accent2, 1.4, 0.15)
+			stroke.Transparency = 0.08
+			uiTween(stroke, 0.42, {Transparency = 0.58}, Enum.EasingStyle.Quad)
+		end)
+	end
+
+	local function animateTree(root, delayTime)
+		if not root or not root.Parent then return end
+		local targets = {root}
+		for _, item in ipairs(root:GetDescendants()) do
+			if item:IsA("GuiObject") then table.insert(targets, item) end
+		end
+
+		for _, item in ipairs(targets) do
+			if item:IsA("GuiObject") and item.Visible then
+				local goals = {}
+				if item:IsA("TextLabel") or item:IsA("TextButton") or item:IsA("TextBox") then
+					goals.TextTransparency = item.TextTransparency
+					item.TextTransparency = 1
+				end
+				if item:IsA("ImageLabel") or item:IsA("ImageButton") then
+					goals.ImageTransparency = item.ImageTransparency
+					item.ImageTransparency = 1
+				end
+				if item.BackgroundTransparency < 1 then
+					goals.BackgroundTransparency = item.BackgroundTransparency
+					item.BackgroundTransparency = 1
+				end
+				if next(goals) then
+					task.delay(delayTime or 0, function()
+						if item and item.Parent then uiTween(item, 0.34, goals) end
+					end)
+				end
+			end
+		end
+	end
+
+	local function copyClipboard(text)
+		if setclipboard then pcall(setclipboard, text) end
+	end
+
+	local function accountCreatedText(plr_)
+		local daysAge = tonumber(plr_.AccountAge) or 0
+		local created = os.time() - (daysAge * 24 * 60 * 60)
+		local createdText = os.date("%d-%m-%Y", created)
+		return createdText, daysAge
+	end
+
+	-- يجلب واجهة Orion الرئيسية بالاسم (مثل SKY) من CoreGui/PlayerGui
+
+	local function getOrionGui(titleText)
+		for _,t in ipairs(CoreGui:GetDescendants()) do
+			if t:IsA("TextLabel") and t.Text == titleText then
+				local p = t.Parent
+				while p and not p:IsA("ScreenGui") do
+					p = p.Parent
+				end
+				return p
+			end
+		end
+	end
+
+	-- يدوّر على ScrollingFrame حق الصفحة عن طريق نص Sentinel مثل ##COUNTER_CONTAINER##
+
+	local function findOrionScrollBySentinel(sentinelText)
+		local function scan(root)
+			for _,v in ipairs(root:GetDescendants()) do
+				if (v:IsA("TextLabel") or v:IsA("TextBox")) and v.Text == sentinelText then
+					local p = v
+					while p and not p:IsA("ScrollingFrame") do
+						p = p.Parent
+					end
+					return p
+				end
+			end
+		end
+		-- CoreGui (الأغلب)
+		local got = scan(CoreGui)
+		if got then return got end
+		-- PlayerGui (احتياط)
+		local pg = plr:FindFirstChildOfClass("PlayerGui")
+		if pg then
+			got = scan(pg)
+			if got then return got end
+		end
+		return nil
+	end
+
+	local orionGui = getOrionGui(UI_TITLE)
+	local skyWindowBusy = false
+
+	local function getMainWindow(gui)
+		if not gui then return nil end
+		local best, bestArea = nil, 0
+		for _, item in ipairs(gui:GetDescendants()) do
+			if item:IsA("Frame") and item.Visible then
+				local area = item.AbsoluteSize.X * item.AbsoluteSize.Y
+				if area > bestArea then
+					best, bestArea = item, area
+				end
+			end
+		end
+		return best
+	end
+
+	local function setSkyWindowEnabled(gui, enabled, instant)
+		if not gui or skyWindowBusy then return end
+		local main = getMainWindow(gui)
+		if not main then
+			gui.Enabled = enabled
+			return
+		end
+
+		local scale = getScale(main)
+		if instant then
+			gui.Enabled = enabled
+			scale.Scale = 1
+			return
+		end
+
+		skyWindowBusy = true
+		if enabled then
+			gui.Enabled = true
+			scale.Scale = 0.9
+			uiTween(scale, 0.42, {Scale = 1}, Enum.EasingStyle.Back)
+			task.delay(0.44, function() skyWindowBusy = false end)
+		else
+			uiTween(scale, 0.2, {Scale = 0.9}, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
+			task.delay(0.2, function()
+				if gui then gui.Enabled = false end
+				if scale then scale.Scale = 1 end
+				skyWindowBusy = false
+			end)
+		end
+	end
+
+	-- Hide Settings tab button in sidebar (نفتحها من الترس)
+	task.spawn(function()
+		task.wait(0.4)
+		if not orionGui then return end
+		for _,b in ipairs(orionGui:GetDescendants()) do
+			if b:IsA("TextButton") and tostring(b.Text):lower():find("settings") then
+				b.Visible = false
+			end
+		end
+	end)
+
+	-- ====== Toggle window (إخفاء/إظهار) ======
+	local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+	local toggleKey = Enum.KeyCode.RightShift
+	local SETTINGS_FILE = "SKY_settings.json"
+
+	local function saveSettings()
+		local data = { toggleKey = toggleKey.Name }
+		pcall(function()
+			if writefile then
+				writefile(SETTINGS_FILE, HttpService:JSONEncode(data))
+			end
+		end)
+	end
+
+	local function loadSettings()
+		pcall(function()
+			if isfile and readfile and isfile(SETTINGS_FILE) then
+				local decoded = HttpService:JSONDecode(readfile(SETTINGS_FILE))
+				if decoded and decoded.toggleKey and Enum.KeyCode[tostring(decoded.toggleKey)] then
+					toggleKey = Enum.KeyCode[tostring(decoded.toggleKey)]
+				end
+			end
+		end)
+	end
+	loadSettings()
+
+	UserInputService.InputBegan:Connect(function(input, gpe)
+		-- لا تغلق الواجهة وأنت تكتب في الشات/أي TextBox
+		if gpe then return end
+		if UserInputService:GetFocusedTextBox() then return end
+		if (not isMobile) and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == toggleKey then
+			local og = getOrionGui(UI_TITLE)
+			if og then setSkyWindowEnabled(og, not og.Enabled) end
+			return
+		end
+	end)
+
+	-- ====== Character refs ======
+	local currentHum, currentHRP = nil, nil
+	local function bindCharacter(char)
+		currentHum = char:FindFirstChildOfClass("Humanoid")
+		currentHRP = char:FindFirstChild("HumanoidRootPart")
+	end
+	if plr.Character then bindCharacter(plr.Character) end
+	plr.CharacterAdded:Connect(function(c) task.wait(0.2); bindCharacter(c) end)
+
+	-- ====== Ground helper (يحطك على الأرض) ======
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+	local function getGroundedCFrame(fromCFrame)
+		local char = plr.Character
+		if not char then return fromCFrame end
+		rayParams.FilterDescendantsInstances = {char}
+		local origin = fromCFrame.Position + Vector3.new(0, 10, 0)
+		local dir = Vector3.new(0, -500, 0)
+		local hit = Workspace:Raycast(origin, dir, rayParams)
+		if hit then
+			return CFrame.new(hit.Position + Vector3.new(0, 3, 0))
+		end
+		-- fallback: ارفع شوي
+		return fromCFrame + Vector3.new(0, 3, 0)
+	end
+
+	-- ====== AUTO States ======
+	local AUTO = {
+		AntiSit   = false, -- ما يشتغل تلقائي
+		AntiCuff  = false, -- من سكربت 1st
+		AntiCuffRe = false, -- مضاد كلبش re (/e .re)
+		AntiFling = true,
+		AntiThrow = true,
+		AntiAFK   = true,
+		AntiBots  = false, -- يدوي
+		AntiBang  = false, -- يدوي
+		CommandField = false,
+		HiddenCommandEnabled = false,
+		ClearCommandAfterSend = true,
+	
+		KatanaAnim = false,
+	}
+	local AUTO_SETTINGS_FILE = "SKY_auto.json"
+
+	local function loadAutoSettings()
+		pcall(function()
+			if isfile and readfile and isfile(AUTO_SETTINGS_FILE) then
+				local decoded = HttpService:JSONDecode(readfile(AUTO_SETTINGS_FILE))
+				if type(decoded) == "table" then
+					if decoded.KatanaAnim ~= nil then
+						AUTO.KatanaAnim = decoded.KatanaAnim and true or false
+					end
+					if decoded.CommandField ~= nil then
+						AUTO.CommandField = decoded.CommandField and true or false
+						setCommandFieldVisible(AUTO.CommandField)
+					end
+					if decoded.HiddenCommandEnabled ~= nil then
+						AUTO.HiddenCommandEnabled = decoded.HiddenCommandEnabled and true or false
+					end
+					if decoded.ClearCommandAfterSend ~= nil then
+						AUTO.ClearCommandAfterSend = decoded.ClearCommandAfterSend and true or false
+					end
+				end
+			end
+		end)
+	end
+
+	local function saveAutoSettings()
+		local data = {
+			KatanaAnim = AUTO.KatanaAnim and true or false,
+			CommandField = AUTO.CommandField and true or false,
+			HiddenCommandEnabled = AUTO.HiddenCommandEnabled and true or false,
+			ClearCommandAfterSend = AUTO.ClearCommandAfterSend and true or false,
+		}
+		pcall(function()
+			if writefile then
+				writefile(AUTO_SETTINGS_FILE, HttpService:JSONEncode(data))
+			end
+		end)
+	end
+
+	loadAutoSettings()
+
+
+
+	-- ====== Safe position tracking ======
+	local lastSafeCFrame = nil
+	local lastSafeTime = 0
+
+	local function updateSafe()
+		local hrp = currentHRP
+		if not hrp then return end
+		if hrp.Position.Y > 5 then
+			local now = tick()
+			if now - lastSafeTime > 0.25 then
+				lastSafeTime = now
+				lastSafeCFrame = hrp.CFrame
+			end
+		end
+	end
+
+	-- ====== AntiSit (خفيف) ======
+	RunService.Heartbeat:Connect(function()
+		updateSafe()
+		if AUTO.AntiSit and currentHum then
+			if currentHum.Sit then currentHum.Sit = false end
+		end
+	end)
+
+	-- ====== AntiAFK ======
+	plr.Idled:Connect(function()
+		if AUTO.AntiAFK and VirtualUser then
+			pcall(function()
+				VirtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+				task.wait(1)
+				VirtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+			end)
+		end
+	end)
+
+	-- ====== AntiFling (تطيح وما تموت) ======
+	local function applyAntiDeathSettings(hum)
+		pcall(function() hum.BreakJointsOnDeath = false end)
+		pcall(function() hum.RequiresNeck = false end)
+		pcall(function() hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false) end)
+	end
+
+	local originalFallenHeight = workspace.FallenPartsDestroyHeight
+
+	local function setAntiFlingEnabled(v)
+		AUTO.AntiFling = v
+		if v then
+			originalFallenHeight = workspace.FallenPartsDestroyHeight
+			workspace.FallenPartsDestroyHeight = -1000000 -- يمنع حذف الجسم تحت الماب (أهم شي)
+		else
+			workspace.FallenPartsDestroyHeight = originalFallenHeight
+		end
+	end
+	setAntiFlingEnabled(true)
+
+	RunService.Stepped:Connect(function()
+		if not AUTO.AntiFling then return end
+		local hum = currentHum
+		local hrp = currentHRP
+		if not hum or not hrp then return end
+
+		applyAntiDeathSettings(hum)
+
+		-- صفّر السبين بس (خفيف)
+		if hrp.AssemblyAngularVelocity.Magnitude > 80 then
+			hrp.AssemblyAngularVelocity = Vector3.zero
+		end
+
+		-- إذا حاول يموت تحت الماب، رجّع الصحة (بدون رفع)
+		if hum.Health <= 0 then
+			hum.Health = math.max(hum.MaxHealth, 100)
+			pcall(function() hum:ChangeState(Enum.HumanoidStateType.Freefall) end)
+		end
+	end)
+
+	-- ====== AntiThrow (يشتغل/يطفي صح + يرجعك "على الأرض") ======
+	local antiThrowConn = nil
+
+	local function stopAntiThrow()
+		if antiThrowConn then
+			antiThrowConn:Disconnect()
+			antiThrowConn = nil
+		end
+	end
+
+	local function startAntiThrow()
+		stopAntiThrow()
+		antiThrowConn = RunService.Heartbeat:Connect(function()
+			if not AUTO.AntiThrow then return end
+			local hrp = currentHRP
+			local hum = currentHum
+			if not hrp or not hum then return end
+			if not lastSafeCFrame then return end
+
+			-- trigger: رمي/اندفاع قوي لتحت
+			local lv = hrp.AssemblyLinearVelocity
+			if hrp.Position.Y < -30 and (lv.Y < -90 or lv.Magnitude > 120) then
+				local target = getGroundedCFrame(lastSafeCFrame)
+				hrp.CFrame = target
+				hrp.AssemblyLinearVelocity = Vector3.zero
+				hrp.AssemblyAngularVelocity = Vector3.zero
+				pcall(function()
+					hum.PlatformStand = false
+					hum.Sit = false
+					hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+				end)
+			end
+		end)
+	end
+
+	AUTO.AntiThrow = true
+	startAntiThrow()
+
+	-- ====== Bang protection ======
+	local bangProtectActive = false
+
+	local function stopBangProtect()
+		bangProtectActive = false
+	end
+
+	local function startBangProtect()
+		if bangProtectActive then
+			return
+		end
+
+		bangProtectActive = true
+
+		task.spawn(function()
+			while bangProtectActive do
+				local char = plr.Character
+				if char then
+					local root = char:FindFirstChild("HumanoidRootPart")
+					if root then
+						local original = root.CFrame
+						root.CFrame = CFrame.new(99999999999, 99999999999, 99999999999)
+						task.wait(0.04)
+						if bangProtectActive and root and root.Parent then
+							root.CFrame = original
+						elseif root and root.Parent then
+							root.CFrame = original
+						end
+					end
+				end
+
+				task.wait(0.05)
+			end
+		end)
+	end
+
+	local function startAntiBang()
+		startBangProtect()
+	end
+
+	local function stopAntiBang()
+		stopBangProtect()
+	end
+
+		-- ======
+
+	-- مضاد كلبش re: يعتمد على الريموت - أي RemoteEvent يرسل لك حدث، يطلق /e .re باسمك
+	local antiCuffReTaskId = 0
+	local lastAntiReTime = 0
+
+	local function fireReOnce()
+		local now = tick()
+		if now - lastAntiReTime < 0.6 then return end
+		lastAntiReTime = now
+		pcall(function()
+			game:GetService("Players"):Chat("/e .re " .. plr.Name)
+		end)
+	end
+
+	local function startAntiCuffRe()
+		AUTO.AntiCuffRe = true
+		antiCuffReTaskId += 1
+		local myId = antiCuffReTaskId
+		task.spawn(function()
+			while AUTO.AntiCuffRe and myId == antiCuffReTaskId do
+				fireReOnce()
+				task.wait(1)
+			end
+		end)
+	end
+
+	local function stopAntiCuffRe()
+		AUTO.AntiCuffRe = false
+		antiCuffReTaskId += 1
+	end
+
+-- ====== AntiCuff (من سكربت 1st: تثبيت الجسم ومنع تأثير الكلبشة) ======
+	local antiCuffMoveConn = nil
+	local antiCuffCharConn = nil
+
+	local function applyAntiCuffToChar(char)
+		if not AUTO.AntiCuff then return end
+		if not char then return end
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		local root = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
+		if not hum or not root then return end
+
+		if antiCuffMoveConn then
+			antiCuffMoveConn:Disconnect()
+			antiCuffMoveConn = nil
+		end
+
+		local RunService = game:GetService("RunService")
+		antiCuffMoveConn = RunService.Heartbeat:Connect(function()
+			if not AUTO.AntiCuff then return end
+			if not char or char.Parent == nil then return end
+
+			-- لو الهومانويد أو الروت تغيروا (مثلاً .re) نعيد التقاطهم
+			if not hum or hum.Parent == nil then
+				hum = char:FindFirstChildOfClass("Humanoid")
+			end
+			if not root or root.Parent == nil then
+				root = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
+			end
+			if not hum or not root then return end
+
+			-- نرجّع إعدادات الجلوس / الحالات كل فريم عشان أي re أو سكربت ما يلغي المضاد
+			hum.Sit = true
+			hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+			hum:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
+			local moveDir = hum.MoveDirection
+			if moveDir.Magnitude > 0 then
+				local v = root.Velocity
+				root.Velocity = Vector3.new(moveDir.X * 16, v.Y, moveDir.Z * 16)
+			end
+		end)
+	end
+
+	local function startAntiCuff()
+		AUTO.AntiCuff = true
+		local char = plr.Character or plr.CharacterAdded:Wait()
+		applyAntiCuffToChar(char)
+
+		if antiCuffCharConn then
+			antiCuffCharConn:Disconnect()
+			antiCuffCharConn = nil
+		end
+
+		antiCuffCharConn = plr.CharacterAdded:Connect(function(newChar)
+			if not AUTO.AntiCuff then return end
+			applyAntiCuffToChar(newChar)
+		end)
+	end
+
+	local function stopAntiCuff()
+		AUTO.AntiCuff = false
+		if antiCuffCharConn then
+			antiCuffCharConn:Disconnect()
+			antiCuffCharConn = nil
+		end
+		if antiCuffMoveConn then
+			antiCuffMoveConn:Disconnect()
+			antiCuffMoveConn = nil
+		end
+
+		local char = plr.Character
+		if char then
+			local hum = char:FindFirstChildOfClass("Humanoid")
+			if hum then
+				hum.Sit = false
+				hum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+				hum:SetStateEnabled(Enum.HumanoidStateType.Physics, true)
+			end
+		end
+	end
+
+-- ====== AntiBots (يتنقل على كل الكراسي بسرعة بدون ما يجلس) ======
+	local antiBotsTaskId = 0
+
+	local function getAllSeats()
+		local seats = {}
+		for _,d in ipairs(workspace:GetDescendants()) do
+			if d:IsA("Seat") or d:IsA("VehicleSeat") then
+				table.insert(seats, d)
+			end
+		end
+		return seats
+	end
+
+	local function standOnSeatCFrame(seat, hum)
+		local y = 0
+		pcall(function()
+			y = (seat.Size.Y/2) + (hum.HipHeight or 0) + 0.15
+		end)
+		local pos = seat.Position + Vector3.new(0, y, 0)
+		return CFrame.new(pos, pos + seat.CFrame.LookVector)
+	end
+
+
+	local katanaTaskId = 0
+	local KATANA_ANIMATION_ID = "rbxassetid://18396187889"
+	local katanaTrack = nil
+	local katanaConns = {}
+	local katanaCharConn = nil
+
+	local function clearKatanaConns()
+		for i = #katanaConns, 1, -1 do
+			local c = katanaConns[i]
+			if c then
+				pcall(function() c:Disconnect() end)
+			end
+			katanaConns[i] = nil
+		end
+	end
+
+	local function stopKatanaTrack()
+		if katanaTrack then
+			pcall(function() katanaTrack:Stop(0.1) end)
+			katanaTrack = nil
+		end
+	end
+
+	local function playKatanaAnimation(hum)
+		if not AUTO.KatanaAnim or not hum or not hum.Parent then return false end
+		stopKatanaTrack()
+
+		local animator = hum:FindFirstChildOfClass("Animator")
+		if not animator then
+			animator = Instance.new("Animator")
+			animator.Parent = hum
+		end
+
+		local anim = Instance.new("Animation")
+		anim.AnimationId = KATANA_ANIMATION_ID
+
+		local ok, track = pcall(function()
+			return animator:LoadAnimation(anim)
+		end)
+		anim:Destroy()
+
+		if not ok or not track then
+			return false
+		end
+
+		katanaTrack = track
+		katanaTrack.Looped = false
+		katanaTrack.Priority = Enum.AnimationPriority.Action
+		local played = pcall(function()
+			katanaTrack:Play(0.1, 1, 1)
+		end)
+		return played
+	end
+
+	local function bindKatanaToChar(char, myId)
+		if not char then return end
+		local hum = char:FindFirstChildOfClass("Humanoid") or char:WaitForChild("Humanoid", 5)
+		if not hum then return end
+
+		clearKatanaConns()
+		stopKatanaTrack()
+
+		local function hookTool(tool)
+			if myId ~= katanaTaskId then return end
+			if not tool:IsA("Tool") then return end
+
+			table.insert(katanaConns, tool.Equipped:Connect(function()
+				if not AUTO.KatanaAnim or myId ~= katanaTaskId then return end
+				playKatanaAnimation(hum)
+			end))
+
+			table.insert(katanaConns, tool.Unequipped:Connect(function()
+				if myId ~= katanaTaskId then return end
+				stopKatanaTrack()
+			end))
+		end
+
+		for _,child in ipairs(char:GetChildren()) do
+			hookTool(child)
+		end
+		table.insert(katanaConns, char.ChildAdded:Connect(hookTool))
+
+		-- إذا شغلت السويتش وأنت ماسك أداة بالفعل، شغل الانيميشن مباشرة.
+		for _,child in ipairs(char:GetChildren()) do
+			if child:IsA("Tool") then
+				playKatanaAnimation(hum)
+				break
+			end
+		end
+	end
+
+	local function startKatanaAnim()
+		AUTO.KatanaAnim = true
+		katanaTaskId += 1
+		local myId = katanaTaskId
+
+		clearKatanaConns()
+		stopKatanaTrack()
+
+		local char = plr.Character
+		if char then
+			bindKatanaToChar(char, myId)
+		end
+
+		if katanaCharConn then
+			katanaCharConn:Disconnect()
+			katanaCharConn = nil
+		end
+
+		katanaCharConn = plr.CharacterAdded:Connect(function(newChar)
+			if not AUTO.KatanaAnim or myId ~= katanaTaskId then return end
+			task.wait(0.2)
+			bindKatanaToChar(newChar, myId)
+		end)
+	end
+
+	local function stopKatanaAnim()
+		AUTO.KatanaAnim = false
+		katanaTaskId += 1
+		if katanaCharConn then
+			katanaCharConn:Disconnect()
+			katanaCharConn = nil
+		end
+		clearKatanaConns()
+		stopKatanaTrack()
+	end
+
+	if AUTO.KatanaAnim then
+		startKatanaAnim()
+	end
+
+local function startAntiBots()
+		antiBotsTaskId += 1
+		local myId = antiBotsTaskId
+
+		task.spawn(function()
+			local idx = 1
+			while AUTO.AntiBots and myId == antiBotsTaskId do
+				local hrp = currentHRP
+				local hum = currentHum
+				if not hrp or not hum then task.wait(0.05); continue end
+
+				local seats = getAllSeats()
+				if #seats == 0 then
+					task.wait(0.2)
+					continue
+				end
+
+				if idx > #seats then idx = 1 end
+				local seat = seats[idx]
+				idx += 1
+
+				if seat and seat.Parent then
+					pcall(function()
+						-- بدون جلوس: نخليه واقف فوق الكرسي مباشرة
+						hum.Sit = false
+						hum.PlatformStand = false
+						local cf = standOnSeatCFrame(seat, hum)
+						hrp.CFrame = cf
+						hrp.AssemblyLinearVelocity = Vector3.zero
+						hrp.AssemblyAngularVelocity = Vector3.zero
+					end)
+				end
+
+				-- أسرع
+				task.wait(0.01)
+			end
+		end)
+	end
+
+
+	-- ====== Extra player/visual features ======
+	local FPSPingActive = false
+	local FPSPingConnection = nil
+	local FPSPingGui = nil
+
+	local ESPActive = false
+	local ESPConnections = {}
+	local ESPObjects = {}
+
+	local AntiLagActive = false
+	local antiLagSaved = {
+		lighting = nil,
+		quality = nil,
+		effects = {},
+	}
+
+	local VanishActive = false
+	local vanishSavedTransparency = {}
+	local vanishCharConn = nil
+
+	local NoClipActive = false
+	local noClipConnection = nil
+	local noClipSaved = {}
+
+	local function getGuiParent()
+		local parent = nil
+		pcall(function() parent = CoreGui end)
+		if not parent then
+			parent = plr:WaitForChild("PlayerGui")
+		end
+		return parent
+	end
+
+	-- FPS / Ping: كرت صغير أسود.
+	local function stopFPSPing()
+		FPSPingActive = false
+		if FPSPingConnection then
+			FPSPingConnection:Disconnect()
+			FPSPingConnection = nil
+		end
+		if FPSPingGui then
+			FPSPingGui:Destroy()
+			FPSPingGui = nil
+		end
+	end
+
+	local function startFPSPing()
+		if FPSPingActive then return end
+		FPSPingActive = true
+		stopFPSPing()
+		FPSPingActive = true
+
+		local sg = Instance.new("ScreenGui")
+		sg.Name = "SKY_FPSPing"
+		sg.ResetOnSpawn = false
+		sg.IgnoreGuiInset = true
+		sg.DisplayOrder = 2147483647
+		local parent = getGuiParent()
+		pcall(function() sg.Parent = parent end)
+		if not sg.Parent then sg.Parent = plr:WaitForChild("PlayerGui") end
+		FPSPingGui = sg
+
+		local frame = Instance.new("Frame")
+		frame.Size = UDim2.new(0, 132, 0, 52)
+		frame.Position = UDim2.new(1, -145, 0, 10)
+		frame.BackgroundColor3 = THEME.Surface
+		frame.BackgroundTransparency = 0.05
+		frame.BorderSizePixel = 0
+		frame.Parent = sg
+		round(frame, 10)
+
+		local stroke = Instance.new("UIStroke")
+		stroke.Parent = frame
+		stroke.Color = THEME.Stroke
+		stroke.Thickness = 1
+		stroke.Transparency = 0.25
+
+		local fpsLbl = Instance.new("TextLabel")
+		fpsLbl.Parent = frame
+		fpsLbl.BackgroundTransparency = 1
+		fpsLbl.Size = UDim2.new(1, -12, 0, 24)
+		fpsLbl.Position = UDim2.new(0, 7, 0, 2)
+		fpsLbl.Font = Enum.Font.GothamBold
+		fpsLbl.TextSize = 14
+		fpsLbl.TextXAlignment = Enum.TextXAlignment.Left
+		fpsLbl.TextColor3 = Color3.fromRGB(100, 230, 110)
+		fpsLbl.Text = "FPS: --"
+
+		local pingLbl = Instance.new("TextLabel")
+		pingLbl.Parent = frame
+		pingLbl.BackgroundTransparency = 1
+		pingLbl.Size = UDim2.new(1, -12, 0, 24)
+		pingLbl.Position = UDim2.new(0, 7, 0, 26)
+		pingLbl.Font = Enum.Font.GothamBold
+		pingLbl.TextSize = 14
+		pingLbl.TextXAlignment = Enum.TextXAlignment.Left
+		pingLbl.TextColor3 = THEME.Accent2
+		pingLbl.Text = "Ping: --"
+
+		addGradient(frame, THEME.Surface, THEME.Background, 20)
+		local fpsScale = getScale(frame)
+		fpsScale.Scale = 0.78
+		uiTween(fpsScale, 0.4, {Scale = 1}, Enum.EasingStyle.Back)
+
+		local fpsCount, elapsed = 0, 0
+		FPSPingConnection = RunService.RenderStepped:Connect(function(dt)
+			if not FPSPingActive or not frame.Parent then return end
+			fpsCount += 1
+			elapsed += dt
+			if elapsed >= 0.5 then
+				local fps = math.floor((fpsCount / elapsed) + 0.5)
+				local ping = 0
+				pcall(function()
+					ping = math.floor(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue() + 0.5)
+				end)
+				fpsLbl.Text = "FPS: " .. tostring(fps)
+				pingLbl.Text = "Ping: " .. tostring(ping) .. " ms"
+
+				if fps >= 55 then
+					fpsLbl.TextColor3 = Color3.fromRGB(100, 230, 110)
+				elseif fps >= 30 then
+					fpsLbl.TextColor3 = Color3.fromRGB(255, 205, 70)
+				else
+					fpsLbl.TextColor3 = Color3.fromRGB(255, 90, 90)
+				end
+				fpsCount, elapsed = 0, 0
+			end
+		end)
+	end
+
+	-- ESP: اسم + هايلايت، مع تنظيف كامل عند الإيقاف.
+	local function removeESPForPlayer(player)
+		local data = ESPObjects[player]
+		if data then
+			for _,obj in ipairs(data) do
+				pcall(function() obj:Destroy() end)
+			end
+			ESPObjects[player] = nil
+		end
+	end
+
+	local function addESPForPlayer(player)
+		if not ESPActive or not player or player == plr then return end
+		removeESPForPlayer(player)
+
+		local created = {}
+		ESPObjects[player] = created
+
+		local function attach(char)
+			if not ESPActive or not char then return end
+			for i = #created, 1, -1 do
+				pcall(function() created[i]:Destroy() end)
+				created[i] = nil
+			end
+
+			local root = char:FindFirstChild("HumanoidRootPart") or char:WaitForChild("HumanoidRootPart", 5)
+			if not root then return end
+
+			local hl = Instance.new("Highlight")
+			hl.Name = "SKY_ESP_Highlight"
+			hl.Adornee = char
+			hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+			hl.FillTransparency = 0.82
+			hl.OutlineTransparency = 0.05
+			hl.FillColor = Color3.fromRGB(255,80,80)
+			hl.OutlineColor = Color3.fromRGB(255,255,255)
+			hl.Parent = char
+			table.insert(created, hl)
+
+			local bb = Instance.new("BillboardGui")
+			bb.Name = "SKY_ESP_Name"
+			bb.Size = UDim2.new(0, 150, 0, 32)
+			bb.StudsOffset = Vector3.new(0, 3.2, 0)
+			bb.AlwaysOnTop = true
+			bb.Adornee = root
+			bb.Parent = root
+			table.insert(created, bb)
+
+			local lbl = Instance.new("TextLabel")
+			lbl.Parent = bb
+			lbl.Size = UDim2.new(1, 0, 1, 0)
+			lbl.BackgroundTransparency = 1
+			lbl.Font = Enum.Font.GothamBold
+			lbl.TextSize = 14
+			lbl.TextStrokeTransparency = 0.45
+			lbl.TextColor3 = Color3.fromRGB(255,255,255)
+			lbl.Text = player.Name
+		end
+
+		if player.Character then
+			attach(player.Character)
+		end
+		table.insert(ESPConnections, player.CharacterAdded:Connect(function(char)
+			task.wait(0.15)
+			attach(char)
+		end))
+	end
+
+	local function stopESP()
+		ESPActive = false
+		for player,_ in pairs(ESPObjects) do
+			removeESPForPlayer(player)
+		end
+		for _,conn in ipairs(ESPConnections) do
+			pcall(function() conn:Disconnect() end)
+		end
+		ESPConnections = {}
+	end
+
+	local function startESP()
+		if ESPActive then return end
+		stopESP()
+		ESPActive = true
+		for _,player in ipairs(Players:GetPlayers()) do
+			addESPForPlayer(player)
+		end
+		table.insert(ESPConnections, Players.PlayerAdded:Connect(function(player)
+			addESPForPlayer(player)
+		end))
+		table.insert(ESPConnections, Players.PlayerRemoving:Connect(function(player)
+			removeESPForPlayer(player)
+		end))
+	end
+
+	-- مضاد لاق قابل للعكس: يحفظ القيم قبل تعطيل المؤثرات.
+	local function stopAntiLag()
+		if not AntiLagActive then return end
+		AntiLagActive = false
+
+		if antiLagSaved.lighting then
+			local Lighting = game:GetService("Lighting")
+			pcall(function()
+				Lighting.GlobalShadows = antiLagSaved.lighting.GlobalShadows
+				Lighting.FogEnd = antiLagSaved.lighting.FogEnd
+				Lighting.Brightness = antiLagSaved.lighting.Brightness
+			end)
+		end
+		if antiLagSaved.quality ~= nil then
+			pcall(function() settings().Rendering.QualityLevel = antiLagSaved.quality end)
+		end
+		for obj,wasEnabled in pairs(antiLagSaved.effects) do
+			if obj and obj.Parent then
+				pcall(function() obj.Enabled = wasEnabled end)
+			end
+		end
+		antiLagSaved = {lighting=nil, quality=nil, effects={}}
+	end
+
+	local function startAntiLag()
+		if AntiLagActive then return end
+		AntiLagActive = true
+		local Lighting = game:GetService("Lighting")
+		antiLagSaved.lighting = {
+			GlobalShadows = Lighting.GlobalShadows,
+			FogEnd = Lighting.FogEnd,
+			Brightness = Lighting.Brightness,
+		}
+		pcall(function() antiLagSaved.quality = settings().Rendering.QualityLevel end)
+
+		pcall(function()
+			Lighting.GlobalShadows = false
+			Lighting.FogEnd = 1000000
+			Lighting.Brightness = math.min(Lighting.Brightness, 1)
+		end)
+		pcall(function()
+			settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+		end)
+
+		for _,v in ipairs(workspace:GetDescendants()) do
+			if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles") or v:IsA("Trail") or v:IsA("Beam") then
+				if antiLagSaved.effects[v] == nil then
+					antiLagSaved.effects[v] = v.Enabled
+				end
+				v.Enabled = false
+			end
+		end
+	end
+
+	-- اختفاء محلي بصري للشخصية، ويرجع كل قيم الشفافية عند الإيقاف.
+	local function applyVanishToCharacter(char)
+		if not char then return end
+		for _,obj in ipairs(char:GetDescendants()) do
+			if obj:IsA("BasePart") then
+				if vanishSavedTransparency[obj] == nil then
+					vanishSavedTransparency[obj] = obj.LocalTransparencyModifier
+				end
+				obj.LocalTransparencyModifier = 1
+			elseif obj:IsA("Decal") then
+				if vanishSavedTransparency[obj] == nil then
+					vanishSavedTransparency[obj] = obj.Transparency
+				end
+				obj.Transparency = 1
+			end
+		end
+	end
+
+	local function stopVanish()
+		VanishActive = false
+		if vanishCharConn then
+			vanishCharConn:Disconnect()
+			vanishCharConn = nil
+		end
+		for obj,old in pairs(vanishSavedTransparency) do
+			if obj and obj.Parent then
+				pcall(function()
+					if obj:IsA("BasePart") then
+						obj.LocalTransparencyModifier = old
+					elseif obj:IsA("Decal") then
+						obj.Transparency = old
+					end
+				end)
+			end
+		end
+		vanishSavedTransparency = {}
+	end
+
+	local function startVanish()
+		if VanishActive then return end
+		stopVanish()
+		VanishActive = true
+		if plr.Character then
+			applyVanishToCharacter(plr.Character)
+		end
+		vanishCharConn = plr.CharacterAdded:Connect(function(char)
+			if not VanishActive then return end
+			task.wait(0.2)
+			applyVanishToCharacter(char)
+		end)
+	end
+
+	-- اختراق الجدران (Noclip) مع حفظ CanCollide الأصلي.
+	local function restoreNoClipParts()
+		for part,old in pairs(noClipSaved) do
+			if part and part.Parent then
+				pcall(function() part.CanCollide = old end)
+			end
+		end
+		noClipSaved = {}
+	end
+
+	local function stopNoClip()
+		NoClipActive = false
+		if noClipConnection then
+			noClipConnection:Disconnect()
+			noClipConnection = nil
+		end
+		restoreNoClipParts()
+	end
+
+	local function startNoClip()
+		if NoClipActive then return end
+		stopNoClip()
+		NoClipActive = true
+		noClipConnection = RunService.Stepped:Connect(function()
+			if not NoClipActive then return end
+			local char = plr.Character
+			if not char then return end
+			for _,part in ipairs(char:GetDescendants()) do
+				if part:IsA("BasePart") then
+					if noClipSaved[part] == nil then
+						noClipSaved[part] = part.CanCollide
+					end
+					part.CanCollide = false
+				end
+			end
+		end)
+	end
+
+	-- ====== Rejoin / Hop ======
+	local function doRejoinSameServer()
+		pcall(function()
+			TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
+		end)
+	end
+
+	local function doServerHop()
+		local placeId = game.PlaceId
+		local cursor = ""
+		for _ = 1, 6 do
+			local url = ("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100"):format(placeId)
+			if cursor ~= "" then url = url .. "&cursor=" .. cursor end
+			local ok, body = pcall(function() return game:HttpGet(url) end)
+			if not ok or not body then break end
+			local data = HttpService:JSONDecode(body)
+			if data and data.data then
+				for _,srv in ipairs(data.data) do
+					if srv.id and srv.playing and srv.maxPlayers and srv.playing < srv.maxPlayers and srv.id ~= game.JobId then
+						pcall(function()
+							TeleportService:TeleportToPlaceInstance(placeId, srv.id, plr)
+						end)
+						return
+					end
+				end
+			end
+			cursor = (data and data.nextPageCursor) or ""
+			if cursor == "" then break end
+		end
+	end
+
+	-- ====== UI widgets ======
+	local function MakeSwitch(parent, text, get, set)
+		-- كرت معلومات اللاعب (يمين) أو كرت لاعب داخل القائمة
+
+		local card = Instance.new("Frame")
+		card.Parent = parent
+		card.BackgroundColor3 = THEME.Surface
+		card.BackgroundTransparency = 0.06
+		card.BorderSizePixel = 0
+		card.Size = UDim2.new(1, 0, 0, 54)
+		round(card, 12)
+		addStroke(card, THEME.Stroke, 1, 0.58)
+		addGradient(card, THEME.Surface, THEME.SurfaceAlt, 0)
+
+		local lbl = Instance.new("TextLabel")
+		lbl.Parent = card
+		lbl.BackgroundTransparency = 1
+		lbl.Position = UDim2.new(0, 14, 0, 0)
+		lbl.Size = UDim2.new(1, -90, 1, 0)
+		lbl.Font = Enum.Font.GothamBold
+		lbl.TextSize = 16
+		lbl.TextColor3 = THEME.Text
+		lbl.TextXAlignment = Enum.TextXAlignment.Left
+		lbl.Text = text
+
+		local toggle = Instance.new("TextButton")
+		toggle.Parent = card
+		toggle.BackgroundColor3 = THEME.SurfaceHover
+		toggle.BorderSizePixel = 0
+		toggle.Size = UDim2.new(0, 56, 0, 26)
+		toggle.Position = UDim2.new(1, -70, 0.5, -13)
+		toggle.Text = ""
+		round(toggle, 999)
+
+		local knob = Instance.new("Frame")
+		knob.Parent = toggle
+		knob.BackgroundColor3 = THEME.Text
+		knob.BorderSizePixel = 0
+		knob.Size = UDim2.new(0, 22, 0, 22)
+		knob.Position = UDim2.new(0, 2, 0.5, -11)
+		round(knob, 999)
+
+		local function refresh()
+			local on = get()
+			if on then
+				uiTween(toggle, 0.25, {BackgroundColor3 = THEME.Accent})
+				uiTween(knob, 0.3, {Position = UDim2.new(1, -24, 0.5, -11)}, Enum.EasingStyle.Back)
+			else
+				uiTween(toggle, 0.25, {BackgroundColor3 = THEME.SurfaceHover})
+				uiTween(knob, 0.3, {Position = UDim2.new(0, 2, 0.5, -11)}, Enum.EasingStyle.Back)
+			end
+		end
+
+		refresh()
+		animateButton(toggle, 1.04)
+		toggle.MouseButton1Click:Connect(function()
+			set(not get())
+			refresh()
+		end)
+
+		return card, refresh
+	end
+
+	local function MakeWideBtn(parent, text, callback)
+		local b = Instance.new("TextButton")
+		b.Parent = parent
+		b.BackgroundColor3 = THEME.Accent
+		b.BorderSizePixel = 0
+		b.Size = UDim2.new(1, 0, 0, 52)
+		b.Text = text
+		b.Font = Enum.Font.GothamBold
+		b.TextSize = 16
+		b.TextColor3 = THEME.Text
+		round(b, 12)
+		addGradient(b, THEME.Accent, THEME.Accent2, 15)
+		addStroke(b, THEME.Accent2, 1, 0.35)
+		animateButton(b)
+		b.MouseButton1Click:Connect(function() task.spawn(callback) end)
+		return b
+	end
+
+	-- ====== WELCOME UI ======
+	do
+		local sf = findOrionScrollBySentinel("##WELCOME_CONTAINER##")
+		if sf and sf:IsA("ScrollingFrame") then
+			sf.Active = true
+			sf.ScrollingEnabled = false
+			sf.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+			for _,ch in ipairs(sf:GetChildren()) do
+				if not ch:IsA("UIListLayout") and not ch:IsA("UIPadding") then ch:Destroy() end
+			end
+
+			local list = sf:FindFirstChildOfClass("UIListLayout") or Instance.new("UIListLayout", sf)
+			list.SortOrder = Enum.SortOrder.LayoutOrder
+			list.Padding = UDim.new(0, 12)
+
+			local pad = sf:FindFirstChildOfClass("UIPadding") or Instance.new("UIPadding", sf)
+			pad.PaddingTop = UDim.new(0, 0)
+			pad.PaddingLeft = UDim.new(0, 12)
+			pad.PaddingRight = UDim.new(0, 12)
+			pad.PaddingBottom = UDim.new(0, 12)
+
+			local page = Instance.new("Frame")
+			page.Parent = sf
+			page.BackgroundColor3 = THEME.Surface
+			page.BackgroundTransparency = 0.08
+			page.Size = UDim2.new(1, 0, 0, 380)
+			page.Position = UDim2.new(0, 0, 0, -90)
+			round(page, 20)
+			addStroke(page, THEME.Stroke, 1, 0.45)
+			addGradient(page, THEME.Surface, THEME.Background, 90)
+
+			local Avatar = Instance.new("ImageLabel")
+			Avatar.Parent = page
+			Avatar.BackgroundTransparency = 1
+			Avatar.Size = UDim2.new(0, 120, 0, 120)
+			Avatar.Position = UDim2.new(0.5, -60, 0, 5)
+			Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size180x180)
+			round(Avatar, 999)
+			addStroke(Avatar, THEME.Accent2, 2, 0.08)
+
+			local WelcomeText = Instance.new("TextLabel")
+			WelcomeText.Parent = page
+			WelcomeText.BackgroundTransparency = 1
+			WelcomeText.Size = UDim2.new(1, 0, 0, 40)
+			WelcomeText.Position = UDim2.new(0, 0, 0, 130)
+			WelcomeText.Text = "Welcome ، " .. plr.Name
+			WelcomeText.Font = Enum.Font.GothamBold
+			WelcomeText.TextSize = 28
+			WelcomeText.TextColor3 = THEME.Text
+			WelcomeText.TextXAlignment = Enum.TextXAlignment.Center
+
+			local CopyBtn = Instance.new("TextButton")
+			CopyBtn.Parent = page
+			CopyBtn.Size = UDim2.new(0, 320, 0, 55)
+			CopyBtn.Position = UDim2.new(0.5, -160, 0, 180)
+			CopyBtn.Text = "نسخ رابط الديسكورد"
+			CopyBtn.Font = Enum.Font.GothamBold
+			CopyBtn.TextSize = 18
+			CopyBtn.TextColor3 = THEME.Text
+			CopyBtn.BackgroundColor3 = THEME.Accent
+			CopyBtn.BorderSizePixel = 0
+			round(CopyBtn, 14)
+			addGradient(CopyBtn, THEME.Accent, THEME.Accent2, 10)
+			addStroke(CopyBtn, THEME.Accent2, 1, 0.25)
+			animateButton(CopyBtn)
+			CopyBtn.MouseButton1Click:Connect(function() copyClipboard(DISCORD_LINK) end)
+
+			local Note1 = Instance.new("TextLabel")
+			Note1.Parent = page
+			Note1.BackgroundTransparency = 1
+			Note1.Size = UDim2.new(1, 0, 0, 20)
+			Note1.Position = UDim2.new(0, 0, 0, 245)
+			Note1.Text = "جميع الحقوق محفوظة في سيرفر الديسكورد"
+			Note1.Font = Enum.Font.Gotham
+			Note1.TextSize = 14
+			Note1.TextColor3 = THEME.Muted
+			Note1.TextXAlignment = Enum.TextXAlignment.Center
+
+			local Note2 = Instance.new("TextLabel")
+			Note2.Parent = page
+			Note2.BackgroundTransparency = 1
+			Note2.Size = UDim2.new(1, 0, 0, 20)
+			Note2.Position = UDim2.new(0, 0, 0, 270)
+			Note2.Text = "(نسخ السيرفر الجديد وخش معنا)"
+			Note2.Font = Enum.Font.Gotham
+			Note2.TextSize = 14
+			Note2.TextColor3 = THEME.Muted
+			Note2.TextXAlignment = Enum.TextXAlignment.Center
+
+			-- نبض هادئ للصورة يعطي الصفحة الرئيسية حياة بدون إزعاج.
+			local avatarScale = getScale(Avatar)
+			task.spawn(function()
+				while Avatar and Avatar.Parent do
+					uiTween(avatarScale, 1.8, {Scale = 1.045}, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+					task.wait(1.8)
+					uiTween(avatarScale, 1.8, {Scale = 1}, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+					task.wait(1.8)
+				end
+			end)
+		end
+	end
+
+	-- ====== AUTO UI (عمودين) ======
+	do
+		local sf = findOrionScrollBySentinel("##AUTO_CONTAINER##")
+		if sf and sf:IsA("ScrollingFrame") then
+			sf.Active = true
+			sf.ScrollingEnabled = true
+			sf.ScrollBarThickness = 6
+			sf.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+			for _,ch in ipairs(sf:GetChildren()) do
+				if not ch:IsA("UIListLayout") and not ch:IsA("UIPadding") then ch:Destroy() end
+			end
+
+			local list = sf:FindFirstChildOfClass("UIListLayout") or Instance.new("UIListLayout", sf)
+			list.SortOrder = Enum.SortOrder.LayoutOrder
+			list.Padding = UDim.new(0, 12)
+
+			local pad = sf:FindFirstChildOfClass("UIPadding") or Instance.new("UIPadding", sf)
+			pad.PaddingTop = UDim.new(0, 12)
+			pad.PaddingLeft = UDim.new(0, 12)
+			pad.PaddingRight = UDim.new(0, 12)
+			pad.PaddingBottom = UDim.new(0, 12)
+
+			-- عنوان داخل الهيدر
+
+			local title = Instance.new("TextLabel")
+			title.Parent = sf
+			title.BackgroundTransparency = 1
+			title.Size = UDim2.new(1, 0, 0, 44)
+			title.Font = Enum.Font.GothamBold
+			title.TextSize = 26
+			title.TextColor3 = Color3.fromRGB(255,255,255)
+			title.Text = "Auto button"
+			title.TextXAlignment = Enum.TextXAlignment.Center
+
+			local actions = Instance.new("Frame")
+			actions.Parent = sf
+			actions.BackgroundTransparency = 1
+			actions.Size = UDim2.new(1, 0, 0, 120)
+			local aList = Instance.new("UIListLayout", actions)
+			aList.SortOrder = Enum.SortOrder.LayoutOrder
+			aList.Padding = UDim.new(0, 12)
+
+			MakeWideBtn(actions, "تغيير سيرفر", doServerHop)
+			MakeWideBtn(actions, "اعاده دخول", doRejoinSameServer)
+
+			-- حاوية أزرار الأوامر (Grid)
+
+			local grid = Instance.new("Frame")
+			grid.Parent = sf
+			grid.BackgroundTransparency = 1
+			grid.Size = UDim2.new(1, 0, 0, 480)
+
+			local left = Instance.new("Frame")
+			left.Parent = grid
+			left.BackgroundTransparency = 1
+			left.Size = UDim2.new(0.5, -6, 1, 0)
+
+			local right = Instance.new("Frame")
+			right.Parent = grid
+			right.BackgroundTransparency = 1
+			right.Size = UDim2.new(0.5, -6, 1, 0)
+			right.Position = UDim2.new(0.5, 6, 0, 0)
+
+			local lList = Instance.new("UIListLayout", left)
+			lList.SortOrder = Enum.SortOrder.LayoutOrder
+			lList.Padding = UDim.new(0, 12)
+
+			local rList = Instance.new("UIListLayout", right)
+			rList.SortOrder = Enum.SortOrder.LayoutOrder
+			rList.Padding = UDim.new(0, 12)
+
+			MakeSwitch(left,  "مضاد جلوس", function() return AUTO.AntiSit end, function(v) AUTO.AntiSit = v end)
+			MakeSwitch(left,  "مضاد كلبشه", function() return AUTO.AntiCuff end, function(v)
+				if v then
+					startAntiCuff()
+				else
+					stopAntiCuff()
+				end
+				saveAutoSettings()
+			end)
+
+			MakeSwitch(left,  "مضاد كلبش re", function() return AUTO.AntiCuffRe end, function(v)
+				if v then
+					startAntiCuffRe()
+				else
+					stopAntiCuffRe()
+				end
+				saveAutoSettings()
+			end)
+
+			MakeSwitch(right, "مضاد فلنق", function() return AUTO.AntiFling end, function(v) setAntiFlingEnabled(v) end)
+			MakeSwitch(right, "مضاد رمي",  function() return AUTO.AntiThrow end, function(v)
+				AUTO.AntiThrow = v
+				if v then startAntiThrow() else stopAntiThrow() end
+			end)
+
+			MakeSwitch(left,  "مضاد بوتات", function() return AUTO.AntiBots end, function(v)
+				AUTO.AntiBots = v
+				if v then startAntiBots() else antiBotsTaskId += 1 end
+			end)
+
+			MakeSwitch(right, "حماية بانق", function() return bangProtectActive end, function(v)
+				if v then
+					startBangProtect()
+				else
+					stopBangProtect()
+				end
+			end)
+
+			
+			MakeSwitch(left,  "FPS / Ping", function() return FPSPingActive end, function(v)
+				if v then startFPSPing() else stopFPSPing() end
+			end)
+
+			MakeSwitch(left,  "ESP", function() return ESPActive end, function(v)
+				if v then startESP() else stopESP() end
+			end)
+
+			MakeSwitch(left,  "مضاد لاق", function() return AntiLagActive end, function(v)
+				if v then startAntiLag() else stopAntiLag() end
+			end)
+
+			MakeSwitch(right, "اختفاء", function() return VanishActive end, function(v)
+				if v then startVanish() else stopVanish() end
+			end)
+
+			MakeSwitch(right, "اختراق جدران", function() return NoClipActive end, function(v)
+				if v then startNoClip() else stopNoClip() end
+			end)
+
+			MakeSwitch(right, "انيميشن كاتانا", function() return AUTO.KatanaAnim end, function(v)
+				if v then
+					startKatanaAnim()
+				else
+					stopKatanaAnim()
+				end
+				saveAutoSettings()
+			end)
+
+			MakeSwitch(right, "مضاد AFK",  function() return AUTO.AntiAFK end, function(v) AUTO.AntiAFK = v end)
+		end
+	end
+
+	-- ====== SETTINGS UI (Scroll + حفظ زر) ======
+	do
+		local sf = findOrionScrollBySentinel("##SETTINGS_CONTAINER##")
+		if sf and sf:IsA("ScrollingFrame") then
+			sf.Active = true
+			sf.ScrollingEnabled = true
+			sf.ScrollBarThickness = 6
+			sf.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+			for _,ch in ipairs(sf:GetChildren()) do
+				if not ch:IsA("UIListLayout") and not ch:IsA("UIPadding") then ch:Destroy() end
+			end
+
+			local list = sf:FindFirstChildOfClass("UIListLayout") or Instance.new("UIListLayout", sf)
+			list.SortOrder = Enum.SortOrder.LayoutOrder
+			list.Padding = UDim.new(0, 6)
+
+			local pad = sf:FindFirstChildOfClass("UIPadding") or Instance.new("UIPadding", sf)
+			pad.PaddingTop = UDim.new(0, 18)
+			pad.PaddingLeft = UDim.new(0, 12)
+			pad.PaddingRight = UDim.new(0, 12)
+			pad.PaddingBottom = UDim.new(0, 18)
+
+			local function centerLabel(text, h, font, size, color)
+				local t = Instance.new("TextLabel")
+				t.Parent = sf
+				t.BackgroundTransparency = 1
+				t.Size = UDim2.new(1, 0, 0, h)
+				t.Font = font
+				t.TextSize = size
+				t.TextColor3 = color
+				t.TextXAlignment = Enum.TextXAlignment.Center
+				t.Text = text
+				return t
+			end
+
+			centerLabel("الإعدادات", 50, Enum.Font.GothamBold, 28, THEME.Text)
+			centerLabel("معلومات حسابي", 28, Enum.Font.GothamBold, 22, Color3.fromRGB(255,255,255))
+
+			local createdText, daysAge = accountCreatedText(plr)
+			centerLabel("تاريخ تقريبي لإنشاء الحساب: " .. createdText, 26, Enum.Font.Gotham, 18, Color3.fromRGB(220,220,220))
+			centerLabel("عمر الحساب (بالأيام): " .. tostring(daysAge), 26, Enum.Font.Gotham, 18, Color3.fromRGB(220,220,220))
+
+			centerLabel("(PC) زر فتح/إخفاء الواجهة", 20, Enum.Font.Gotham, 16, Color3.fromRGB(200,200,200))
+
+			local holder = Instance.new("Frame")
+			holder.Parent = sf
+			holder.BackgroundTransparency = 1
+			holder.Size = UDim2.new(1, 0, 0, 40)
+
+			local KeyPickBtn = Instance.new("TextButton")
+			KeyPickBtn.Parent = holder
+			KeyPickBtn.Size = UDim2.new(0, 180, 0, 38)
+			KeyPickBtn.Position = UDim2.new(0.5, -90, 0, 0)
+			KeyPickBtn.BackgroundColor3 = THEME.SurfaceAlt
+			KeyPickBtn.BackgroundTransparency = 0.15
+			KeyPickBtn.Text = "تغيير الزر"
+			KeyPickBtn.Font = Enum.Font.GothamBold
+			KeyPickBtn.TextSize = 16
+			KeyPickBtn.TextColor3 = THEME.Text
+			KeyPickBtn.BorderSizePixel = 0
+			round(KeyPickBtn, 12)
+			addStroke(KeyPickBtn, THEME.Stroke, 1, 0.45)
+			animateButton(KeyPickBtn)
+
+			local KeyValue = centerLabel(toggleKey.Name, 24, Enum.Font.GothamBold, 18, Color3.fromRGB(255,255,255))
+
+			local waitingForKey = false
+			KeyPickBtn.MouseButton1Click:Connect(function()
+				if isMobile then return end
+				waitingForKey = true
+				KeyValue.Text = "اضغط زر..."
+			end)
+
+			UserInputService.InputBegan:Connect(function(input, gpe)
+				if gpe then return end
+				if waitingForKey and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode ~= Enum.KeyCode.Unknown then
+					toggleKey = input.KeyCode
+					KeyValue.Text = toggleKey.Name
+					waitingForKey = false
+					saveSettings()
+				end
+			end)
+		end
+	end
+
+	-- ====== Gear button opens Settings ======
+	task.spawn(function()
+		task.wait(0.9)
+		if not orionGui then orionGui = getOrionGui(UI_TITLE) end
+		if not orionGui then return end
+
+		local profileFrame = nil
+		for _,v in ipairs(orionGui:GetDescendants()) do
+			if v:IsA("TextLabel") and v.Text == plr.Name then
+				profileFrame = v.Parent
+			end
+		end
+		if not profileFrame or not profileFrame:IsA("Frame") then return end
+
+		local hit = Instance.new("TextButton")
+		hit.Parent = profileFrame
+		hit.BackgroundTransparency = 1
+		hit.BorderSizePixel = 0
+		hit.Size = UDim2.new(0, 34, 0, 34)
+		hit.Position = UDim2.new(1, -40, 0.5, -17)
+		hit.Text = ""
+		hit.AutoButtonColor = false
+
+		local img = Instance.new("ImageLabel")
+		img.Parent = hit
+		img.BackgroundTransparency = 1
+		img.Size = UDim2.new(1, 0, 1, 0)
+		img.Image = "rbxassetid://6031280882"
+		img.ImageTransparency = 0.05
+		img.ImageColor3 = THEME.Accent2
+		animateButton(hit, 1.08)
+
+		hit.MouseButton1Click:Connect(function()
+			for _,b in ipairs(orionGui:GetDescendants()) do
+				if b:IsA("TextButton") and tostring(b.Text):lower():find("settings") then
+					local old = b.Visible
+					b.Visible = true
+					task.wait(0.02)
+					pcall(function() b:Activate() end)
+					pcall(function() b.MouseButton1Click:Fire() end)
+					task.wait(0.05)
+					b.Visible = old
+					break
+				end
+			end
+		end)
+	end)
+
+
+	-- =====================
+	-- --- COUNTER UI ---
+	-- =====================
+
+	local function formatTime(sec)
+		sec = math.max(0, math.floor(sec))
+		local h = math.floor(sec/3600)
+		local m = math.floor((sec%3600)/60)
+		local s = sec%60
+		return string.format("%02d:%02d:%02d", h, m, s)
+	end
+
+	-- Notifications area (ثابتة) في الزاوية مثل أول (توست صغير)
+	local NotifGui
+	local NotifHolder
+
+	-- يتأكد أن واجهة التوست/الإشعارات موجودة (وينشئها إذا ما كانت موجودة)
+
+	local function ensureNotifGui()
+		if NotifGui and NotifGui.Parent then return end
+		local parent = nil
+		pcall(function() parent = game:GetService('CoreGui') end)
+		if not parent then parent = plr:WaitForChild('PlayerGui') end
+
+		NotifGui = Instance.new('ScreenGui')
+		NotifGui.Name = 'SKY_Counter_Notifs'
+		NotifGui.ResetOnSpawn = false
+		NotifGui.IgnoreGuiInset = true
+		pcall(function() NotifGui.Parent = parent end)
+		if not NotifGui.Parent then NotifGui.Parent = plr:WaitForChild('PlayerGui') end
+
+		NotifHolder = Instance.new('Frame')
+		NotifHolder.Parent = NotifGui
+		NotifHolder.BackgroundTransparency = 1
+		NotifHolder.Size = UDim2.new(0, 300, 0, 220)
+		NotifHolder.AnchorPoint = Vector2.new(1,1)
+		NotifHolder.Position = UDim2.new(1, -18, 1, -90) -- قريب من زر الترس
+
+		local list = Instance.new('UIListLayout')
+		list.Parent = NotifHolder
+		list.SortOrder = Enum.SortOrder.LayoutOrder
+		list.Padding = UDim.new(0, 10)
+		list.VerticalAlignment = Enum.VerticalAlignment.Bottom
+
+		local pad = Instance.new('UIPadding')
+		pad.Parent = NotifHolder
+		pad.PaddingBottom = UDim.new(0, 4)
+		pad.PaddingRight  = UDim.new(0, 4)
+	end
+
+	local function tweenIn(frame)
+		local TweenService = game:GetService('TweenService')
+		frame.Position = frame.Position + UDim2.new(0, 60, 0, 0)
+		frame.BackgroundTransparency = 1
+		for _,d in ipairs(frame:GetDescendants()) do
+			if d:IsA('TextLabel') or d:IsA('TextButton') then
+				d.TextTransparency = 1
+			end
+		end
+		TweenService:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Position = frame.Position - UDim2.new(0, 60, 0, 0),
+			BackgroundTransparency = 0.2,
+		}):Play()
+		for _,d in ipairs(frame:GetDescendants()) do
+			if d:IsA('TextLabel') then
+				TweenService:Create(d, TweenInfo.new(0.25), {TextTransparency = 0}):Play()
+			elseif d:IsA('TextButton') then
+				TweenService:Create(d, TweenInfo.new(0.25), {TextTransparency = 0}):Play()
+			end
+		end
+	end
+
+	-- إشعار ثابت (يحتاج زر تمام)
+	local function makePersistentNotif(title, body, durationSec, showOk, userId, showSpinner)
+		ensureNotifGui()
+		durationSec = tonumber(durationSec) or 2
+		showOk = (showOk == true)
+		showSpinner = (showSpinner == true)
+
+		local card = Instance.new('Frame')
+		card.Parent = NotifHolder
+		card.BackgroundColor3 = Color3.fromRGB(0,0,0)
+		card.BackgroundTransparency = 0.2
+		card.BorderSizePixel = 0
+		card.Size = UDim2.new(1, 0, 0, showOk and 86 or 72)
+		round(card, 14)
+
+		local stroke = Instance.new('UIStroke')
+		stroke.Parent = card
+		stroke.Thickness = 1
+		stroke.Color = Color3.fromRGB(70,70,70)
+		stroke.Transparency = 0.25
+
+		-- صورة الحساب (اختياري)
+		local avatar = Instance.new("ImageLabel")
+		avatar.Parent = card
+		avatar.BackgroundTransparency = 1
+		avatar.Size = UDim2.new(0, 34, 0, 34)
+		avatar.Position = UDim2.new(0, 12, 0, 18)
+		round(avatar, 999)
+		avatar.Image = ""
+
+		-- سبنر داخل الصورة (اختياري)
+		local spinner = Instance.new("ImageLabel")
+		spinner.Parent = avatar
+		spinner.BackgroundTransparency = 1
+		spinner.Size = UDim2.new(1, 0, 1, 0)
+		spinner.Position = UDim2.new(0, 0, 0, 0)
+		spinner.Image = "rbxassetid://1095708"
+		spinner.ImageTransparency = 0.15
+		spinner.Visible = false
+		round(spinner, 999)
+
+		local spinConn = nil
+		local function setSpin(on)
+			spinner.Visible = on
+			if on then
+				if spinConn then spinConn:Disconnect() end
+				spinConn = RunService.RenderStepped:Connect(function(dt)
+					if not spinner.Parent then
+						if spinConn then spinConn:Disconnect() end
+						spinConn = nil
+						return
+					end
+					spinner.Rotation = (spinner.Rotation + (dt * 720)) % 360
+				end)
+			else
+				spinner.Rotation = 0
+				if spinConn then spinConn:Disconnect(); spinConn = nil end
+			end
+		end
+
+		if userId then
+			task.spawn(function()
+				local ok, thumb = pcall(function()
+					return Players:GetUserThumbnailAsync(tonumber(userId), Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size180x180)
+				end)
+				if ok and thumb and avatar and avatar.Parent then
+					avatar.Image = thumb
+				end
+			end)
+		end
+		if showSpinner then
+			setSpin(true)
+		end
+
+		local t = Instance.new('TextLabel')
+		t.Parent = card
+		t.BackgroundTransparency = 1
+		t.Position = UDim2.new(1, -14, 0, 10)
+		t.Size = UDim2.new(1, showOk and -120 or -28, 0, 22)
+		t.AnchorPoint = Vector2.new(1,0)
+		t.Font = Enum.Font.GothamBold
+		t.TextSize = 18
+		t.TextColor3 = Color3.fromRGB(255,255,255)
+		t.TextXAlignment = Enum.TextXAlignment.Right
+		t.Text = title
+
+		local b = Instance.new('TextLabel')
+		b.Parent = card
+		b.BackgroundTransparency = 1
+		b.Position = UDim2.new(1, -14, 0, 34)
+		b.Size = UDim2.new(1, showOk and -120 or -28, 0, 36)
+		b.AnchorPoint = Vector2.new(1,0)
+		b.Font = Enum.Font.Gotham
+		b.TextSize = 14
+		b.TextColor3 = Color3.fromRGB(210,210,210)
+		b.TextXAlignment = Enum.TextXAlignment.Right
+		b.TextYAlignment = Enum.TextYAlignment.Top
+		b.TextWrapped = true
+		b.Text = body
+
+		local okBtn = nil
+		if showOk then
+			okBtn = Instance.new('TextButton')
+			okBtn.Parent = card
+			okBtn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+			okBtn.BackgroundTransparency = 0.2
+			okBtn.BorderSizePixel = 0
+			okBtn.Size = UDim2.new(0, 90, 0, 34)
+			okBtn.Position = UDim2.new(1, -12, 0, 26)
+			okBtn.AnchorPoint = Vector2.new(1,0)
+			okBtn.Font = Enum.Font.GothamBold
+			okBtn.TextSize = 14
+			okBtn.TextColor3 = Color3.fromRGB(255,255,255)
+			okBtn.Text = "تمام"
+			round(okBtn, 10)
+			okBtn.AutoButtonColor = false
+			okBtn.MouseButton1Click:Connect(function()
+				if spinConn then spinConn:Disconnect(); spinConn = nil end
+				card:Destroy()
+			end)
+		end
+
+		tweenIn(card)
+
+		if not showOk and durationSec > 0 then
+			task.delay(durationSec, function()
+				if spinConn then spinConn:Disconnect(); spinConn = nil end
+				if card and card.Parent then card:Destroy() end
+			end)
+		end
+	end
+
+	local function makeAutoNotif(title, body, duration)
+		ensureNotifGui()
+
+		local card = Instance.new('Frame')
+		card.Parent = NotifHolder
+		card.BackgroundColor3 = Color3.fromRGB(0,0,0)
+		card.BackgroundTransparency = 0.2
+		card.BorderSizePixel = 0
+		card.Size = UDim2.new(1, 0, 0, 72)
+		round(card, 14)
+
+		local t = Instance.new('TextLabel')
+		t.Parent = card
+		t.BackgroundTransparency = 1
+		t.Position = UDim2.new(1, -14, 0, 14)
+		t.Size = UDim2.new(1, -28, 0, 20)
+		t.AnchorPoint = Vector2.new(1,0)
+		t.Font = Enum.Font.GothamBold
+		t.TextSize = 18
+		t.TextColor3 = Color3.fromRGB(255,255,255)
+		t.TextXAlignment = Enum.TextXAlignment.Right
+		t.Text = title
+
+		local b = Instance.new('TextLabel')
+		b.Parent = card
+		b.BackgroundTransparency = 1
+		b.Position = UDim2.new(1, -14, 0, 36)
+		b.Size = UDim2.new(1, -28, 0, 18)
+		b.AnchorPoint = Vector2.new(1,0)
+		b.Font = Enum.Font.Gotham
+		b.TextSize = 14
+		b.TextColor3 = Color3.fromRGB(210,210,210)
+		b.TextXAlignment = Enum.TextXAlignment.Right
+		b.Text = body
+
+		tweenIn(card)
+		task.delay(duration or 1.0, function()
+			if card and card.Parent then card:Destroy() end
+		end)
+		return card
+	end
+
+	-- تم اختيار لاعب (يختفي بعد 2 ثانية)
+	-- توست (تم اختيار لاعب) مع صورة اللاعب ويختفي بعد مدة
+
+
+	-- ====== CHAT UI: HD Commands + Prefix + تفعيل نسخ ======
+	local chatCopyActive = false
+	local chatCopyTaskId = 0
+
+	local function makeChatUI()
+		local sf = findOrionScrollBySentinel("##CHAT_CONTAINER##")
+		if not (sf and sf:IsA("ScrollingFrame")) then return end
+
+		sf.Active = true
+		sf.ScrollingEnabled = true
+		sf.ScrollBarThickness = 6
+		sf.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+		for _,ch in ipairs(sf:GetChildren()) do
+			if not ch:IsA("UIListLayout") and not ch:IsA("UIPadding") then
+				ch:Destroy()
+			end
+		end
+
+		local list = sf:FindFirstChildOfClass("UIListLayout") or Instance.new("UIListLayout", sf)
+		list.SortOrder = Enum.SortOrder.LayoutOrder
+		list.Padding = UDim.new(0, 12)
+
+		local pad = sf:FindFirstChildOfClass("UIPadding") or Instance.new("UIPadding", sf)
+		pad.PaddingTop = UDim.new(0, 12)
+		pad.PaddingLeft = UDim.new(0, 12)
+		pad.PaddingRight = UDim.new(0, 12)
+		pad.PaddingBottom = UDim.new(0, 12)
+
+		local title = Instance.new("TextLabel")
+		title.Parent = sf
+		title.BackgroundTransparency = 1
+		title.Size = UDim2.new(1, 0, 0, 42)
+		title.Font = Enum.Font.GothamBold
+		title.TextSize = 26
+		title.TextColor3 = Color3.fromRGB(255,255,255)
+		title.Text = "Chat"
+		title.TextXAlignment = Enum.TextXAlignment.Center
+
+		local cmdCard = Instance.new("Frame")
+		cmdCard.Parent = sf
+		cmdCard.BackgroundColor3 = Color3.fromRGB(18,18,18)
+		cmdCard.BackgroundTransparency = 0.08
+		cmdCard.BorderSizePixel = 0
+		cmdCard.Size = UDim2.new(1, 0, 0, 142)
+		round(cmdCard, 14)
+
+		local cmdLabel = Instance.new("TextLabel")
+		cmdLabel.Parent = cmdCard
+		cmdLabel.BackgroundTransparency = 1
+		cmdLabel.Position = UDim2.new(0, 12, 0, 8)
+		cmdLabel.Size = UDim2.new(1, -24, 0, 22)
+		cmdLabel.Font = Enum.Font.GothamBold
+		cmdLabel.TextSize = 16
+		cmdLabel.TextColor3 = Color3.fromRGB(235,235,235)
+		cmdLabel.TextXAlignment = Enum.TextXAlignment.Right
+		cmdLabel.Text = "أوامر HD"
+
+		local cmdInput = Instance.new("TextBox")
+		cmdInput.Parent = cmdCard
+		cmdInput.BackgroundColor3 = Color3.fromRGB(28,28,28)
+		cmdInput.BorderSizePixel = 0
+		cmdInput.Position = UDim2.new(0, 12, 0, 38)
+		cmdInput.Size = UDim2.new(1, -126, 0, 42)
+		cmdInput.ClearTextOnFocus = false
+		cmdInput.PlaceholderText = "اكتب الأمر..."
+		cmdInput.Text = ""
+		cmdInput.Font = Enum.Font.Gotham
+		cmdInput.TextSize = 15
+		cmdInput.TextColor3 = Color3.fromRGB(255,255,255)
+		cmdInput.PlaceholderColor3 = Color3.fromRGB(170,170,170)
+		round(cmdInput, 10)
+
+		local sendBtn = Instance.new("TextButton")
+		sendBtn.Parent = cmdCard
+		sendBtn.BackgroundColor3 = Color3.fromRGB(235,235,235)
+		sendBtn.BorderSizePixel = 0
+		sendBtn.Position = UDim2.new(1, -104, 0, 38)
+		sendBtn.Size = UDim2.new(0, 92, 0, 42)
+		sendBtn.Font = Enum.Font.GothamBold
+		sendBtn.TextSize = 15
+		sendBtn.TextColor3 = Color3.fromRGB(0,0,0)
+		sendBtn.Text = "إرسال"
+		round(sendBtn, 10)
+
+		local targetInput = Instance.new("TextBox")
+		targetInput.Parent = cmdCard
+		targetInput.BackgroundColor3 = Color3.fromRGB(28,28,28)
+		targetInput.BorderSizePixel = 0
+		targetInput.Position = UDim2.new(0, 12, 0, 91)
+		targetInput.Size = UDim2.new(1, -24, 0, 38)
+		targetInput.ClearTextOnFocus = false
+		targetInput.PlaceholderText = "يوزر اللاعب لميزة النسخ"
+		targetInput.Text = ""
+		targetInput.Font = Enum.Font.Gotham
+		targetInput.TextSize = 14
+		targetInput.TextColor3 = Color3.fromRGB(255,255,255)
+		targetInput.PlaceholderColor3 = Color3.fromRGB(170,170,170)
+		round(targetInput, 10)
+
+		local copyCard = Instance.new("Frame")
+		copyCard.Parent = sf
+		copyCard.BackgroundColor3 = Color3.fromRGB(18,18,18)
+		copyCard.BackgroundTransparency = 0.08
+		copyCard.BorderSizePixel = 0
+		copyCard.Size = UDim2.new(1, 0, 0, 108)
+		round(copyCard, 14)
+
+		local prefixLabel = Instance.new("TextLabel")
+		prefixLabel.Parent = copyCard
+		prefixLabel.BackgroundTransparency = 1
+		prefixLabel.Position = UDim2.new(0, 12, 0, 7)
+		prefixLabel.Size = UDim2.new(1, -24, 0, 20)
+		prefixLabel.Font = Enum.Font.Gotham
+		prefixLabel.TextSize = 12
+		prefixLabel.TextColor3 = Color3.fromRGB(185,185,185)
+		prefixLabel.TextXAlignment = Enum.TextXAlignment.Right
+		prefixLabel.Text = "Prefix الـ HD (تلقائي أو يدوي)"
+
+		local prefixInput = Instance.new("TextBox")
+		prefixInput.Parent = copyCard
+		prefixInput.BackgroundColor3 = Color3.fromRGB(28,28,28)
+		prefixInput.BorderSizePixel = 0
+		prefixInput.Position = UDim2.new(0, 12, 0, 36)
+		prefixInput.Size = UDim2.new(0.38, -6, 0, 42)
+		prefixInput.ClearTextOnFocus = false
+		prefixInput.PlaceholderText = "مثال: ,"
+		prefixInput.Text = ","
+		prefixInput.Font = Enum.Font.GothamBold
+		prefixInput.TextSize = 18
+		prefixInput.TextColor3 = Color3.fromRGB(255,255,255)
+		prefixInput.PlaceholderColor3 = Color3.fromRGB(170,170,170)
+		round(prefixInput, 10)
+
+		local copyBtn = Instance.new("TextButton")
+		copyBtn.Parent = copyCard
+		copyBtn.BackgroundColor3 = Color3.fromRGB(235,235,235)
+		copyBtn.BorderSizePixel = 0
+		copyBtn.Position = UDim2.new(0.4, 4, 0, 36)
+		copyBtn.Size = UDim2.new(0.6, -16, 0, 42)
+		copyBtn.Font = Enum.Font.GothamBold
+		copyBtn.TextSize = 16
+		copyBtn.TextColor3 = Color3.fromRGB(0,0,0)
+		copyBtn.Text = "تفعيل نسخ"
+		round(copyBtn, 10)
+
+		local function runManualCommand()
+			local txt = tostring(cmdInput.Text or ""):match("^%s*(.-)%s*$")
+			if txt == "" then
+				makeAutoNotif("الأوامر", "اكتب الأمر أولاً", 1.5)
+				return
+			end
+			sendHDCommand(txt)
+			cmdInput.Text = ""
+			makeAutoNotif("تم إرسال الأمر", txt, 1.5)
+		end
+
+		sendBtn.MouseButton1Click:Connect(runManualCommand)
+		cmdInput.FocusLost:Connect(function(enterPressed)
+			if enterPressed then
+				runManualCommand()
+			end
+		end)
+
+		copyBtn.MouseButton1Click:Connect(function()
+			if not chatCopyActive then
+				local tg = tostring(targetInput.Text or ""):match("^%s*(.-)%s*$")
+				local prefix = tostring(prefixInput.Text or "")
+				if tg == "" then
+					makeAutoNotif("ميزة النسخ", "اكتب يوزر اللاعب أولاً", 1.8)
+					return
+				end
+				if prefix == "" then
+					makeAutoNotif("ميزة النسخ", "أدخل Prefix الخاص بك", 1.8)
+					return
+				end
+
+				local cmds = {
+					prefix .. "size " .. tg .. " 3",
+					prefix .. "height " .. tg .. " 0",
+					prefix .. "neon " .. tg,
+					prefix .. "aura " .. tg,
+					prefix .. "color " .. tg .. " pink",
+				}
+
+				chatCopyActive = true
+				chatCopyTaskId += 1
+				local myId = chatCopyTaskId
+				copyBtn.Text = "ايقاف النسخ"
+				copyBtn.BackgroundColor3 = Color3.fromRGB(80,80,80)
+				copyBtn.TextColor3 = Color3.fromRGB(255,255,255)
+				makeAutoNotif("تم تفعيل النسخ", "على " .. tg, 1.8)
+
+				task.spawn(function()
+					while chatCopyActive and myId == chatCopyTaskId do
+						for _,cmd in ipairs(cmds) do
+							if not chatCopyActive or myId ~= chatCopyTaskId then break end
+							sendHDCommand(cmd)
+							task.wait(0.15)
+						end
+						task.wait(5)
+					end
+				end)
+			else
+				chatCopyActive = false
+				chatCopyTaskId += 1
+				copyBtn.Text = "تفعيل نسخ"
+				copyBtn.BackgroundColor3 = Color3.fromRGB(235,235,235)
+				copyBtn.TextColor3 = Color3.fromRGB(0,0,0)
+				makeAutoNotif("ميزة النسخ", "تم إيقاف النسخ", 1.5)
+			end
+		end)
+	end
+
+	local function makeToastSelected(username, display, userId)
+		ensureNotifGui()
+
+		local card = Instance.new('Frame')
+		card.Parent = NotifHolder
+		card.BackgroundColor3 = Color3.fromRGB(0,0,0)
+		card.BackgroundTransparency = 0.2
+		card.BorderSizePixel = 0
+		card.Size = UDim2.new(1, 0, 0, 72)
+		round(card, 14)
+
+		local img = Instance.new('ImageLabel')
+		img.Parent = card
+		img.BackgroundTransparency = 1
+		img.Size = UDim2.new(0, 46, 0, 46)
+		img.Position = UDim2.new(0, 12, 0, 13)
+		round(img, 999)
+		pcall(function()
+			img.Image = Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size180x180)
+		end)
+
+		local t = Instance.new('TextLabel')
+		t.Parent = card
+		t.BackgroundTransparency = 1
+		t.Position = UDim2.new(0, 70, 0, 14)
+		t.Size = UDim2.new(1, -82, 0, 20)
+		t.Font = Enum.Font.GothamBold
+		t.TextSize = 16
+		t.TextColor3 = Color3.fromRGB(255,255,255)
+		t.TextXAlignment = Enum.TextXAlignment.Left
+		t.Text = 'تم تحديد لاعب'
+
+		local b = Instance.new('TextLabel')
+		b.Parent = card
+		b.BackgroundTransparency = 1
+		b.Position = UDim2.new(0, 70, 0, 34)
+		b.Size = UDim2.new(1, -82, 0, 18)
+		b.Font = Enum.Font.Gotham
+		b.TextSize = 14
+		b.TextColor3 = Color3.fromRGB(210,210,210)
+		b.TextXAlignment = Enum.TextXAlignment.Left
+		b.Text = string.format("%s (%s)\nتم تفعيل عداد", display or "?", username or "?")
+
+		tweenIn(card)
+		task.delay(2.0, function()
+			if card and card.Parent then card:Destroy() end
+		end)
+		return card
+	end
+	-- ====== واجهة "أوامر مخفية" (HD Admin commands) ======
+	local CommandFieldGui
+	local CommandFieldFrame
+	local CommandFieldBox
+	local dragging = false
+	local dragStart, dragStartPos
+
+	local function ensureCommandFieldGui()
+		if CommandFieldGui and CommandFieldGui.Parent then
+			CommandFieldGui.Enabled = true
+			return
+		end
+
+		local parent = nil
+		pcall(function() parent = game:GetService("CoreGui") end)
+		if not parent then parent = plr:WaitForChild("PlayerGui") end
+
+		CommandFieldGui = Instance.new("ScreenGui")
+		CommandFieldGui.Name = "SKY_HDCommands"
+		CommandFieldGui.ResetOnSpawn = false
+		CommandFieldGui.IgnoreGuiInset = true
+		CommandFieldGui.Enabled = true
+		CommandFieldGui.Parent = parent
+
+		local main = Instance.new("Frame")
+		main.Name = "CommandFieldMain"
+		main.Size = UDim2.new(0, 340, 0, 180)
+		main.Position = UDim2.new(0.5, -170, 0.5, -90)
+		main.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+		main.BorderSizePixel = 0
+		main.Parent = CommandFieldGui
+		round(main, 14)
+		CommandFieldFrame = main
+
+		local stroke = Instance.new("UIStroke")
+		stroke.Parent = main
+		stroke.Color = Color3.fromRGB(90, 90, 90)
+		stroke.Thickness = 1
+		stroke.Transparency = 0.25
+
+		local header = Instance.new("TextLabel")
+		header.Parent = main
+		header.BackgroundTransparency = 1
+		header.Size = UDim2.new(1, -20, 0, 28)
+		header.Position = UDim2.new(0, 10, 0, 8)
+		header.Font = Enum.Font.GothamBold
+		header.TextSize = 14
+		header.TextColor3 = Color3.fromRGB(255,255,255)
+		header.Text = "HD Commands"
+		header.TextXAlignment = Enum.TextXAlignment.Left
+		header.TextYAlignment = Enum.TextYAlignment.Center
+		header.Active = true
+		header.Parent = main
+
+		local closeBtn = Instance.new("TextButton")
+		closeBtn.Parent = main
+		closeBtn.Size = UDim2.new(0, 26, 0, 26)
+		closeBtn.Position = UDim2.new(1, -34, 0, 8)
+		closeBtn.BackgroundColor3 = Color3.fromRGB(38,38,38)
+		closeBtn.BorderSizePixel = 0
+		closeBtn.Font = Enum.Font.GothamBold
+		closeBtn.TextSize = 12
+		closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+		closeBtn.Text = "X"
+		round(closeBtn, 8)
+		closeBtn.MouseButton1Click:Connect(function()
+			if CommandFieldGui then
+				CommandFieldGui.Enabled = false
+			end
+		end)
+
+		header.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = true
+				dragStart = input.Position
+				dragStartPos = main.Position
+			end
+		end)
+
+		header.InputChanged:Connect(function(input)
+			if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+				local delta = input.Position - dragStart
+				main.Position = UDim2.new(
+					dragStartPos.X.Scale,
+					dragStartPos.X.Offset + delta.X,
+					dragStartPos.Y.Scale,
+					dragStartPos.Y.Offset + delta.Y
+				)
+			end
+		end)
+
+		header.InputEnded:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = false
+			end
+		end)
+
+		local tb = Instance.new("TextBox")
+		tb.Parent = main
+		tb.Size = UDim2.new(1, -20, 0, 40)
+		tb.Position = UDim2.new(0, 10, 0, 46)
+		tb.BackgroundColor3 = Color3.fromRGB(28,28,28)
+		tb.BorderSizePixel = 0
+		tb.Font = Enum.Font.Gotham
+		tb.TextSize = 14
+		tb.TextColor3 = Color3.fromRGB(255,255,255)
+		tb.PlaceholderText = "اكتب الأمر هنا..."
+		tb.Text = ""
+		tb.ClearTextOnFocus = false
+		round(tb, 8)
+		CommandFieldBox = tb
+
+		local sendBtn = Instance.new("TextButton")
+		sendBtn.Parent = main
+		sendBtn.Size = UDim2.new(1, -20, 0, 34)
+		sendBtn.Position = UDim2.new(0, 10, 0, 96)
+		sendBtn.BackgroundColor3 = Color3.fromRGB(155, 40, 40)
+		sendBtn.BorderSizePixel = 0
+		sendBtn.Font = Enum.Font.GothamBold
+		sendBtn.TextSize = 13
+		sendBtn.TextColor3 = Color3.fromRGB(255,255,255)
+		sendBtn.Text = "إرسال الأمر"
+		round(sendBtn, 8)
+		sendBtn.MouseButton1Click:Connect(function()
+			local txt = CommandFieldBox and CommandFieldBox.Text
+			if txt and txt ~= "" then
+				sendHDCommand(txt)
+				if AUTO.ClearCommandAfterSend and CommandFieldBox then
+					CommandFieldBox.Text = ""
+				end
+			end
+		end)
+
+		tb.FocusLost:Connect(function(enter)
+			if enter then
+				local txt = CommandFieldBox and CommandFieldBox.Text
+				if txt and txt ~= "" then
+					sendHDCommand(txt)
+					if AUTO.ClearCommandAfterSend and CommandFieldBox then
+						CommandFieldBox.Text = ""
+					end
+				end
+			end
+		end)
+	end
+
+	local function setCommandFieldVisible(on)
+		if on then
+			ensureCommandFieldGui()
+			if CommandFieldGui then CommandFieldGui.Enabled = true end
+		else
+			if CommandFieldGui then CommandFieldGui.Enabled = false end
+		end
+	end
+
+	setCommandFieldVisible(false)
+
+
+	-- Counter storage
+	local tracked = {} -- [lowerName] = data
+	local rows = {}    -- [lowerName] = rowFrame
+
+	-- يبني واجهة صفحة العداد (Counter) داخل ##COUNTER_CONTAINER##
+
+	local function makeCounterUI()
+		local sf = findOrionScrollBySentinel('##COUNTER_CONTAINER##')
+		if not (sf and sf:IsA('ScrollingFrame')) then return end
+
+		sf.Active = true
+		sf.ScrollingEnabled = true
+		sf.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+		for _,ch in ipairs(sf:GetChildren()) do
+			if not ch:IsA('UIListLayout') and not ch:IsA('UIPadding') then
+				ch:Destroy()
+			end
+		end
+
+		local list = sf:FindFirstChildOfClass('UIListLayout') or Instance.new('UIListLayout', sf)
+		list.SortOrder = Enum.SortOrder.LayoutOrder
+		list.Padding = UDim.new(0, 10)
+
+		local pad = sf:FindFirstChildOfClass('UIPadding') or Instance.new('UIPadding', sf)
+		pad.PaddingTop = UDim.new(0, 12)
+		pad.PaddingLeft = UDim.new(0, 12)
+		pad.PaddingRight = UDim.new(0, 12)
+		pad.PaddingBottom = UDim.new(0, 12)
+
+		-- Header
+		local header = Instance.new('Frame')
+		header.Parent = sf
+		header.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		header.BackgroundTransparency = 0.2
+		header.BorderSizePixel = 0
+		header.Size = UDim2.new(1, 0, 0, 96)
+		round(header, 14)
+
+		local title = Instance.new('TextLabel')
+		title.Parent = header
+		title.BackgroundTransparency = 1
+		title.Size = UDim2.new(1, 0, 0, 34)
+		title.Position = UDim2.new(0,0,0,8)
+		title.Font = Enum.Font.GothamBold
+		title.TextSize = 26
+		title.TextColor3 = Color3.fromRGB(255,255,255)
+		title.Text = 'إحتساب النقاط'
+		title.TextXAlignment = Enum.TextXAlignment.Center
+
+		local serverLbl = Instance.new('TextLabel')
+		serverLbl.Parent = header
+		serverLbl.BackgroundTransparency = 1
+		serverLbl.Size = UDim2.new(1, 0, 0, -7)
+		serverLbl.Position = UDim2.new(0,0,0,58)
+		serverLbl.Font = Enum.Font.GothamBold
+		serverLbl.TextSize = 18
+		serverLbl.TextColor3 = Color3.fromRGB(190, 190, 190)
+		serverLbl.Text = 'مدة بقائك: 00:00:00'
+		serverLbl.TextXAlignment = Enum.TextXAlignment.Center
+
+		-- Input row
+		local inputRow = Instance.new('Frame')
+		inputRow.Parent = sf
+		inputRow.BackgroundTransparency = 1
+		inputRow.Size = UDim2.new(1, 0, 0, 38)
+
+		local box = Instance.new('TextBox')
+		box.Parent = inputRow
+		box.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+		box.BackgroundTransparency = 0.15
+		box.BorderSizePixel = 0
+		box.PlaceholderText = 'اكتب اسم لاعب'
+		box.Text = ''
+		box.ClearTextOnFocus = false
+		box.Font = Enum.Font.GothamBold
+		box.TextSize = 18
+		box.TextColor3 = Color3.fromRGB(235,235,235)
+		box.PlaceholderColor3 = Color3.fromRGB(200,200,200)
+		box.Size = UDim2.new(1, -110, 1, 0)
+		box.Position = UDim2.new(0, 0, 0, -25)
+		round(box, 12)
+
+		local startBtn = Instance.new('TextButton')
+		startBtn.Parent = inputRow
+		startBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+		startBtn.BackgroundTransparency = 0.05
+		startBtn.BorderSizePixel = 0
+		startBtn.Size = UDim2.new(0, 96, 1, 0)
+		startBtn.Position = UDim2.new(1, -96, 0, -25)
+		startBtn.Font = Enum.Font.GothamBold
+		startBtn.TextSize = 18
+		startBtn.TextColor3 = Color3.fromRGB(255,255,255)
+		startBtn.Text = 'بدء'
+		round(startBtn, 12)
+
+		-- List holder
+		local listWrap = Instance.new('Frame')
+		listWrap.Parent = sf
+		listWrap.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		listWrap.BackgroundTransparency = 1 -- مخفي (بدون مربع كبير)
+		listWrap.BorderSizePixel = 0
+		listWrap.Size = UDim2.new(1, 0, 0, 300)
+		round(listWrap, 14)
+
+		local rowsSF = Instance.new('ScrollingFrame')
+		rowsSF.Parent = listWrap
+		rowsSF.BackgroundTransparency = 1
+		rowsSF.BorderSizePixel = 0
+		rowsSF.Size = UDim2.new(1, -16, 1, -16)
+		rowsSF.Position = UDim2.new(0, 8, 0, -20)
+		rowsSF.ScrollBarThickness = 6
+		rowsSF.CanvasSize = UDim2.new(0,0,0,0)
+		rowsSF.AutomaticCanvasSize = Enum.AutomaticSize.Y
+		rowsSF.ScrollingDirection = Enum.ScrollingDirection.Y
+		rowsSF.ScrollingEnabled = true
+		rowsSF.Active = true
+
+		local rlist = Instance.new('UIListLayout')
+		rlist.Parent = rowsSF
+		rlist.SortOrder = Enum.SortOrder.LayoutOrder
+		rlist.Padding = UDim.new(0, 10)
+
+		local rpad = Instance.new('UIPadding')
+		rpad.Parent = rowsSF
+		rpad.PaddingTop = UDim.new(0, 0)
+		rpad.PaddingBottom = UDim.new(0, 4)
+		rpad.PaddingLeft = UDim.new(0, 4)
+		rpad.PaddingRight = UDim.new(0, 4)
+
+		local startedAt = os.clock()
+		RunService.RenderStepped:Connect(function()
+			serverLbl.Text = 'مدة بقائك: ' .. formatTime(os.clock() - startedAt)
+			for k,data in pairs(tracked) do
+				local row = rows[k]
+				if row and row.Parent then
+					local sub = row:FindFirstChild('Sub')
+					if sub and sub:IsA('TextLabel') then
+						local dur = 0
+						if data.inServer and data.startTime then
+							dur = os.clock() - data.startTime
+						else
+							dur = data.lastDuration or 0
+						end
+						sub.Text = string.format('%s | دخول: %d | خروج: %d', formatTime(dur), data.joins, data.leaves)
+					end
+				end
+			end
+		end)
+
+		local function ensureRow(data)
+			local key = data.key
+			if rows[key] and rows[key].Parent then return end
+
+			local row = Instance.new('Frame')
+			row.Name = 'Row_'..key
+			row.Parent = rowsSF
+			row.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+			row.BackgroundTransparency = 0.15
+			row.BorderSizePixel = 0
+			row.Size = UDim2.new(1, 0, 0, 74)
+			row.LayoutOrder = -(data.order or 0) -- الأحدث فوق
+			round(row, 14)
+			rows[key] = row
+
+			local img = Instance.new('ImageLabel')
+			img.Parent = row
+			img.BackgroundTransparency = 1
+			img.Size = UDim2.new(0, 54, 0, 54)
+			img.Position = UDim2.new(0, 10, 0.5, -27)
+			round(img, 999)
+			img.Image = data.thumb or ''
+
+			local name = Instance.new('TextLabel')
+			name.Parent = row
+			name.BackgroundTransparency = 1
+			name.Position = UDim2.new(0, 74, 0, 10)
+			name.Size = UDim2.new(1, -170, 0, 22)
+			name.Font = Enum.Font.GothamBold
+			name.TextSize = 18
+			name.TextColor3 = Color3.fromRGB(255,255,255)
+			name.TextXAlignment = Enum.TextXAlignment.Left
+			name.Text = data.username
+
+			local sub = Instance.new('TextLabel')
+			sub.Name = 'Sub'
+			sub.Parent = row
+			sub.BackgroundTransparency = 1
+			sub.Position = UDim2.new(0, 74, 0, 36)
+			sub.Size = UDim2.new(1, -170, 0, 18)
+			sub.Font = Enum.Font.Gotham
+			sub.TextSize = 14
+			sub.TextColor3 = Color3.fromRGB(210,210,210)
+			sub.TextXAlignment = Enum.TextXAlignment.Left
+			sub.Text = '00:00:00 | دخول: 0 | خروج: 0'
+
+			local reset = Instance.new('TextButton')
+			reset.Parent = row
+			reset.Size = UDim2.new(0, 34, 0, 34)
+			reset.Position = UDim2.new(1, -82, 0.5, -17)
+			reset.BackgroundTransparency = 1
+			reset.Font = Enum.Font.GothamBold
+			reset.TextSize = 20
+			reset.TextColor3 = Color3.fromRGB(255,255,255)
+			reset.Text = '🔄'
+
+			local del = Instance.new('TextButton')
+			del.Parent = row
+			del.Size = UDim2.new(0, 34, 0, 34)
+			del.Position = UDim2.new(1, -44, 0.5, -17)
+			del.BackgroundTransparency = 1
+			del.Font = Enum.Font.GothamBold
+			del.TextSize = 20
+			del.TextColor3 = Color3.fromRGB(255,255,255)
+			del.Text = '❌'
+
+			reset.MouseButton1Click:Connect(function()
+				data.joins = 0
+				data.leaves = 0
+				data.startTime = os.clock()
+				data.inServer = false
+				-- إذا موجود الآن اعتبره داخل
+				for _,p in ipairs(Players:GetPlayers()) do
+					if p.UserId == data.userId then
+						data.inServer = true
+						data.startTime = os.clock()
+						break
+					end
+				end
+			end)
+
+			del.MouseButton1Click:Connect(function()
+				tracked[key] = nil
+				rows[key] = nil
+				row:Destroy()
+			end)
+		end
+
+		local orderCounter = 0
+
+		local function findPlayerInServer(query)
+			query = (query or ""):gsub("^%s+", ""):gsub("%s+$", "")
+			if query == "" then return nil end
+			local q = query:lower()
+			-- 1) Exact username match (case-insensitive)
+			for _,p in ipairs(Players:GetPlayers()) do
+				if p.Name:lower() == q then return p end
+			end
+			-- 2) Exact display name match (case-insensitive)
+			for _,p in ipairs(Players:GetPlayers()) do
+				local dn = (p.DisplayName or "")
+				if dn:lower() == q then return p end
+			end
+			return nil
+		end
+
+		-- يضيف لاعب للقائمة في العداد ويبدأ تتبع الوقت/الدخول/الخروج
+
+		local function addTrackByName(name)
+			name = (name or ""):gsub("^%s+", ""):gsub("%s+$","")
+			if name == "" then return end
+
+			local p = findPlayerInServer(name)
+			if not p then
+				makeAutoNotif("غير موجود", "اكتب اسم اللاعب كامل ولازم يكون داخل السيرفر", 1.0)
+				return
+			end
+
+			local key = p.Name:lower()
+
+			-- إذا كان موجود بالقائمة: خلّه يطلع فوق (الأحدث)
+			if tracked[key] then
+				orderCounter += 1
+				tracked[key].order = orderCounter
+				local row = rows[key]
+				if row and row.Parent then
+					row.LayoutOrder = -orderCounter
+				end
+				return
+			end
+
+			orderCounter += 1
+
+			local thumb = ""
+			pcall(function()
+				thumb = Players:GetUserThumbnailAsync(p.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size180x180)
+			end)
+
+			tracked[key] = {
+				key = key,
+				username = p.Name,
+				display = p.DisplayName or p.Name,
+				userId = p.UserId,
+				thumb = thumb,
+				joins = 0,
+				leaves = 0,
+				inServer = true,
+				startTime = os.clock(),
+				order = orderCounter,
+			}
+
+			ensureRow(tracked[key])
+			local row = rows[key]
+			if row and row.Parent then
+				row.LayoutOrder = -orderCounter -- الأحدث فوق
+			end
+			-- (بدون إشعار هنا)
+		end
+
+		-- Export for Target tab
+		_G.SKY_AddCounterTrack = addTrackByName
+
+		startBtn.MouseButton1Click:Connect(function()
+			addTrackByName(box.Text)
+			box.Text = ''
+		end)
+
+		-- player join/leave events
+		Players.PlayerAdded:Connect(function(p)
+			for _,data in pairs(tracked) do
+				if p.UserId == data.userId then
+					data.joins += 1
+					data.inServer = true
+					data.startTime = os.clock() -- إعادة العداد
+					data.lastDuration = 0
+					-- (تم تعطيل رسائل الدخل من صفحة العداد)
+
+					ensureRow(data)
+				end
+			end
+		end)
+
+		Players.PlayerRemoving:Connect(function(p)
+			for _,data in pairs(tracked) do
+				if p.UserId == data.userId then
+					data.leaves += 1
+					data.inServer = false
+					local dur = 0
+					if data.startTime then
+						dur = os.clock() - data.startTime
+					else
+						dur = data.lastDuration or 0
+					end
+					data.lastDuration = dur
+					data.startTime = nil
+
+					-- رسالة صفحة العداد فقط عند خروج "الضحية" الحالية
+					if _G.SKY_TargetUserId and p.UserId == _G.SKY_TargetUserId then
+						local dn = data.display or p.DisplayName or p.Name
+						local un = data.username or p.Name
+						local timeStr = formatTime(dur)
+						makePersistentNotif("توقف عداد عن لاعب", string.format("الاسم: %s\nاليوزر: %s\nالوقت: %s", dn, un, timeStr), 20, false, p.UserId, false)
+					end
+
+					ensureRow(data)
+				end
+			end
+		end)
+	end
+
+	-- =====================
+	-- --- TARGET UI (حسب طلب راكان) ---
+	-- =====================
+	-- يبني واجهة صفحة الاستهداف (Target) داخل ##TARGET_CONTAINER##
+
+	local function makeTargetUI()
+		local sf = findOrionScrollBySentinel("##TARGET_CONTAINER##")
+		if not (sf and sf:IsA("ScrollingFrame")) then return end
+
+		sf.Active = true
+		sf.ScrollingEnabled = true
+		sf.AutomaticCanvasSize = Enum.AutomaticSize.Y
+		sf.ScrollBarThickness = 6
+
+		for _,ch in ipairs(sf:GetChildren()) do
+			if not ch:IsA("UIListLayout") and not ch:IsA("UIPadding") then
+				ch:Destroy()
+			end
+		end
+
+		local list = sf:FindFirstChildOfClass("UIListLayout") or Instance.new("UIListLayout", sf)
+		list.SortOrder = Enum.SortOrder.LayoutOrder
+		list.Padding = UDim.new(0, 12)
+
+		local pad = sf:FindFirstChildOfClass("UIPadding") or Instance.new("UIPadding", sf)
+		pad.PaddingTop = UDim.new(0, 12)
+		pad.PaddingLeft = UDim.new(0, 12)
+		pad.PaddingRight = UDim.new(0, 12)
+		pad.PaddingBottom = UDim.new(0, 12)
+
+		-- State
+		local currentTarget = nil
+		local targetUserId, targetName, targetDisplay, targetAgeDays = nil, nil, nil, nil
+		local lastToolsText = ""
+		local targetOffline = false
+		local targetSessionStart = nil -- بداية جلسة بقاء الضحية الحالية
+		local pickMode = false
+		local pickConn = nil
+
+		-- أحداث دخول/خروج الضحية (صفحة الاستهداف فقط) - اتصال واحد بدون تكرار
+		if SKY_TargetConnAdd then SKY_TargetConnAdd:Disconnect(); SKY_TargetConnAdd = nil end
+		if SKY_TargetConnRem then SKY_TargetConnRem:Disconnect(); SKY_TargetConnRem = nil end
+
+		SKY_TargetConnAdd = Players.PlayerAdded:Connect(function(pl)
+			if _G.SKY_TargetUserId and pl.UserId == _G.SKY_TargetUserId then
+				-- رجع الهدف (دخل من جديد)
+				currentTarget = pl
+				targetOffline = false
+				targetSessionStart = os.clock() -- جلسة جديدة
+				if setOfflineVisual then pcall(function() setOfflineVisual(false) end) end
+				refresh()
+				-- رسالة دخل الضحية + تم إعادة تشغيل العداد
+				local dn = pl.DisplayName or pl.Name
+				makePersistentNotif("دخل الضحية !", string.format("اليوزر: %s\nالاسم: %s\nتم اعاده تشغيل عداد", pl.Name, dn), 0, true, pl.UserId, false)
+			end
+		end)
+
+		SKY_TargetConnRem = Players.PlayerRemoving:Connect(function(pl)
+			if _G.SKY_TargetUserId and pl.UserId == _G.SKY_TargetUserId then
+				-- طلع الهدف
+				targetOffline = true
+				-- نخلي currentTarget nil عشان الأدوات ما تتحدث من لاعب غير موجود
+				currentTarget = nil
+				if setOfflineVisual then pcall(function() setOfflineVisual(true) end) end
+				refresh()
+				local dn = targetDisplay or (pl.DisplayName or pl.Name)
+				local dur = 0
+				if targetSessionStart then dur = os.clock() - targetSessionStart end
+				targetSessionStart = nil
+				makePersistentNotif("خرج الضحيه !",
+					string.format("اليوزر: %s\nالاسم: %s\nبقي متصل لمدة: %s", pl.Name, dn, formatTime(dur)),
+					string.format("بقي متصل لمدة: %s", formatTime(dur)),
+					0,
+					true,
+					pl.UserId,
+					false
+				)
+			end
+		end)
+
+		local function findPlayerInServerPrefix(query)
+			query = (query or ""):gsub("^%s+",""):gsub("%s+$","")
+			if query == "" then return nil end
+			local q = query:lower()
+
+			-- exact first
+			for _,p in ipairs(Players:GetPlayers()) do
+				if p.Name:lower() == q or ((p.DisplayName or ""):lower() == q) then
+					return p
+				end
+			end
+			-- prefix match
+			for _,p in ipairs(Players:GetPlayers()) do
+				if p.Name:lower():sub(1, #q) == q then
+					return p
+				end
+			end
+			for _,p in ipairs(Players:GetPlayers()) do
+				local dn = (p.DisplayName or ""):lower()
+				if dn:sub(1, #q) == q then
+					return p
+				end
+			end
+			return nil
+		end
+
+		local function getToolsText(p)
+			local lines = {}
+			local function addTools(container)
+				if not container then return end
+				for _,it in ipairs(container:GetChildren()) do
+					if it:IsA("Tool") then
+						table.insert(lines, "- " .. it.Name)
+					end
+				end
+			end
+			addTools(p:FindFirstChildOfClass("Backpack"))
+			if p.Character then
+				addTools(p.Character)
+			end
+			if #lines == 0 then
+				return "لا توجد أدوات ظاهرة"
+			end
+			return table.concat(lines, "\n")
+		end
+
+		local SKY_PICK_HL = nil
+		local function flashWhiteHighlight(char)
+			-- هايلايت أبيض ثابت (أوضح من Highlight داخل الموديل)
+			if not char or not char.Parent then return end
+			if not SKY_PICK_HL then
+				SKY_PICK_HL = Instance.new("Highlight")
+				SKY_PICK_HL.Name = "SKY_TargetFlash"
+				SKY_PICK_HL.FillTransparency = 1
+				SKY_PICK_HL.OutlineTransparency = 0
+				SKY_PICK_HL.OutlineColor = Color3.fromRGB(255,255,255)
+				SKY_PICK_HL.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+				pcall(function() SKY_PICK_HL.Parent = game:GetService("CoreGui") end)
+				if not SKY_PICK_HL.Parent then SKY_PICK_HL.Parent = plr:WaitForChild("PlayerGui") end
+			end
+			SKY_PICK_HL.Adornee = char
+			SKY_PICK_HL.Enabled = true
+			task.delay(2, function()
+				if SKY_PICK_HL and SKY_PICK_HL.Adornee == char then
+					SKY_PICK_HL.Enabled = false
+					SKY_PICK_HL.Adornee = nil
+				end
+			end)
+		end
+
+		-- Layout wrapper: left buttons + right info
+		local wrapper = Instance.new("Frame")
+		wrapper.Parent = sf
+		wrapper.BackgroundTransparency = 1
+		wrapper.Size = UDim2.new(1, 0, 0, 460)
+
+		local left = Instance.new("Frame")
+		left.Parent = wrapper
+		left.BackgroundTransparency = 1
+		left.Size = UDim2.new(0.62, -10, 1, 0)
+
+		local right = Instance.new("Frame")
+		right.Parent = wrapper
+		right.BackgroundTransparency = 1
+		right.Size = UDim2.new(0.38, -10, 1, 0)
+		right.Position = UDim2.new(0.62, 10, 0, 0)
+
+		local lList = Instance.new("UIListLayout", left)
+		lList.SortOrder = Enum.SortOrder.LayoutOrder
+		lList.Padding = UDim.new(0, 10)
+
+		-- Top row: SearchBox (ستايل العداد) + Finger
+		local topRow = Instance.new("Frame")
+		topRow.Parent = left
+		topRow.BackgroundTransparency = 1
+		topRow.Size = UDim2.new(1, 0, 0, 38)
+
+		-- مربع بحث/إدخال اليوزر
+
+		local searchBox = Instance.new("TextBox")
+		searchBox.Parent = topRow
+		searchBox.BackgroundColor3 = THEME.SurfaceAlt
+		searchBox.BackgroundTransparency = 0.15
+		searchBox.BorderSizePixel = 0
+		searchBox.PlaceholderText = "اكتب اول 3 احرف"
+		searchBox.Text = ""
+		searchBox.ClearTextOnFocus = false
+		searchBox.Font = Enum.Font.GothamBold
+		searchBox.TextSize = 18
+		searchBox.TextColor3 = THEME.Text
+		searchBox.PlaceholderColor3 = THEME.Muted
+		searchBox.Size = UDim2.new(1, -60, 1, 0)
+		searchBox.Position = UDim2.new(0, 0, 0, 0)
+		round(searchBox, 12)
+		addStroke(searchBox, THEME.Stroke, 1, 0.48)
+
+		-- زر (الاصبع) لاختيار لاعب بالضغط على جسمه (PC)
+
+		local fingerBtn = Instance.new("TextButton")
+		fingerBtn.Parent = topRow
+		fingerBtn.BackgroundColor3 = THEME.Accent
+		fingerBtn.BackgroundTransparency = 0.05
+		fingerBtn.BorderSizePixel = 0
+		fingerBtn.Size = UDim2.new(0, 50, 1, 0)
+		fingerBtn.Position = UDim2.new(1, -50, 0, 0)
+		fingerBtn.Font = Enum.Font.GothamBold
+		fingerBtn.TextSize = 18
+		fingerBtn.TextColor3 = THEME.Text
+		fingerBtn.Text = "الاصبع"
+		round(fingerBtn, 12)
+		addGradient(fingerBtn, THEME.Accent, THEME.Accent2, 15)
+		animateButton(fingerBtn)
+
+		-- Buttons grid (placeholders)
+		-- حاوية أزرار الأوامر (Grid)
+
+		local grid = Instance.new("Frame")
+		grid.Parent = left
+		grid.BackgroundTransparency = 1
+		grid.Size = UDim2.new(1, 0, 0, 320)
+
+		local gl = Instance.new("UIGridLayout", grid)
+		gl.CellSize = UDim2.new(0.48, 0, 0, 42)
+		gl.CellPadding = UDim2.new(0.04, 0, 0, 10)
+		gl.SortOrder = Enum.SortOrder.LayoutOrder
+
+		local function makeBtn(text, cb)
+			local b = Instance.new("TextButton")
+			b.Parent = grid
+			b.BackgroundColor3 = THEME.SurfaceAlt
+			b.BackgroundTransparency = 0.1
+			b.BorderSizePixel = 0
+			b.Font = Enum.Font.GothamBold
+			b.TextSize = 16
+			b.TextColor3 = THEME.Text
+			b.Text = text
+			round(b, 10)
+			addStroke(b, THEME.Stroke, 1, 0.52)
+			animateButton(b)
+			b.MouseButton1Click:Connect(function()
+				if cb then task.spawn(cb) end
+			end)
+			return b
+		end
+
+		-- أزرار صفحة الاستهداف (Target) - إصلاح الأزرار الأساسية
+		-- زر to: ينقلك قدّام اللاعب المستهدف
+		local function teleportToTarget()
+			if not currentTarget then return end
+			local myChar = Players.LocalPlayer.Character
+			local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+			local tChar = currentTarget.Character
+			local tHRP = tChar and tChar:FindFirstChild("HumanoidRootPart")
+			if not (myHRP and tHRP) then return end
+			local frontPos = (tHRP.CFrame * CFrame.new(0, 0, -3)).Position
+			myHRP.CFrame = CFrame.new(frontPos, tHRP.Position)
+		end
+
+		-- زر view: مشاهدة اللاعب (Toggle)
+		local spectating = false
+		local oldSubject = nil
+		local viewBtn = nil
+
+		local function toggleSpectate()
+			if not currentTarget then return end
+			local cam = workspace.CurrentCamera
+			if not cam then return end
+
+			if not spectating then
+				local tHum = currentTarget.Character and currentTarget.Character:FindFirstChildOfClass("Humanoid")
+				if not tHum then return end
+				oldSubject = cam.CameraSubject
+				cam.CameraSubject = tHum
+				spectating = true
+				if viewBtn then uiTween(viewBtn, 0.22, {BackgroundColor3 = THEME.Accent}) end
+			else
+				if oldSubject then cam.CameraSubject = oldSubject end
+				spectating = false
+				if viewBtn then uiTween(viewBtn, 0.22, {BackgroundColor3 = THEME.SurfaceAlt}) end
+			end
+		end
+
+
+		-- أدوات وأوامر الكلبشه (من سكربت الكلبشة الثاني)
+		local lastCuffTime = 0
+
+		local function getCuffTool()
+			local player = plr
+			if player.Backpack then
+				for _, tool in ipairs(player.Backpack:GetChildren()) do
+					if tool:IsA("Tool") then
+						local name = tool.Name:lower()
+						if name:find("كلبش") or name:find("angels handcuffs") then
+							return tool
+						end
+					end
+				end
+			end
+			if player.Character then
+				for _, tool in ipairs(player.Character:GetChildren()) do
+					if tool:IsA("Tool") then
+						local name = tool.Name:lower()
+						if name:find("كلبش") or name:find("angels handcuffs") then
+							return tool
+						end
+					end
+				end
+			end
+			return nil
+		end
+
+		local function cuffPlayer(targetPlayer)
+			if not targetPlayer or not targetPlayer.Character then
+				return false
+			end
+
+			local player = plr
+			local tool = getCuffTool()
+			if not tool then
+				return false
+			end
+
+			-- تأكد إن اللاعب ماسك الكلبشة فعليًا
+			if tool.Parent == player.Backpack then
+				local char = player.Character
+				if char then
+					local hum = char:FindFirstChildOfClass("Humanoid")
+					if hum then
+						hum:EquipTool(tool)
+					else
+						tool.Parent = char
+					end
+				end
+			end
+
+			local remote = nil
+			for _, obj in ipairs(tool:GetDescendants()) do
+				if obj:IsA("RemoteEvent") then
+					remote = obj
+					break
+				end
+			end
+			if not remote then
+				return false
+			end
+
+			local char = targetPlayer.Character
+			local arm =
+				char:FindFirstChild("RightUpperArm") or
+				char:FindFirstChild("LeftUpperArm") or
+				char:FindFirstChild("Right Arm") or
+				char:FindFirstChild("Left Arm")
+
+			if not arm then
+				return false
+			end
+
+			local now = tick()
+			if now - lastCuffTime < 0.75 then
+				return false
+			end
+			lastCuffTime = now
+
+			remote:FireServer(arm)
+
+			task.wait(0.1)
+			if tool.Parent == player.Character then
+				tool.Parent = player.Backpack
+			end
+
+			return true
+		end
+
+
+		local function cuffTarget()
+			cuffPlayer(currentTarget)
+		end
+
+		local function killByCuffTarget()
+			local target = currentTarget
+			if not target or not target.Character then return end
+
+			local player = plr
+			local myChar = player.Character
+			if not myChar then return end
+			local myHRP = myChar:FindFirstChild("HumanoidRootPart")
+			local tChar = target.Character
+			local tHRP = tChar and tChar:FindFirstChild("HumanoidRootPart")
+			if not (myHRP and tHRP) then return end
+
+			local tool = getCuffTool()
+			if not tool then return end
+
+			-- تأكد إن الأداة في الشخصية
+			if tool.Parent ~= myChar then
+				tool.Parent = myChar
+				task.wait()
+			end
+
+			-- ابحث عن الريموت داخل أداة الكلبشة
+			local remote = nil
+			for _,obj in ipairs(tool:GetDescendants()) do
+				if obj:IsA("RemoteEvent") then
+					remote = obj
+					break
+				end
+			end
+			if not remote then return end
+
+			local arm =
+				tChar:FindFirstChild("RightUpperArm") or
+				tChar:FindFirstChild("LeftUpperArm") or
+				tChar:FindFirstChild("Right Arm") or
+				tChar:FindFirstChild("Left Arm")
+
+			if not arm then return end
+
+			local originalCF = myHRP.CFrame
+
+			-- كلْبِش الهدف أولاً
+			pcall(function()
+				remote:FireServer(arm)
+			end)
+
+			task.wait(0.1)
+
+			-- نزّل الاثنين تحت
+			local downCF = CFrame.new(0, -8000, 0)
+			myHRP.CFrame = downCF
+			if tHRP then
+				tHRP.CFrame = downCF
+			end
+
+			-- فك الكلبشة عن الضحية تحت
+			task.wait(0.15)
+			pcall(function()
+				remote:FireServer()
+			end)
+
+			-- رجّع أداة الكلبشة للشنطة لو كانت بيدك
+			if tool.Parent == myChar then
+				tool.Parent = player.Backpack
+			end
+
+			-- رجّع نفسك لمكانك الأصلي، وخلي الضحية تحت
+			myHRP.CFrame = originalCF
+		end
+		local function hangByCuffTarget()
+			local target = currentTarget
+			if not target or not target.Character then return end
+			local username = tostring(target.Name or "")
+			if username ~= "" then
+				local lower = string.lower(username)
+				if lower:sub(1,3) == "nan" then
+					makePersistentNotif("تعليق", "ما يمكن تنفيذ تعليق على لاعب يبدأ اسمه بـ nan", 3, false, target.UserId, false)
+					return
+				end
+			end
+			-- كلبشة الهدف باستخدام نفس منطق cuffPlayer
+			local ok = cuffPlayer(target)
+			if not ok then return end
+			local tChar = target.Character
+			local tHRP = tChar and tChar:FindFirstChild("HumanoidRootPart")
+			if not tHRP then return end
+			local ws = workspace
+			local oldFallen = ws.FallenPartsDestroyHeight
+			ws.FallenPartsDestroyHeight = -1e14
+			local originalCF = tHRP.CFrame
+			-- نرسل الضحية بعيد فوق
+			pcall(function()
+				tHRP.CFrame = CFrame.new(0, 10000000, 0)
+			end)
+			task.wait(0.2)
+			-- امر re مخفي عبر HD Admin / الشات
+			if username ~= "" then
+				sendHDCommand("/e .re " .. username)
+			end
+			task.wait(0.1)
+			ws.FallenPartsDestroyHeight = oldFallen
+			-- تأكد أداة الكلبشة رجعت للشنطة
+			local tool = getCuffTool()
+			if tool and tool.Parent == plr.Character then
+				tool.Parent = plr.Backpack
+			end
+		end
+
+
+
+		-- زر بانق (خلف): تتبع ورا اللاعب + محاولة تشغيل رقصة
+		local bangOn = false
+		local antiCuffFromBang = false
+		local bangConn = nil
+		local bangTrack = nil
+		local bangAnim = Instance.new("Animation")
+		bangAnim.AnimationId = "rbxassetid://138440659403841"
+		local strongBangOn = false
+		local strongBangBtn = nil
+		local strongBangToggleId = 0
+		local strongBangFront = false
+
+
+		-- ===== Bang (v2 - مطوّر): يلتصق ويعيد المحاولة لو الهدف طلع ورجع =====
+		local animIdR6 = "148840371"
+		local animIdR15 = "5918726674"
+		local bangMaxForce = 9e12
+		local bangMonitorInterval = 0.12
+
+		local bangTrack = nil
+		local bangDesired = false
+		local bangAttached = false
+		local bangTargetName = nil
+		local bangSavedCanCollide = {}
+
+		local function destroyBangObjects(root)
+			if not root then return end
+			for _,obj in pairs(root:GetChildren()) do
+				if obj.Name=="BangAlignPosition" or obj.Name=="BangAlignOrientation" or obj.Name=="BangAttachment" then
+					pcall(function() obj:Destroy() end)
+				end
+			end
+		end
+
+		local function stopBangAnim()
+			if bangTrack then pcall(function() bangTrack:Stop(0) end) end
+			bangTrack = nil
+		end
+
+		local function playBangAnim()
+			stopBangAnim()
+			local ch = Players.LocalPlayer.Character
+			local hum = ch and ch:FindFirstChildOfClass("Humanoid")
+			if not hum then return end
+			local animator = hum:FindFirstChildOfClass("Animator") or Instance.new("Animator", hum)
+			local anim = Instance.new("Animation")
+			local id = (hum.RigType==Enum.HumanoidRigType.R6) and animIdR6 or animIdR15
+			anim.AnimationId = "rbxassetid://"..id
+			local ok, track = pcall(function() return animator:LoadAnimation(anim) end)
+			if not ok or not track then return end
+			bangTrack = track
+			bangTrack.Looped = true
+			pcall(function() bangTrack:Play(0.05, 1, 1) end)
+			-- سرعة البانق قويّة (ثابتة 9999)
+			pcall(function() bangTrack:AdjustSpeed(9999) end)
+		end
+
+		local function disableLocalCollisions()
+			local ch = Players.LocalPlayer.Character
+			if not ch then return end
+			for _,part in pairs(ch:GetDescendants()) do
+				if part:IsA("BasePart") then
+					if bangSavedCanCollide[part] == nil then
+						bangSavedCanCollide[part] = part.CanCollide
+					end
+					part.CanCollide = false
+				end
+			end
+		end
+
+		local function restoreLocalCollisions()
+			for part,old in pairs(bangSavedCanCollide) do
+				if part and part.Parent and part:IsA("BasePart") then
+					pcall(function() part.CanCollide = old end)
+				end
+			end
+			table.clear(bangSavedCanCollide)
+		end
+
+		local function safeCreateBangAttach(rootMe, rootTarget)
+			if not rootMe or not rootTarget then return false end
+			destroyBangObjects(rootMe)
+			-- نظف القديم من الهدف عشان ما تتكدس Attachments
+			pcall(function()
+				local old = rootTarget:FindFirstChild("BangTargetAttachment")
+				if old then old:Destroy() end
+			end)
+
+			local a0 = Instance.new("Attachment")
+			a0.Name = "BangAttachment"
+			a0.Parent = rootMe
+
+			local a1 = Instance.new("Attachment")
+			a1.Name = "BangTargetAttachment"
+			a1.Parent = rootTarget
+			a1.Position = Vector3.new(0,0,1)
+
+			local ap = Instance.new("AlignPosition")
+			ap.Name = "BangAlignPosition"
+			ap.Parent = rootMe
+			ap.Attachment0 = a0
+			ap.Attachment1 = a1
+			ap.MaxForce = bangMaxForce
+			ap.Responsiveness = 500
+			ap.ReactionForceEnabled = false
+
+			local ao = Instance.new("AlignOrientation")
+			ao.Name = "BangAlignOrientation"
+			ao.Parent = rootMe
+			ao.Attachment0 = a0
+			ao.Attachment1 = a1
+			ao.MaxTorque = bangMaxForce
+			ao.Responsiveness = 500
+			ao.ReactionTorqueEnabled = false
+
+			return true
+		end
+
+		local function attachToTarget(plr)
+			if not plr or plr==Players.LocalPlayer then return end
+			if not plr.Character then return end
+			local myChar = Players.LocalPlayer.Character
+			if not myChar then return end
+
+			local rootMe = myChar:FindFirstChild("HumanoidRootPart")
+			local rootTarget = plr.Character:FindFirstChild("HumanoidRootPart")
+			if not rootMe or not rootTarget then return end
+
+			disableLocalCollisions()
+			safeCreateBangAttach(rootMe, rootTarget)
+			playBangAnim()
+			bangAttached = true
+		end
+
+		local function detachBang()
+			local myChar = Players.LocalPlayer.Character
+			local rootMe = myChar and myChar:FindFirstChild("HumanoidRootPart")
+			if rootMe then
+				destroyBangObjects(rootMe)
+			end
+			stopBangAnim()
+			restoreLocalCollisions()
+			bangAttached = false
+		end
+
+		-- Loop ثابت: يعيد المحاولة لو الهدف طلع ورجع أو ضاعت الـ Attachments
+		task.spawn(function()
+			while true do
+				if bangDesired and bangTargetName and bangTargetName ~= "" then
+					local target = Players:FindFirstChild(bangTargetName)
+					if target and target.Parent and target.Character and Players.LocalPlayer.Character then
+						local myRoot = Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+						local theirRoot = target.Character:FindFirstChild("HumanoidRootPart")
+						if myRoot and theirRoot then
+							if not bangAttached then
+								pcall(function() attachToTarget(target) end)
+							else
+								local okAttach = myRoot:FindFirstChild("BangAttachment") ~= nil
+								if not okAttach then
+									bangAttached = false
+									pcall(function() attachToTarget(target) end)
+								end
+							end
+						else
+							bangAttached = false
+						end
+					else
+						bangAttached = false
+					end
+				end
+				task.wait(bangMonitorInterval)
+			end
+		end)
+
+		local function stopBang()
+			-- Bang v2: يوقف الانيميشن + يفك الالتصاق + يرجّع التصادم
+			bangOn = false
+			bangDesired = false
+			bangTargetName = nil
+			detachBang()
+		end
+
+		local function startBang()
+			-- Bang v2: لازم Target
+			if not currentTarget then return end
+			bangOn = true
+			bangDesired = true
+			bangTargetName = currentTarget.Name
+			bangAttached = false
+			pcall(function() attachToTarget(currentTarget) end)
+		end
+
+		-- زر بانق أمام (جلوس + ذبذبة)
+		local frontBangOn = false
+		local frontBangConn = nil
+		local function stopFrontBang()
+			frontBangOn = false
+			if frontBangConn then frontBangConn:Disconnect(); frontBangConn = nil end
+			local ch = Players.LocalPlayer.Character
+			local hum = ch and ch:FindFirstChildOfClass("Humanoid")
+			if hum then hum.Sit = false end
+		end
+
+		local function startFrontBang()
+			if not currentTarget then return end
+			local myChar = Players.LocalPlayer.Character
+			local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+			local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+			local tChar = currentTarget.Character
+			local tHRP = tChar and tChar:FindFirstChild("HumanoidRootPart")
+			if not (myHRP and myHum and tHRP) then return end
+
+			local frontDist = 1.1
+			local wobbleAmp = 1.25
+			local wobbleHz  = 35
+			myHum.Sit = true
+
+			frontBangConn = RunService.Heartbeat:Connect(function()
+				if not frontBangOn then return end
+				local mc = Players.LocalPlayer.Character
+				local hrp = mc and mc:FindFirstChild("HumanoidRootPart")
+				local hum = mc and mc:FindFirstChildOfClass("Humanoid")
+				local tc = currentTarget and currentTarget.Character
+				local thrp = tc and tc:FindFirstChild("HumanoidRootPart")
+				if not (hrp and hum and thrp) then return end
+				hum.Sit = true
+
+				-- المكان (فوق + قدّام)
+				local baseCF = thrp.CFrame * CFrame.new(0, 1.5, -frontDist)
+
+				-- الاهتزاز
+				local wob = math.sin(os.clock() * (math.pi * 1) * wobbleHz) * wobbleAmp
+				if wob > 0 then
+					wob = wob * 0.25
+				else
+					wob = wob * 1.8
+				end
+
+				local wobCF = baseCF * CFrame.new(0, 0, wob)
+				local pos = wobCF.Position
+
+				-- نخلي الاتجاه أفقي فقط (نلغي فرق الارتفاع)
+				local lookPos = Vector3.new(thrp.Position.X, pos.Y, thrp.Position.Z)
+
+				hrp.CFrame = CFrame.new(pos, lookPos)
+			end)
+		end
+
+		-- زرا "مدري 1" و"مدري 2" المنقولان من السكربت القديم.
+		-- كلاهما يستخدم اللاعب المحدد حاليًا في صفحة Target.
+		local madri1On, madri2On, madriBothOn = false, false, false
+		local madri1Track, madri2Track = nil, nil
+		local madriBothTracks = {}
+		local madri1RunId, madri2RunId, madriBothRunId = 0, 0, 0
+		local madri1Btn, madri2Btn, madriBothBtn = nil, nil, nil
+		local stopMadri1, stopMadri2, stopMadriBoth
+
+		local function setMadriButtonState(button, enabled, label)
+			if not button then return end
+			button.Text = enabled and ("إيقاف " .. label) or label
+			uiTween(button, 0.24, {
+				BackgroundColor3 = enabled and THEME.Accent or THEME.SurfaceAlt
+			})
+		end
+
+		local function stopAnimationTrack(track)
+			if track then
+				pcall(function() track:Stop() end)
+			end
+		end
+
+		local function playMadriAnimation(animationId, speed)
+			local character = Players.LocalPlayer.Character
+			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+			if not humanoid then return nil end
+
+			local animator = humanoid:FindFirstChildOfClass("Animator")
+			if not animator then
+				animator = Instance.new("Animator")
+				animator.Parent = humanoid
+			end
+
+			local animation = Instance.new("Animation")
+			animation.AnimationId = "rbxassetid://" .. tostring(animationId)
+			local ok, track = pcall(function()
+				return animator:LoadAnimation(animation)
+			end)
+			animation:Destroy()
+
+			if not (ok and track) then return nil end
+			pcall(function()
+				track:Play()
+				track:AdjustSpeed(speed or 1)
+			end)
+			return track
+		end
+
+		stopMadri1 = function()
+			madri1On = false
+			madri1RunId += 1
+			stopAnimationTrack(madri1Track)
+			madri1Track = nil
+
+			local character = Players.LocalPlayer.Character
+			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+			if humanoid then humanoid.Sit = false end
+			setMadriButtonState(madri1Btn, false, "مدري 1")
+		end
+
+		stopMadri2 = function()
+			madri2On = false
+			madri2RunId += 1
+			stopAnimationTrack(madri2Track)
+			madri2Track = nil
+			setMadriButtonState(madri2Btn, false, "مدري 2")
+		end
+
+		stopMadriBoth = function()
+			madriBothOn = false
+			madriBothRunId += 1
+			for _, track in ipairs(madriBothTracks) do
+				stopAnimationTrack(track)
+			end
+			madriBothTracks = {}
+
+			local character = Players.LocalPlayer.Character
+			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+			if humanoid then humanoid.Sit = false end
+			setMadriButtonState(madriBothBtn, false, "1 و 2")
+		end
+
+		local function toggleMadri1()
+			if madri1On then
+				stopMadri1()
+				return
+			end
+			if not (currentTarget and currentTarget.Character) then
+				makeAutoNotif("Target", "حدد لاعب أولاً", 1.5)
+				return
+			end
+
+			-- الزر المنفرد يوقف الوضع المدمج قبل تشغيل نفسه.
+			stopMadriBoth()
+			stopMadri2()
+			madri1On = true
+			madri1RunId += 1
+			local thisRun = madri1RunId
+			setMadriButtonState(madri1Btn, true, "مدري 1")
+
+			local character = Players.LocalPlayer.Character
+			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+			if humanoid then humanoid.Sit = true end
+			madri1Track = playMadriAnimation("2506281703", 1)
+
+			local distance = 1.5
+			local movingInward = true
+			while madri1On and thisRun == madri1RunId and sf and sf.Parent do
+				local myCharacter = Players.LocalPlayer.Character
+				local myRoot = myCharacter and myCharacter:FindFirstChild("HumanoidRootPart")
+				local myHumanoid = myCharacter and myCharacter:FindFirstChildOfClass("Humanoid")
+				local targetCharacter = currentTarget and currentTarget.Character
+				local targetHead = targetCharacter and targetCharacter:FindFirstChild("Head")
+
+				if not (myRoot and myHumanoid and targetHead) then break end
+				myHumanoid.Sit = true
+
+				if movingInward then
+					distance -= 0.2
+					if distance <= 0.5 then movingInward = false end
+				else
+					distance += 0.2
+					if distance >= 2.5 then movingInward = true end
+				end
+
+				local position = targetHead.Position + targetHead.CFrame.LookVector * distance
+				myRoot.CFrame = CFrame.new(
+					Vector3.new(position.X, targetHead.Position.Y, position.Z),
+					targetHead.Position
+				)
+				myRoot.Velocity = Vector3.new(0, 2, 0)
+				RunService.Heartbeat:Wait()
+			end
+
+			if madri1On and thisRun == madri1RunId then
+				stopMadri1()
+			end
+		end
+
+		local function toggleMadri2()
+			if madri2On then
+				stopMadri2()
+				return
+			end
+			if not (currentTarget and currentTarget.Character) then
+				makeAutoNotif("Target", "حدد لاعب أولاً", 1.5)
+				return
+			end
+
+			stopMadriBoth()
+			stopMadri1()
+			madri2On = true
+			madri2RunId += 1
+			local thisRun = madri2RunId
+			setMadriButtonState(madri2Btn, true, "مدري 2")
+			madri2Track = playMadriAnimation("10714068222", 3)
+
+			while madri2On and thisRun == madri2RunId and sf and sf.Parent do
+				local myCharacter = Players.LocalPlayer.Character
+				local myRoot = myCharacter and myCharacter:FindFirstChild("HumanoidRootPart")
+				local targetCharacter = currentTarget and currentTarget.Character
+				local targetRoot = targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart")
+
+				if not (myRoot and targetRoot) then break end
+				myRoot.CFrame = targetRoot.CFrame * CFrame.new(0, 0, 1)
+				RunService.Heartbeat:Wait()
+			end
+
+			if madri2On and thisRun == madri2RunId then
+				stopMadri2()
+			end
+		end
+
+		local function toggleMadriBoth()
+			if madriBothOn then
+				stopMadriBoth()
+				return
+			end
+			if not (currentTarget and currentTarget.Character) then
+				makeAutoNotif("Target", "حدد لاعب أولاً", 1.5)
+				return
+			end
+
+			stopMadri1()
+			stopMadri2()
+			madriBothOn = true
+			madriBothRunId += 1
+			local thisRun = madriBothRunId
+			setMadriButtonState(madriBothBtn, true, "1 و 2")
+
+			local character = Players.LocalPlayer.Character
+			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+			if humanoid then humanoid.Sit = true end
+
+			local firstTrack = playMadriAnimation("2506281703", 1)
+			local secondTrack = playMadriAnimation("10714068222", 1000)
+			madriBothTracks = {}
+			if firstTrack then table.insert(madriBothTracks, firstTrack) end
+			if secondTrack then table.insert(madriBothTracks, secondTrack) end
+
+			-- نفس حركة مدري 1 الأصلية.
+			task.spawn(function()
+				local distance = 1.5
+				local movingInward = true
+				while madriBothOn and thisRun == madriBothRunId and sf and sf.Parent do
+					local myCharacter = Players.LocalPlayer.Character
+					local myRoot = myCharacter and myCharacter:FindFirstChild("HumanoidRootPart")
+					local myHumanoid = myCharacter and myCharacter:FindFirstChildOfClass("Humanoid")
+					local targetCharacter = currentTarget and currentTarget.Character
+					local targetHead = targetCharacter and targetCharacter:FindFirstChild("Head")
+					if not (myRoot and myHumanoid and targetHead) then break end
+
+					myHumanoid.Sit = true
+					if movingInward then
+						distance -= 0.2
+						if distance <= 0.5 then movingInward = false end
+					else
+						distance += 0.2
+						if distance >= 2.5 then movingInward = true end
+					end
+
+					local position = targetHead.Position + targetHead.CFrame.LookVector * distance
+					myRoot.CFrame = CFrame.new(
+						Vector3.new(position.X, targetHead.Position.Y, position.Z),
+						targetHead.Position
+					)
+					myRoot.Velocity = Vector3.new(0, 2, 0)
+					RunService.Heartbeat:Wait()
+				end
+
+				if madriBothOn and thisRun == madriBothRunId then
+					stopMadriBoth()
+				end
+			end)
+
+			-- نفس حركة مدري 2 الأصلية، وتعمل بالتزامن مع الحركة الأولى.
+			task.spawn(function()
+				while madriBothOn and thisRun == madriBothRunId and sf and sf.Parent do
+					local myCharacter = Players.LocalPlayer.Character
+					local myRoot = myCharacter and myCharacter:FindFirstChild("HumanoidRootPart")
+					local targetCharacter = currentTarget and currentTarget.Character
+					local targetRoot = targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart")
+					if not (myRoot and targetRoot) then break end
+
+					myRoot.CFrame = targetRoot.CFrame * CFrame.new(0, 0, 1)
+					RunService.Heartbeat:Wait()
+				end
+
+				if madriBothOn and thisRun == madriBothRunId then
+					stopMadriBoth()
+				end
+			end)
+		end
+
+		-- إنشاء الأزرار الأساسية
+		local toBtn = makeBtn("to", function() teleportToTarget() end)
+		viewBtn = makeBtn("view", function() toggleSpectate() end)
+		viewBtn.BackgroundColor3 = THEME.SurfaceAlt
+		viewBtn.AutoButtonColor = false
+
+		-- زر "كلبشه" بنفس ستايل زر to ويستخدم ميزة الكلبشة الأصلية
+		local cuffBtn = makeBtn("كلبشه", function()
+			cuffTarget()
+		end)
+
+		local killCuffBtn = makeBtn("قتل بالكلبشه", function()
+			killByCuffTarget()
+		end)
+
+		local hangBtn = makeBtn("تعليق", function()
+			hangByCuffTarget()
+		end)
+
+		local bangBtn = makeBtn("بانق", function()
+			-- إلغاء وضع بانق قوي إذا شغّلت بانق العادي
+			if strongBangOn then
+				strongBangOn = false
+				if strongBangBtn then
+					strongBangBtn.BackgroundColor3 = THEME.SurfaceAlt
+				end
+			end
+
+			bangOn = not bangOn
+			if bangOn then
+				if frontBangOn then frontBangOn = false; stopFrontBang() end
+				-- تشغيل مضاد الكلبشة إذا مو شغّال أساساً
+				if not AUTO.AntiCuff then
+					startAntiCuff()
+					antiCuffFromBang = true
+				end
+				startBang()
+				uiTween(bangBtn, 0.22, {BackgroundColor3 = THEME.Accent})
+			else
+				stopBang()
+				-- لو ولا نوع من أنواع البانق شغّال، نطفي المضاد اللي شغّلناه من هنا
+				if antiCuffFromBang and (not bangOn and not frontBangOn and not strongBangOn) then
+					stopAntiCuff()
+					antiCuffFromBang = false
+				end
+				uiTween(bangBtn, 0.22, {BackgroundColor3 = THEME.SurfaceAlt})
+			end
+		end)
+		bangBtn.AutoButtonColor = false
+		bangBtn.BackgroundColor3 = THEME.SurfaceAlt
+
+				local frontBangBtn = makeBtn("بانق أمام", function()
+			-- إلغاء وضع بانق قوي إذا شغّلت بانق الأمامي
+			if strongBangOn then
+				strongBangOn = false
+				if strongBangBtn then
+					strongBangBtn.BackgroundColor3 = THEME.SurfaceAlt
+				end
+			end
+
+			frontBangOn = not frontBangOn
+			if frontBangOn then
+				if bangOn then bangOn = false; stopBang(); bangBtn.BackgroundColor3 = THEME.SurfaceAlt end
+				-- تشغيل مضاد الكلبشة إذا مو شغّال أساساً
+				if not AUTO.AntiCuff then
+					startAntiCuff()
+					antiCuffFromBang = true
+				end
+				startFrontBang()
+				uiTween(frontBangBtn, 0.22, {BackgroundColor3 = THEME.Accent})
+			else
+				stopFrontBang()
+				if antiCuffFromBang and (not bangOn and not frontBangOn and not strongBangOn) then
+					stopAntiCuff()
+					antiCuffFromBang = false
+				end
+				uiTween(frontBangBtn, 0.22, {BackgroundColor3 = THEME.SurfaceAlt})
+			end
+		end)
+		frontBangBtn.AutoButtonColor = false
+		frontBangBtn.BackgroundColor3 = THEME.SurfaceAlt
+		-- زر "بانق قوي": ينتقل كل نص ثانية بين بانق (خلف - جالس) ومص (قدّام - واقف)
+		strongBangBtn = makeBtn("بانق قوي", function()
+			strongBangOn = not strongBangOn
+			if strongBangOn then
+				-- طفي أوضاع البانق الأخرى أولاً
+				if bangOn then
+					bangOn = false
+					stopBang()
+					bangBtn.BackgroundColor3 = THEME.SurfaceAlt
+				end
+				if frontBangOn then
+					frontBangOn = false
+					stopFrontBang()
+					frontBangBtn.BackgroundColor3 = THEME.SurfaceAlt
+				end
+
+				uiTween(strongBangBtn, 0.22, {BackgroundColor3 = THEME.Accent})
+
+				-- بدء بانق عادي (خلف) + تفعيل اللوب الخاص بالتبديل
+				if not currentTarget then return end
+				bangOn = true
+				bangDesired = true
+				bangTargetName = currentTarget.Name
+				bangAttached = false
+				pcall(function() attachToTarget(currentTarget) end)
+
+				strongBangToggleId += 1
+				local myId = strongBangToggleId
+				strongBangFront = false
+
+				task.spawn(function()
+					while strongBangOn and myId == strongBangToggleId do
+						local ch = Players.LocalPlayer.Character
+						local hum = ch and ch:FindFirstChildOfClass("Humanoid")
+						local rootMe = ch and ch:FindFirstChild("HumanoidRootPart")
+						local target = currentTarget
+						local tChar = target and target.Character
+						local rootTarget = tChar and tChar:FindFirstChild("HumanoidRootPart")
+						local a1 = rootTarget and rootTarget:FindFirstChild("BangTargetAttachment")
+						if not (hum and rootMe and rootTarget and a1) then
+							break
+						end
+
+						-- تبديل بين الوضعين: خلف (بانق) وقدّام (مص)
+						strongBangFront = not strongBangFront
+
+						if strongBangFront then
+							-- قدّام الهدف - واقف
+							pcall(function()
+								hum.Sit = false
+								a1.Position = Vector3.new(0, 0, -0.5)
+							end)
+						else
+							-- خلف الهدف - جالس
+							pcall(function()
+								hum.Sit = true
+								a1.Position = Vector3.new(0, 0, 1)
+							end)
+						end
+
+						-- سرعة عالية للانيميشن (نفس نظام بانق)
+						pcall(function()
+							if bangTrack then bangTrack:AdjustSpeed(9999) end
+						end)
+
+						-- كل نص ثانية تقريباً
+						task.wait(0.01)
+					end
+				end)
+			else
+				-- إيقاف وضع بانق قوي فقط (يرجع البانق لوضع الإيقاف)
+				strongBangToggleId += 1
+				strongBangFront = false
+				bangOn = false
+				stopBang()
+				if bangBtn then bangBtn.BackgroundColor3 = THEME.SurfaceAlt end
+				if frontBangBtn then frontBangBtn.BackgroundColor3 = THEME.SurfaceAlt end
+				uiTween(strongBangBtn, 0.22, {BackgroundColor3 = THEME.SurfaceAlt})
+			end
+		end)
+strongBangBtn.AutoButtonColor = false
+		strongBangBtn.BackgroundColor3 = THEME.SurfaceAlt
+
+		-- الزران الجديدان داخل شبكة صفحة Target.
+		madri1Btn = makeBtn("مدري 1", toggleMadri1)
+		madri1Btn.AutoButtonColor = false
+		setMadriButtonState(madri1Btn, false, "مدري 1")
+
+		madri2Btn = makeBtn("مدري 2", toggleMadri2)
+		madri2Btn.AutoButtonColor = false
+		setMadriButtonState(madri2Btn, false, "مدري 2")
+
+		madriBothBtn = makeBtn("1 و 2", toggleMadriBoth)
+		madriBothBtn.AutoButtonColor = false
+		setMadriButtonState(madriBothBtn, false, "1 و 2")
+
+		
+
+
+
+
+		-- Right panel (معلومات + خط + أدوات)
+		-- كرت معلومات اللاعب (يمين) أو كرت لاعب داخل القائمة
+
+		local card = Instance.new("Frame")
+		card.Parent = right
+		card.BackgroundColor3 = THEME.Surface
+		card.BackgroundTransparency = 0.06
+		card.BorderSizePixel = 0
+		card.Size = UDim2.new(1, 0, 0, 460)
+		round(card, 14)
+		addStroke(card, THEME.Stroke, 1, 0.42)
+		addGradient(card, THEME.Surface, THEME.Background, 90)
+
+		-- صورة اللاعب (Thumbnail)
+
+		local avatar = Instance.new("ImageLabel")
+		avatar.Parent = card
+		avatar.BackgroundTransparency = 1
+		avatar.Size = UDim2.new(0, 128, 0, 128)
+		avatar.Position = UDim2.new(0.5, -64, 0, -5)
+		round(avatar, 999)
+		addStroke(avatar, THEME.Accent2, 2, 0.1)
+		local setOfflineVisual = nil
+
+		-- Overlay داخل صورة الحساب عند خروج الضحية (نص + دوران)
+		local avatarOverlay = Instance.new("Frame")
+		avatarOverlay.Parent = card
+		avatarOverlay.BackgroundTransparency = 1
+		avatarOverlay.Size = avatar.Size
+		avatarOverlay.Position = avatar.Position
+		avatarOverlay.Visible = false
+
+		local overlayTxt = Instance.new("TextLabel")
+		overlayTxt.Parent = avatarOverlay
+		overlayTxt.BackgroundTransparency = 1
+		overlayTxt.Size = UDim2.new(1, 0, 0, 24)
+		overlayTxt.Position = UDim2.new(0, 0, 1, -26)
+		overlayTxt.Font = Enum.Font.GothamBold
+		overlayTxt.TextSize = 14
+		overlayTxt.TextColor3 = Color3.fromRGB(255,255,255)
+		overlayTxt.TextStrokeTransparency = 0.4
+		overlayTxt.TextXAlignment = Enum.TextXAlignment.Center
+		overlayTxt.Text = "طلع الضحيه! 👋"
+
+		local spinner = Instance.new("ImageLabel")
+		spinner.Parent = avatarOverlay
+		spinner.BackgroundTransparency = 1
+		spinner.Size = UDim2.new(0, 34, 0, 34)
+		spinner.Position = UDim2.new(0.5, -17, 0.5, -22)
+		spinner.Image = "rbxassetid://1095708"
+		spinner.ImageTransparency = 0.15
+		round(spinner, 999)
+
+		local spinnerConn = nil
+		function setOfflineVisual(on)
+			if on then
+				avatar.ImageTransparency = 0.5
+				avatarOverlay.Visible = true
+				if not spinnerConn then
+					spinnerConn = RunService.RenderStepped:Connect(function(dt)
+						if not spinner.Parent then
+							if spinnerConn then spinnerConn:Disconnect() end
+							spinnerConn = nil
+							return
+						end
+						spinner.Rotation = (spinner.Rotation + (dt * 720)) % 360
+					end)
+				end
+			else
+				avatar.ImageTransparency = 0
+				avatarOverlay.Visible = false
+				spinner.Rotation = 0
+				if spinnerConn then spinnerConn:Disconnect(); spinnerConn = nil end
+			end
+		end
+
+		-- نص معلومات اللاعب (اسم/يوزر/عمر الحساب)
+
+		local info = Instance.new("TextLabel")
+		info.Parent = card
+		info.BackgroundTransparency = 1
+		info.Position = UDim2.new(0, 16, 0, 132)
+		info.Size = UDim2.new(1, -32, 0, 92)
+		info.Font = Enum.Font.GothamBold
+		info.TextSize = 14
+		info.TextColor3 = THEME.Text
+		info.TextXAlignment = Enum.TextXAlignment.Right
+		info.TextYAlignment = Enum.TextYAlignment.Top
+		info.TextWrapped = true
+		info.Text = "اختر لاعب"
+
+		-- خط فاصل بين المعلومات والأدوات
+
+		local sep = Instance.new("Frame")
+		sep.Parent = card
+		sep.BackgroundColor3 = THEME.Accent2
+		sep.BackgroundTransparency = 0.75
+		sep.BorderSizePixel = 0
+		sep.Position = UDim2.new(0, 16, 0, 185)
+		sep.Size = UDim2.new(1, -32, 0, 1)
+
+		-- نص الأدوات (Tools) اللي مع اللاعب
+
+		local toolsLbl = Instance.new("TextLabel")
+		toolsLbl.Parent = card
+		toolsLbl.BackgroundTransparency = 1
+		toolsLbl.Position = UDim2.new(0, 16, 0, 190)
+		toolsLbl.Size = UDim2.new(1, -32, 0, 180)
+		toolsLbl.Font = Enum.Font.Gotham
+		toolsLbl.TextSize = 13
+		toolsLbl.TextColor3 = THEME.Muted
+		toolsLbl.TextXAlignment = Enum.TextXAlignment.Right
+		toolsLbl.TextYAlignment = Enum.TextYAlignment.Top
+		toolsLbl.TextWrapped = true
+		toolsLbl.Text = ""
+
+		local setPickMode = nil
+		local refresh = nil
+		refresh = function()
+			local p = currentTarget
+			-- إذا ما فيه هدف لكن هو هدفنا وطلع: لا نمسح صورته/معلوماته
+			if not p then
+				if targetUserId and targetOffline then
+					-- حافظ على الصورة الحالية + خلي النص ثابت
+					local dn = targetDisplay or targetName or "?"
+					local un = targetName or "?"
+					local age = tonumber(targetAgeDays) or 0
+					info.Text = string.format("الاسم: %s\nاليوزر: %s\nعمر الحساب: %s يوم", dn, un, tostring(age))
+					toolsLbl.Text = lastToolsText ~= "" and lastToolsText or "لا توجد أدوات ظاهرة"
+					return
+				end
+				avatar.Image = ""
+				info.Text = "اختر لاعب"
+				toolsLbl.Text = ""
+				if setOfflineVisual then pcall(function() setOfflineVisual(false) end) end
+				return
+			end
+
+			targetUserId = p.UserId
+			_G.SKY_TargetUserId = targetUserId
+			targetName = p.Name
+			targetDisplay = p.DisplayName or p.Name
+			targetAgeDays = tonumber(p.AccountAge) or 0
+
+			local ok, thumb = pcall(function()
+				return Players:GetUserThumbnailAsync(p.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size180x180)
+			end)
+			if ok and thumb then
+				avatar.Image = thumb
+			end
+
+			info.Text = string.format("الاسم: %s\nاليوزر: %s\nعمر الحساب: %s يوم", targetDisplay, targetName, tostring(targetAgeDays))
+
+			lastToolsText = getToolsText(p)
+			toolsLbl.Text = lastToolsText
+
+			-- لو كان خارج، رجعه طبيعي
+			if targetOffline then
+				targetOffline = false
+				if setOfflineVisual then pcall(function() setOfflineVisual(false) end) end
+			end
+		end
+
+		local function applySelection(p, fromFinger)
+			currentTarget = p
+			targetUserId = p and p.UserId or nil
+			_G.SKY_TargetUserId = targetUserId
+			targetName = p and p.Name or nil
+			targetDisplay = p and (p.DisplayName or p.Name) or nil
+			targetAgeDays = p and (tonumber(p.AccountAge) or 0) or 0
+			targetOffline = false
+			if setOfflineVisual then pcall(function() setOfflineVisual(false) end) end
+			-- ابدأ العداد من جديد عند اختيار لاعب
+			targetSessionStart = os.clock()
+
+			refresh()
+
+			-- شغّل/أعد تشغيل العداد (بدون رسائل إضافية)
+			if _G.SKY_AddCounterTrack then
+				_G.SKY_AddCounterTrack(p.Name)
+			end
+
+			-- هايلايت أبيض لمدة ثانيتين
+			if fromFinger and p.Character then
+				flashWhiteHighlight(p.Character)
+			end
+
+			-- رسالة واحدة فقط: تم تحديد لاعب + تم تفعيل عداد
+			-- (بدون إشعار هنا)
+			-- لو الاختيار كان من الاصبع: قفل وضع الاصبع تلقائيًا
+			if fromFinger and setPickMode then
+				pcall(function() setPickMode(false) end)
+			end
+		end
+
+		-- كتابة (Enter)
+		searchBox.FocusLost:Connect(function(enterPressed)
+			if not enterPressed then return end
+			local p = findPlayerInServerPrefix(searchBox.Text)
+			if not p then
+				makeAutoNotif("غير موجود", "تأكد من الاسم/اول 3 احرف + يكون داخل السيرفر", 1.0)
+				return
+			end
+			searchBox.Text = ""
+			applySelection(p, false)
+		end)
+
+		-- الاصبع
+		setPickMode = function(v)
+			pickMode = v and true or false
+
+			-- تحديث لون زر الاصبع (ابيض = مطفي، اخضر = شغال)
+			pcall(function()
+				if fingerBtn then
+					if pickMode then
+						uiTween(fingerBtn, 0.22, {BackgroundColor3 = THEME.Success})
+						fingerBtn.TextColor3 = THEME.Text
+					else
+						uiTween(fingerBtn, 0.22, {BackgroundColor3 = THEME.Accent})
+						fingerBtn.TextColor3 = THEME.Text
+					end
+				end
+			end)
+
+			if not UserInputService.KeyboardEnabled then
+				pickMode = false
+			end
+
+			if pickConn then
+				pickConn:Disconnect()
+				pickConn = nil
+			end
+
+			if pickMode then
+				pickConn = UserInputService.InputBegan:Connect(function(input, gpe)
+					if gpe then return end
+					if input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+					if not pickMode then return end
+
+					local mouse = Players.LocalPlayer:GetMouse()
+					local hit = mouse and mouse.Target
+					if not hit then return end
+
+					local model = hit:FindFirstAncestorOfClass("Model")
+					if not model then return end
+
+					local p = Players:GetPlayerFromCharacter(model)
+					if p then
+						setPickMode(false)
+						applySelection(p, true)
+					end
+				end)
+			end
+		end
+
+		fingerBtn.MouseButton1Click:Connect(function()
+			if not UserInputService.KeyboardEnabled then
+				makeAutoNotif("غير متاح", "ميزة الاصبع للـPC فقط", 1.5)
+				return
+			end
+
+			setPickMode(not pickMode)
+			if pickMode then
+				fingerBtn.Text = "اختر..."
+				uiTween(fingerBtn, 0.22, {BackgroundColor3 = THEME.Success})
+				makeAutoNotif("تحديد", "اضغط على جسم اللاعب", 2.0)
+			else
+				fingerBtn.Text = "الاصبع"
+				uiTween(fingerBtn, 0.22, {BackgroundColor3 = THEME.Accent})
+			end
+		end)
+
+		task.spawn(function()
+			while sf and sf.Parent do
+				if currentTarget and (not Players:FindFirstChild(currentTarget.Name)) then
+					currentTarget = nil
+				end
+				refresh()
+				task.wait(1.0)
+			end
+		end)
+
+		refresh()
+	end
+
+	-- ====== طبقة SKY Aurora النهائية ======
+	-- تنسّق عناصر Orion والعناصر التي تنشأ لاحقًا، بدون الاعتماد على أسماء داخل المكتبة.
+	local function colorBrightness(color)
+		return (color.R + color.G + color.B) / 3
+	end
+
+	local function styleGuiObject(item)
+		if not item or not item.Parent then return end
+
+		if item:IsA("ScrollingFrame") then
+			item.ScrollBarImageColor3 = THEME.Accent
+			item.ScrollBarImageTransparency = 0.18
+		end
+
+		if item:IsA("Frame") or item:IsA("ScrollingFrame") then
+			if item.BackgroundTransparency < 0.92 and colorBrightness(item.BackgroundColor3) < 0.24 then
+				item.BackgroundColor3 = THEME.Surface
+			end
+		end
+
+		if item:IsA("TextButton") then
+			local brightness = colorBrightness(item.BackgroundColor3)
+			if item.BackgroundTransparency < 0.92 then
+				if brightness > 0.72 then
+					item.BackgroundColor3 = THEME.Accent
+					item.TextColor3 = THEME.Text
+					addGradient(item, THEME.Accent, THEME.Accent2, 12)
+				elseif brightness < 0.24 then
+					item.BackgroundColor3 = THEME.SurfaceAlt
+				end
+				if not item:FindFirstChildOfClass("UICorner") then round(item, 10) end
+				addStroke(item, THEME.Stroke, 1, 0.55)
+			end
+			animateButton(item)
+		elseif item:IsA("ImageButton") then
+			animateButton(item)
+		end
+
+		if item:IsA("TextBox") then
+			item.BackgroundColor3 = THEME.SurfaceAlt
+			item.TextColor3 = THEME.Text
+			item.PlaceholderColor3 = THEME.Muted
+			if not item:FindFirstChildOfClass("UICorner") then round(item, 10) end
+			local stroke = addStroke(item, THEME.Stroke, 1, 0.5)
+			if not item:GetAttribute("SKYFocusStyled") then
+				item:SetAttribute("SKYFocusStyled", true)
+				item.Focused:Connect(function()
+					uiTween(stroke, 0.2, {Color = THEME.Accent2, Transparency = 0.08, Thickness = 1.5})
+				end)
+				item.FocusLost:Connect(function()
+					uiTween(stroke, 0.22, {Color = THEME.Stroke, Transparency = 0.5, Thickness = 1})
+				end)
+			end
+		end
+
+		if item:IsA("TextLabel") then
+			local brightness = colorBrightness(item.TextColor3)
+			if brightness > 0.72 then item.TextColor3 = THEME.Text end
+		end
+	end
+
+	local function playPageIntro(scroller)
+		if not scroller or not scroller.Parent or not scroller.Visible then return end
+		local now = os.clock()
+		if (scroller:GetAttribute("SKYLastIntro") or 0) + 0.45 > now then return end
+		scroller:SetAttribute("SKYLastIntro", now)
+
+		local index = 0
+		for _, child in ipairs(scroller:GetChildren()) do
+			if child:IsA("GuiObject") and child.Visible then
+				index += 1
+				local delayTime = math.min((index - 1) * 0.045, 0.22)
+				local scale = getScale(child)
+				scale.Scale = 0.965
+				task.delay(delayTime, function()
+					if scale and scale.Parent then
+						uiTween(scale, 0.34, {Scale = 1}, Enum.EasingStyle.Back)
+					end
+				end)
+				animateTree(child, delayTime)
+			end
+		end
+	end
+
+	local function hookPage(scroller)
+		if not scroller:IsA("ScrollingFrame") or scroller:GetAttribute("SKYPageHooked") then return end
+		scroller:SetAttribute("SKYPageHooked", true)
+		scroller:GetPropertyChangedSignal("Visible"):Connect(function()
+			if scroller.Visible then playPageIntro(scroller) end
+		end)
+		local parent = scroller.Parent
+		if parent and parent:IsA("GuiObject") then
+			parent:GetPropertyChangedSignal("Visible"):Connect(function()
+				if parent.Visible and scroller.Visible then playPageIntro(scroller) end
+			end)
+		end
+	end
+
+	local function modernizeSkyUI()
+		orionGui = orionGui or getOrionGui(UI_TITLE)
+		if not orionGui then return end
+
+		for _, item in ipairs(orionGui:GetDescendants()) do
+			styleGuiObject(item)
+			if item:IsA("ScrollingFrame") then hookPage(item) end
+		end
+
+		local main = getMainWindow(orionGui)
+		if main then
+			main.BackgroundColor3 = THEME.Background
+			if not main:FindFirstChildOfClass("UICorner") then round(main, 16) end
+			addStroke(main, THEME.Accent, 1.25, 0.28)
+			addGradient(main, THEME.Background, THEME.Surface, 25)
+
+			local accentLine = Instance.new("Frame")
+			accentLine.Name = "SKYAuroraLine"
+			accentLine.Parent = main
+			accentLine.BorderSizePixel = 0
+			accentLine.BackgroundColor3 = Color3.new(1, 1, 1)
+			accentLine.Size = UDim2.new(1, -24, 0, 3)
+			accentLine.Position = UDim2.new(0, 12, 0, 0)
+			accentLine.ZIndex = 50
+			round(accentLine, 999)
+			local glow = addGradient(accentLine, THEME.Accent2, THEME.Accent3, 0)
+			glow.Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0, THEME.Accent2),
+				ColorSequenceKeypoint.new(0.5, THEME.Accent),
+				ColorSequenceKeypoint.new(1, THEME.Accent3),
+			})
+
+			task.spawn(function()
+				while accentLine and accentLine.Parent do
+					glow.Offset = Vector2.new(-1, 0)
+					uiTween(glow, 2.4, {Offset = Vector2.new(1, 0)}, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+					task.wait(2.4)
+				end
+			end)
+		end
+
+		orionGui.DescendantAdded:Connect(function(item)
+			task.defer(function()
+				if item and item.Parent then
+					styleGuiObject(item)
+					if item:IsA("ScrollingFrame") then hookPage(item) end
+				end
+			end)
+		end)
+
+		for _, item in ipairs(orionGui:GetDescendants()) do
+			if item:IsA("ScrollingFrame") and item.Visible then playPageIntro(item) end
+		end
+		setSkyWindowEnabled(orionGui, true)
+	end
+
+	makeChatUI()
+	makeCounterUI()
+	makeTargetUI()
+
+	task.defer(modernizeSkyUI)
+
+
+end
