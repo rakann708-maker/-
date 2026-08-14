@@ -3378,11 +3378,12 @@ local function startAntiBots()
 
 		-- زرا "مدري 1" و"مدري 2" المنقولان من السكربت القديم.
 		-- كلاهما يستخدم اللاعب المحدد حاليًا في صفحة Target.
-		local madri1On, madri2On = false, false
+		local madri1On, madri2On, madriBothOn = false, false, false
 		local madri1Track, madri2Track = nil, nil
-		local madri1RunId, madri2RunId = 0, 0
-		local madri1Btn, madri2Btn = nil, nil
-		local stopMadri1, stopMadri2
+		local madriBothTracks = {}
+		local madri1RunId, madri2RunId, madriBothRunId = 0, 0, 0
+		local madri1Btn, madri2Btn, madriBothBtn = nil, nil, nil
+		local stopMadri1, stopMadri2, stopMadriBoth
 
 		local function setMadriButtonState(button, enabled, label)
 			if not button then return end
@@ -3444,6 +3445,20 @@ local function startAntiBots()
 			setMadriButtonState(madri2Btn, false, "مدري 2")
 		end
 
+		stopMadriBoth = function()
+			madriBothOn = false
+			madriBothRunId += 1
+			for _, track in ipairs(madriBothTracks) do
+				stopAnimationTrack(track)
+			end
+			madriBothTracks = {}
+
+			local character = Players.LocalPlayer.Character
+			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+			if humanoid then humanoid.Sit = false end
+			setMadriButtonState(madriBothBtn, false, "1 و 2")
+		end
+
 		local function toggleMadri1()
 			if madri1On then
 				stopMadri1()
@@ -3454,7 +3469,8 @@ local function startAntiBots()
 				return
 			end
 
-			-- الوظيفتان تحركان HumanoidRootPart؛ لا نشغلهما معًا.
+			-- الزر المنفرد يوقف الوضع المدمج قبل تشغيل نفسه.
+			stopMadriBoth()
 			stopMadri2()
 			madri1On = true
 			madri1RunId += 1
@@ -3510,6 +3526,7 @@ local function startAntiBots()
 				return
 			end
 
+			stopMadriBoth()
 			stopMadri1()
 			madri2On = true
 			madri2RunId += 1
@@ -3531,6 +3548,87 @@ local function startAntiBots()
 			if madri2On and thisRun == madri2RunId then
 				stopMadri2()
 			end
+		end
+
+		local function toggleMadriBoth()
+			if madriBothOn then
+				stopMadriBoth()
+				return
+			end
+			if not (currentTarget and currentTarget.Character) then
+				makeAutoNotif("Target", "حدد لاعب أولاً", 1.5)
+				return
+			end
+
+			stopMadri1()
+			stopMadri2()
+			madriBothOn = true
+			madriBothRunId += 1
+			local thisRun = madriBothRunId
+			setMadriButtonState(madriBothBtn, true, "1 و 2")
+
+			local character = Players.LocalPlayer.Character
+			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+			if humanoid then humanoid.Sit = true end
+
+			local firstTrack = playMadriAnimation("2506281703", 1)
+			local secondTrack = playMadriAnimation("10714068222", 3)
+			madriBothTracks = {}
+			if firstTrack then table.insert(madriBothTracks, firstTrack) end
+			if secondTrack then table.insert(madriBothTracks, secondTrack) end
+
+			-- نفس حركة مدري 1 الأصلية.
+			task.spawn(function()
+				local distance = 1.5
+				local movingInward = true
+				while madriBothOn and thisRun == madriBothRunId and sf and sf.Parent do
+					local myCharacter = Players.LocalPlayer.Character
+					local myRoot = myCharacter and myCharacter:FindFirstChild("HumanoidRootPart")
+					local myHumanoid = myCharacter and myCharacter:FindFirstChildOfClass("Humanoid")
+					local targetCharacter = currentTarget and currentTarget.Character
+					local targetHead = targetCharacter and targetCharacter:FindFirstChild("Head")
+					if not (myRoot and myHumanoid and targetHead) then break end
+
+					myHumanoid.Sit = true
+					if movingInward then
+						distance -= 0.2
+						if distance <= 0.5 then movingInward = false end
+					else
+						distance += 0.2
+						if distance >= 2.5 then movingInward = true end
+					end
+
+					local position = targetHead.Position + targetHead.CFrame.LookVector * distance
+					myRoot.CFrame = CFrame.new(
+						Vector3.new(position.X, targetHead.Position.Y, position.Z),
+						targetHead.Position
+					)
+					myRoot.Velocity = Vector3.new(0, 2, 0)
+					RunService.Heartbeat:Wait()
+				end
+
+				if madriBothOn and thisRun == madriBothRunId then
+					stopMadriBoth()
+				end
+			end)
+
+			-- نفس حركة مدري 2 الأصلية، وتعمل بالتزامن مع الحركة الأولى.
+			task.spawn(function()
+				while madriBothOn and thisRun == madriBothRunId and sf and sf.Parent do
+					local myCharacter = Players.LocalPlayer.Character
+					local myRoot = myCharacter and myCharacter:FindFirstChild("HumanoidRootPart")
+					local targetCharacter = currentTarget and currentTarget.Character
+					local targetRoot = targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart")
+					if not (myRoot and targetRoot) then break end
+
+					myRoot.CFrame = targetRoot.CFrame * CFrame.new(0, 0, 1)
+					RunService.Heartbeat:Wait()
+				end
+
+				if madriBothOn and thisRun == madriBothRunId then
+					stopMadriBoth()
+				end
+			end)
 		end
 
 		-- إنشاء الأزرار الأساسية
@@ -3705,6 +3803,10 @@ strongBangBtn.AutoButtonColor = false
 		madri2Btn = makeBtn("مدري 2", toggleMadri2)
 		madri2Btn.AutoButtonColor = false
 		setMadriButtonState(madri2Btn, false, "مدري 2")
+
+		madriBothBtn = makeBtn("1 و 2", toggleMadriBoth)
+		madriBothBtn.AutoButtonColor = false
+		setMadriButtonState(madriBothBtn, false, "1 و 2")
 
 		
 
