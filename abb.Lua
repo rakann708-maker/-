@@ -1,24 +1,8 @@
---[[
-سكربت SKY (مُشروح)
-- تم إضافة تعليقات فوق أهم الدوال وعناصر الواجهة لتوضيح وظيفتها/وش تمثل.
-- أي تعليق يبدأ بـ "--" وما يأثر على تشغيل السكربت.
-]]--
-
--- AUTO-FIX: wrapped whole script to ensure blocks are closed properly
-
 do
---[[
-SKY (OrionLib) - نسخة كاملة (Fix v4)
-تعديلات هالمرة:
-1) AntiThrow (مضاد رمي) صار يطفي/يشتغل صح + يرجعك لنفس مكانك "على الأرض" (يضبطك على الأرض وما يعلقك بالطيران)
-2) AntiBots (مضاد بوتات) انصلح: يرجع يتنقّل على كل الكراسي + يجلس فعلياً على الكرسي
-3) AntiBang (مضاد بانق) صار: إذا شغلته يوديك بعيد تحت الأرض ويخليك هناك لين تطفيه (بدون رجعة تلقائية)
 
-ملاحظة: بعض الخرائط ما فيها Seats حقيقية (Seat/VehicleSeat). وقتها AntiBots ما بيلاقي كراسي.
-]]
 
 	-- ====== عدّل الرابط ======
-	local DISCORD_LINK = "https://discord.gg/hKKebtnbbk"
+	local DISCORD_LINK = "https://discord.gg/Ka5"
 
 	-- ====== Services ======
 	-- خدمة اللاعبين
@@ -107,11 +91,11 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 	OrionLib.SelectedTheme = "SOFTBLACK"
 
 	local Window = OrionLib:MakeWindow({
-		Name = "SKY",
+		Name = "KA5",
 		SearchBar = { Default = "بحث", ClearTextOnFocus = true },
 		HidePremium = false,
 		SaveConfig = true,
-		ConfigFolder = "SKY"
+		ConfigFolder = "KA5"
 	})
 
 	local ICON = "rbxassetid://4483345998"
@@ -187,7 +171,7 @@ SKY (OrionLib) - نسخة كاملة (Fix v4)
 		return nil
 	end
 
-	local orionGui = getOrionGui("SKY")
+	local orionGui = getOrionGui("KA5")
 
 	-- Hide Settings tab button in sidebar (نفتحها من الترس)
 	task.spawn(function()
@@ -3434,7 +3418,7 @@ local function startAntiBots()
 			local character = Players.LocalPlayer.Character
 			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 			if humanoid then humanoid.Sit = false end
-			setMadriButtonState(madri1Btn, false, "مدري 1")
+			setMadriButtonState(madri1Btn, false, "بانق 1ST")
 		end
 
 		stopMadri2 = function()
@@ -3442,7 +3426,7 @@ local function startAntiBots()
 			madri2RunId += 1
 			stopAnimationTrack(madri2Track)
 			madri2Track = nil
-			setMadriButtonState(madri2Btn, false, "مدري 2")
+			setMadriButtonState(madri2Btn, false, "بانق هيد 1ST")
 		end
 
 		stopMadriBoth = function()
@@ -3456,7 +3440,7 @@ local function startAntiBots()
 			local character = Players.LocalPlayer.Character
 			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 			if humanoid then humanoid.Sit = false end
-			setMadriButtonState(madriBothBtn, false, "1 و 2")
+			setMadriButtonState(madriBothBtn, false, "ثنائي بانق")
 		end
 
 		local function toggleMadri1()
@@ -3475,7 +3459,7 @@ local function startAntiBots()
 			madri1On = true
 			madri1RunId += 1
 			local thisRun = madri1RunId
-			setMadriButtonState(madri1Btn, true, "مدري 1")
+			setMadriButtonState(madri1Btn, true, "بانق 1ST")
 
 			local character = Players.LocalPlayer.Character
 			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -3531,7 +3515,7 @@ local function startAntiBots()
 			madri2On = true
 			madri2RunId += 1
 			local thisRun = madri2RunId
-			setMadriButtonState(madri2Btn, true, "مدري 2")
+			setMadriButtonState(madri2Btn, true, "بانق هيد 1ST")
 			madri2Track = playMadriAnimation("10714068222", 3)
 
 			while madri2On and thisRun == madri2RunId and sf and sf.Parent do
@@ -3565,7 +3549,7 @@ local function startAntiBots()
 			madriBothOn = true
 			madriBothRunId += 1
 			local thisRun = madriBothRunId
-			setMadriButtonState(madriBothBtn, true, "1 و 2")
+			setMadriButtonState(madriBothBtn, true, "ثنائي بانق")
 
 			local character = Players.LocalPlayer.Character
 			local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -3796,17 +3780,17 @@ strongBangBtn.AutoButtonColor = false
 		strongBangBtn.BackgroundColor3 = Color3.fromRGB(20,20,20)
 
 		-- الزران الجديدان داخل شبكة صفحة Target.
-		madri1Btn = makeBtn("مدري 1", toggleMadri1)
+		madri1Btn = makeBtn("بانق 1ST", toggleMadri1)
 		madri1Btn.AutoButtonColor = false
-		setMadriButtonState(madri1Btn, false, "مدري 1")
+		setMadriButtonState(madri1Btn, false, "بانق 1ST")
 
-		madri2Btn = makeBtn("مدري 2", toggleMadri2)
+		madri2Btn = makeBtn("بانق هيد 1ST", toggleMadri2)
 		madri2Btn.AutoButtonColor = false
-		setMadriButtonState(madri2Btn, false, "مدري 2")
+		setMadriButtonState(madri2Btn, false, "بانق هيد 1ST")
 
-		madriBothBtn = makeBtn("1 و 2", toggleMadriBoth)
+		madriBothBtn = makeBtn("ثنائي بانق", toggleMadriBoth)
 		madriBothBtn.AutoButtonColor = false
-		setMadriButtonState(madriBothBtn, false, "1 و 2")
+		setMadriButtonState(madriBothBtn, false, "ثنائي بانق")
 
 		
 
